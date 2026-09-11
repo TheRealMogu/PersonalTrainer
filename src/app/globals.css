@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+    system-ui, sans-serif;
+
+  --color-ink: #1c1c1e;
+  --color-muted: #8a8a8e;
+  --color-hairline: #e5e5ea;
+  --color-surface: #ffffff;
+  --color-canvas: #f5f5f7;
+  --color-accent: #0071e3;
+  --color-over: #ff3b30;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  /* spazio per la tab bar fissa + safe area iPhone */
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+}
+
+/* Niente zoom automatico di Safari sugli input sotto i 16px. */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
