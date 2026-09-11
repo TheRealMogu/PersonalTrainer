@@ -5,12 +5,14 @@
     system-ui, sans-serif;
 
   --color-ink: #1c1c1e;
-  --color-muted: #8a8a8e;
+  --color-muted: #6e6e73;
   --color-hairline: #e5e5ea;
   --color-surface: #ffffff;
   --color-canvas: #f5f5f7;
   --color-accent: #0071e3;
   --color-over: #ff3b30;
+  /* riferimento del target: piu' marcato della griglia, che resta recessiva */
+  --color-reference: #b8b8bd;
 }
 
 :root {

@@ -8,6 +8,8 @@ personale.
   aggiunta pasti con tasti rapidi o form manuale, navigazione tra i giorni.
 - **Piano** — target giornaliero, regole generali e integrazione.
 - **Allenamento** — programma Team Schiavi, settimana T1 (3 giornate).
+- **Storico** — media giornaliera e andamento dei macro su 7 o 30 giorni, con
+  linea del target e vista tabellare.
 
 Stack: Next.js (App Router) + TypeScript, Tailwind CSS, Drizzle ORM, Neon
 (Postgres serverless). Deploy su Vercel, wrapping iOS con Capacitor.
@@ -79,9 +81,10 @@ npm test
 ```
 
 Coprono la logica pura: somma dei macro, calcolo di "quanto rimane" e dello
-sforo, e le utility sulle date (validazione, spostamento di giorno, fuso
-italiano). Girano con il test runner di Node, senza dipendenze aggiuntive e
-senza toccare il database.
+sforo, le utility sulle date (validazione, spostamento di giorno, fuso
+italiano) e le aggregazioni dello storico (medie, giorni entro il target,
+scala dei grafici). Girano con il test runner di Node, senza dipendenze
+aggiuntive e senza toccare il database.
 
 ### Modificare i dati iniziali
 
@@ -171,6 +174,7 @@ src/
     page.tsx             Diario (?day=YYYY-MM-DD)
     piano/page.tsx       Piano
     allenamento/page.tsx Allenamento
+    storico/page.tsx     Storico (?giorni=7|30)
     actions.ts           Server Actions: aggiungi / elimina pasto
     globals.css          tema Tailwind (palette, tipografia di sistema)
   components/            componenti UI
@@ -181,6 +185,7 @@ src/
     targets.ts           target giornalieri
     nutrition.ts         somma macro e calcolo progresso
     date.ts              utility sulle date (YYYY-MM-DD)
+    history.ts           intervalli, medie e scala dei grafici
     plan.ts              linee guida del PT
     seed-data.ts         tasti rapidi + programma di allenamento
     queries.ts           letture dal database

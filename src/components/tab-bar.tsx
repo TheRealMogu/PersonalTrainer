@@ -7,6 +7,7 @@ const TABS = [
   { href: "/", label: "Diario" },
   { href: "/piano", label: "Piano" },
   { href: "/allenamento", label: "Allenamento" },
+  { href: "/storico", label: "Storico" },
 ];
 
 export function TabBar() {
@@ -24,7 +25,7 @@ export function TabBar() {
             <li key={tab.href} className="flex-1">
               <Link
                 href={tab.href}
-                className={`flex h-14 items-center justify-center text-[13px] font-medium transition-colors ${
+                className={`flex h-14 items-center justify-center px-1 text-center text-[12px] font-medium leading-tight transition-colors ${
                   active ? "text-accent" : "text-muted"
                 }`}
               >
