@@ -63,6 +63,7 @@ perdere il diario.
 |---|---|
 | `npm run dev` | server di sviluppo |
 | `npm run build` / `npm start` | build e avvio in produzione |
+| `npm test` | test della logica di calcolo (macro e date) |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript senza emettere output |
 | `npm run db:generate` | genera una migration dalle modifiche a `src/db/schema.ts` |
@@ -70,6 +71,17 @@ perdere il diario.
 | `npm run db:push` | sincronizza lo schema senza migration (solo in sviluppo) |
 | `npm run db:studio` | Drizzle Studio per ispezionare i dati |
 | `npm run db:seed` | carica i dati iniziali |
+
+### Test
+
+```bash
+npm test
+```
+
+Coprono la logica pura: somma dei macro, calcolo di "quanto rimane" e dello
+sforo, e le utility sulle date (validazione, spostamento di giorno, fuso
+italiano). Girano con il test runner di Node, senza dipendenze aggiuntive e
+senza toccare il database.
 
 ### Modificare i dati iniziali
 
