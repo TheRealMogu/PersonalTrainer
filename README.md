@@ -134,14 +134,26 @@ segnalibro. Ci sono tre modi, con costi molto diversi.
 
 Nessun Mac, nessun account Apple Developer a pagamento.
 
-**1. Compila l'IPA.** Nella repo: scheda **Actions** → *Compila IPA per
-iPhone* → **Run workflow**, e incolla l'URL del deploy Vercel. A fine
-esecuzione scarichi l'artifact `PersonalTrainer-ipa`.
+**0. Imposta l'URL una volta sola.** Settings → *Secrets and variables* →
+Actions → **New repository secret**, nome `APP_URL`, valore l'URL del deploy
+Vercel. È un secret e non un campo digitato perché GitHub maschera i secret
+nei log: l'app non ha login, quindi chi conosce l'indirizzo può scrivere nel
+diario.
+
+**1. Compila l'IPA.** Scheda **Actions** → *Compila IPA per iPhone* → **Run
+workflow**. A fine esecuzione scarichi l'artifact `PersonalTrainer-ipa`.
 
 La compilazione gira su un runner macOS di GitHub. **La repo è privata, quindi
 i minuti macOS contano 10×**: una build da ~10 minuti ne consuma ~100 dei 2.000
-gratuiti mensili, cioè una ventina di build al mese. Rendendo la repo pubblica
-i minuti macOS sono gratis.
+gratuiti mensili, cioè una ventina di build al mese. In pratica bastano,
+perché l'IPA si ricompila quasi mai (vedi punto 4).
+
+> **Non rendere pubblica la repo per risparmiare minuti.** Su repo pubblica i
+> minuti macOS sono gratis, ma diventano pubblici anche i log delle run e **gli
+> artifact**: l'IPA è scaricabile da chiunque e contiene l'URL della tua app.
+> Siccome l'app non ha autenticazione, chiunque potrebbe leggere e modificare
+> il tuo diario. Il secret protegge i log, non l'artifact. Se un giorno vuoi la
+> repo pubblica, prima serve un minimo di autenticazione sull'app.
 
 **2. Installalo.** L'IPA non è firmato: lo firma il tuo Apple ID tramite uno
 strumento di sideload, tipicamente **AltStore** o **SideStore**. Si installano

@@ -2,13 +2,12 @@ name: Compila IPA per iPhone
 
 # Si avvia a mano dalla scheda Actions. Non gira a ogni push: i runner macOS
 # su repo private consumano minuti con moltiplicatore 10x.
+# L'URL arriva dal secret APP_URL (Settings -> Secrets and variables ->
+# Actions), non da un campo digitato: GitHub maschera i secret nei log, un
+# input no. L'app non ha login, quindi chi conosce l'indirizzo puo' scrivere
+# nel diario.
 on:
   workflow_dispatch:
-    inputs:
-      app_url:
-        description: "URL pubblico dell'app (es. https://tuo-progetto.vercel.app)"
-        required: true
-        type: string
 
 jobs:
   ipa:
@@ -30,14 +29,21 @@ jobs:
 
       - name: Controlla che l'URL sia valido
         env:
-          APP_URL: ${{ inputs.app_url }}
+          APP_URL: ${{ secrets.APP_URL }}
         run: |
+          # Nessun echo dell'URL: finirebbe nei log della run.
+          if [[ -z "$APP_URL" ]]; then
+            echo "Manca il secret APP_URL."
+            echo "Impostalo in Settings -> Secrets and variables -> Actions,"
+            echo "con l'URL del deploy (es. https://tuo-progetto.vercel.app)."
+            exit 1
+          fi
           if [[ ! "$APP_URL" =~ ^https:// ]]; then
-            echo "APP_URL deve iniziare per https:// — ricevuto: $APP_URL"
+            echo "APP_URL deve iniziare per https://"
             exit 1
           fi
           code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$APP_URL" || echo "000")
-          echo "$APP_URL risponde $code"
+          echo "Il server risponde: $code"
           if [[ "$code" == "000" ]]; then
             echo "L'URL non risponde: l'app compilata mostrerebbe solo la pagina di errore."
             exit 1
@@ -45,7 +51,7 @@ jobs:
 
       - name: Genera il progetto iOS
         env:
-          APP_URL: ${{ inputs.app_url }}
+          APP_URL: ${{ secrets.APP_URL }}
         run: |
           npx cap add ios
           npx cap sync ios
