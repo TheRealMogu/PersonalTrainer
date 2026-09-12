@@ -15,8 +15,10 @@ quantità variabili, correzione dei pasti, sessione di allenamento con carichi
 e recupero, storico con progressione, accesso con password, tema chiaro e
 scuro.
 
-**Non è mai stato eseguito**: la compilazione dell'IPA. Il codice c'è e gli
-script sono stati validati, ma nessuno ha ancora premuto Run workflow.
+**Eseguito una volta**: la compilazione dell'IPA è andata a buon fine al primo
+tentativo (run #1, 1m 32s, artifact da 352 KB). I log confermano che Capacitor
+è compilato dentro e che la validazione Apple è passata. **Non è ancora stato
+installato su un telefono**, quindi non sappiamo se si apre.
 
 **Non è mai stato verificato su un telefono vero**: tutte le prove sono in
 Chromium con viewport da iPhone. Safari non è Chromium.
@@ -27,14 +29,17 @@ Chromium con viewport da iPhone. Safari non è Chromium.
 
 Finché l'app vive solo sul computer, tutto il resto è teoria.
 
-- [ ] **Compilare il primo IPA.** Actions → *Compila IPA per iPhone* → Run
+- [x] **Compilare il primo IPA.** Fatto: run #1 verde. Actions → *Compila IPA per iPhone* → Run
       workflow. Non serve più il deploy: senza URL compila lo stesso e
       mostra la pagina di errore, ma l'app finisce sul telefono.
 - [ ] **Deploy su Vercel** e rilancio con l'URL, così l'app funziona davvero.
 - [ ] **Provarla in Safari**, non in Chromium: tastiera che copre i campi,
       rimbalzo dello scroll, `env(safe-area-inset-*)` sui modelli con notch.
       È il collaudo che manca del tutto.
-- [ ] **Sideload con AltStore/SideStore** e verificare il rinnovo a 7 giorni.
+- [ ] **Sideload e rinnovo a 7 giorni.** Da Linux servono i port della
+      comunità (AltServer-Linux, Legacy iOS Kit): funzionano ma non sono mai
+      stati provati su questo progetto, e il rinnovo automatico potrebbe non
+      esserci. Da valutare se un Windows/Mac occasionale conviene.
 
 ## 2. Non perdere i dati
 
@@ -75,6 +80,10 @@ L'app presuppone che tutto vada bene. Non è vero.
       controlli sotto i 44 px (è già successo due volte).
 - [ ] **Numeri di versione**: oggi l'IPA non ha una versione riconoscibile.
       Serve per sapere quale build hai sul telefono.
+- [ ] **Aggiornare le azioni di GitHub.** Il primo giro ha avvisato che
+      `checkout`, `setup-node` e `upload-artifact` puntano a una versione di
+      Node in dismissione. Funzionano ancora (girano su una più nuova), ma
+      prima o poi smetteranno.
 
 ## 5. Dati personali fuori dal codice
 

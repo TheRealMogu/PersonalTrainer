@@ -196,16 +196,38 @@ pubblica.
 > Non togliere l'autenticazione finché la repo è pubblica.
 
 **2. Installalo.** L'IPA non è firmato: lo firma il tuo Apple ID tramite uno
-strumento di sideload, tipicamente **AltStore** o **SideStore**. Si installano
-sul computer (o, per SideStore, funzionano anche senza restare collegati) e
-firmano l'app col tuo ID gratuito.
+strumento di sideload. Quale, dipende dal computer che hai.
+
+*Da Windows o Mac* — **[AltStore](https://altstore.io)** ufficiale: installi
+AltServer sul computer, colleghi l'iPhone via USB, e da AltStore installi
+l'IPA. È la strada più semplice, e il rinnovo a 7 giorni avviene da solo
+finché telefono e computer stanno sulla stessa rete Wi-Fi.
+
+*Da Linux* — AltStore ufficiale **non esiste**. Ci sono port della comunità
+che funzionano ma sono più artigianali:
+
+- **[Ez AltServer Linux](https://github.com/nab138/Ez-AltServer-Linux)** —
+  involucro semplificato, la via più corta;
+- **[AltServer-Linux](https://github.com/NyaMisty/AltServer-Linux)** — il
+  port originale: `./AltServer -u UDID -a apple-id -p password app.ipa`;
+- **[Legacy iOS Kit](https://github.com/LukeZGD/Legacy-iOS-Kit/wiki/Sideloading-on-Linux)**
+  — `./restore.sh` → *Sideload IPA*, guidato.
+
+In tutti i casi serve `usbmuxd` installato, il telefono collegato via USB e
+"Autorizza questo computer" accettato sul telefono.
+
+**2b. Autorizza il profilo.** Dopo l'installazione l'app non si apre finché
+non vai in **Impostazioni → Generali → VPN e gestione dispositivo**, tocchi
+il tuo profilo e scegli **Autorizza**. È il passaggio che tutti dimenticano.
 
 **3. I 7 giorni.** Un certificato Apple gratuito **scade dopo 7 giorni**: dopo
 di che l'app non si apre più finché non viene rifirmata. È il limite di Apple,
-non nostro. Gli strumenti di sideload rinnovano la firma automaticamente
-finché il telefono e il computer si vedono in rete — è esattamente il
-"si riaggiorna ogni sette giorni". Con un account Apple Developer da 99 $/anno
-il certificato dura un anno e il rinnovo non serve.
+non nostro.
+
+Da Windows o Mac, AltStore rinnova da solo finché telefono e computer si
+vedono in rete — è il "si riaggiorna ogni sette giorni". Dai port Linux il
+rinnovo è più probabilmente da rilanciare a mano. Con un account Apple
+Developer da 99 $/anno il certificato dura un anno e il problema non si pone.
 
 **4. Aggiornamenti dell'app.** Non serve ricompilare a ogni modifica: la
 webview carica il sito pubblicato, quindi dopo ogni deploy su Vercel l'app è
