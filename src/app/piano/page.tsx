@@ -1,4 +1,5 @@
 import { Card } from "@/components/card";
+import { LogoutButton } from "@/components/logout-button";
 import { PageHeader } from "@/components/page-header";
 import { PLAN_SECTIONS } from "@/lib/plan";
 import { DAILY_TARGETS, MACRO_LABELS, MACRO_ORDER, MACRO_UNITS } from "@/lib/targets";
@@ -33,6 +34,10 @@ export default function PianoPage() {
           </ul>
         </Card>
       ))}
+
+      <Card title="Accesso">
+        <LogoutButton />
+      </Card>
     </main>
   );
 }

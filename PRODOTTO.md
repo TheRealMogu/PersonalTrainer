@@ -56,6 +56,7 @@ prodotto, non una mancanza di funzionalità.
 | Aggiungere lo stesso cibo in quantità diversa | 2 tocchi | ~8 (form manuale) | **da fare** |
 | Correggere un pasto già inserito | 2 tocchi | elimina + reinserisci | **da fare** |
 | Annullare un errore | 1 tocco | 1 | ok |
+| Entrare nell'app | 0 tocchi dopo il primo accesso | 0 | ok |
 | Segnare il carico di una serie | 2 tocchi | impossibile | **da fare** |
 | Vedere il carico dell'ultima volta | 0 tocchi | impossibile | **da fare** |
 | Sapere cosa mi entra ancora | 0 tocchi | da calcolare a mente | **da fare** |
@@ -94,6 +95,11 @@ cosa che ha diritto di essere appariscente. È la direzione estetica già presa
 e va difesa a ogni aggiunta.
 
 ## Cosa c'è oggi
+
+- **Accesso con password** — la repo è pubblica e l'IPA è scaricabile da
+  chiunque, quindi l'indirizzo dell'app non è più un segreto: la porta la
+  chiude la password. Sessione lunga un anno, così si digita una volta per
+  dispositivo.
 
 - **Diario** — barre per kcal e macro con quanto rimane e lo stato oltre
   target, aggiunta da tasti rapidi o a mano, eliminazione annullabile,

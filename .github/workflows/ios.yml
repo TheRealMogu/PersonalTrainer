@@ -56,6 +56,9 @@ jobs:
           npx cap add ios
           npx cap sync ios
 
+      - name: Genera icona e splash dell'app
+        run: npx capacitor-assets generate --ios
+
       - name: Mostra schemi e target disponibili
         run: xcodebuild -list -project ios/App/App.xcodeproj || true
 
