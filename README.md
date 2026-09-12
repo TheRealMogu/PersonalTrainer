@@ -121,85 +121,88 @@ npm run db:migrate    # applicalo a Neon dalla tua macchina
 
 ## 4. Metterla sull'iPhone
 
-Ci sono due strade, e **non sono equivalenti in costo**. Leggi entrambe prima
-di scegliere.
+L'obiettivo è un'**app vera** (`.ipa`) installata sul telefono, non un
+segnalibro. Ci sono tre modi, con costi molto diversi.
 
-### Strada A — Aggiungi a Home (subito, gratis, senza Mac)
+> **Nota importante, vale per tutti e tre:** l'app è un guscio nativo attorno
+> al sito pubblicato. Le pagine sono renderizzate dal server (Server Components
+> e Server Actions) e i dati stanno su Neon, quindi **serve comunque il deploy
+> su Vercel e serve la rete**. Non esiste una versione completamente offline
+> senza riscrivere l'architettura.
 
-L'app è già una PWA installabile. Dopo il deploy su Vercel:
+### Strada A — IPA compilato da GitHub, sideload (consigliata)
 
-1. Apri il sito con **Safari** sull'iPhone (non Chrome: solo Safari installa).
-2. Tocca **Condividi** → **Aggiungi a Home**.
-3. Conferma il nome.
+Nessun Mac, nessun account Apple Developer a pagamento.
 
-Ottieni un'icona sulla Home che apre l'app **a tutto schermo**, senza barra
-degli indirizzi, con la sua schermata di avvio. Da usare è indistinguibile da
-un'app scaricata dallo Store.
+**1. Compila l'IPA.** Nella repo: scheda **Actions** → *Compila IPA per
+iPhone* → **Run workflow**, e incolla l'URL del deploy Vercel. A fine
+esecuzione scarichi l'artifact `PersonalTrainer-ipa`.
 
-Quello che serve è già nel repo: `src/app/manifest.ts` (`display: standalone`)
-e `src/app/apple-icon.tsx`, che genera in build il PNG 180×180 che iOS vuole
-per l'icona — iOS non accetta SVG per la Home.
+La compilazione gira su un runner macOS di GitHub. **La repo è privata, quindi
+i minuti macOS contano 10×**: una build da ~10 minuti ne consuma ~100 dei 2.000
+gratuiti mensili, cioè una ventina di build al mese. Rendendo la repo pubblica
+i minuti macOS sono gratis.
 
-Limiti da conoscere:
+**2. Installalo.** L'IPA non è firmato: lo firma il tuo Apple ID tramite uno
+strumento di sideload, tipicamente **AltStore** o **SideStore**. Si installano
+sul computer (o, per SideStore, funzionano anche senza restare collegati) e
+firmano l'app col tuo ID gratuito.
 
-- **Serve connessione.** Le pagine sono renderizzate dal server, quindi senza
-  rete l'app non si apre. Vale anche per la Strada B.
-- Niente notifiche push né accesso a HealthKit.
-- L'aggiornamento è automatico: dopo ogni deploy su Vercel l'app è aggiornata,
-  non c'è niente da reinstallare.
+**3. I 7 giorni.** Un certificato Apple gratuito **scade dopo 7 giorni**: dopo
+di che l'app non si apre più finché non viene rifirmata. È il limite di Apple,
+non nostro. Gli strumenti di sideload rinnovano la firma automaticamente
+finché il telefono e il computer si vedono in rete — è esattamente il
+"si riaggiorna ogni sette giorni". Con un account Apple Developer da 99 $/anno
+il certificato dura un anno e il rinnovo non serve.
 
-### Strada B — App nativa con Capacitor (serve un Mac e 99 $/anno)
+**4. Aggiornamenti dell'app.** Non serve ricompilare a ogni modifica: la
+webview carica il sito pubblicato, quindi dopo ogni deploy su Vercel l'app è
+già aggiornata. L'IPA si rifà solo se cambia la configurazione nativa.
 
-Ha senso solo se in futuro servono notifiche push, HealthKit o la
-pubblicazione sull'App Store. Per il solo uso personale la Strada A basta.
+### Strada B — Xcode su un Mac
 
-Cosa serve prima di iniziare:
-
-- un **Mac con Xcode** (i comandi `cap` per iOS non girano su Windows o Linux);
-- un **account Apple Developer**, 99 $/anno, se vuoi tenere l'app installata
-  oltre sette giorni: con un ID gratuito il certificato scade e l'app smette
-  di aprirsi finché non la reinstalli;
-- il **deploy su Vercel già fatto**, perché serve l'URL.
-
-```bash
-npm install @capacitor/core @capacitor/ios
-npm install -D @capacitor/cli
-```
-
-In `capacitor.config.json` sostituisci l'URL con il dominio del tuo deploy.
-Il `webDir` punta a `public/`, che deve esistere: nel repo c'è già.
-
-```json
-{
-  "appId": "com.personaltrainer.app",
-  "appName": "Personal Trainer",
-  "webDir": "public",
-  "server": { "url": "https://il-tuo-progetto.vercel.app", "cleartext": false },
-  "ios": { "contentInset": "always" }
-}
-```
-
-Poi, sul Mac:
+Se hai un Mac, salti GitHub Actions e i suoi minuti:
 
 ```bash
-npx cap add ios
-npx cap sync ios
-npx cap open ios     # apre Xcode
+npm ci
+APP_URL="https://tuo-progetto.vercel.app" npx cap add ios
+APP_URL="https://tuo-progetto.vercel.app" npx cap sync ios
+npx cap open ios
 ```
 
-In Xcode: **Signing & Capabilities** → seleziona il tuo team, collega
-l'iPhone, premi **Run**. L'icona dell'app si imposta da
-`App/Assets.xcassets/AppIcon`.
+In Xcode: **Signing & Capabilities** → scegli il tuo team (basta un Apple ID
+gratuito), collega l'iPhone, premi **Run**. Valgono gli stessi 7 giorni.
 
-L'app carica il sito remoto nella webview, quindi dopo ogni deploy su Vercel è
-già aggiornata. `npx cap sync ios` serve solo se cambi configurazione o plugin
-nativi.
+L'icona dell'app si imposta da `App/Assets.xcassets/AppIcon`.
 
-> **Nota sullo stato di verifica:** la Strada A è stata verificata (manifest
-> servito correttamente, icona PNG 180×180 generata, tag `apple-touch-icon` e
-> `apple-mobile-web-app-*` presenti nell'HTML). La Strada B **non è stata
-> eseguita**: richiede un Mac, che non era disponibile. I comandi sono quelli
-> standard di Capacitor, ma vanno provati.
+### Strada C — Aggiungi a Home (ripiego, zero strumenti)
+
+Apri il sito con **Safari** → **Condividi** → **Aggiungi a Home**. Parte a
+tutto schermo con la sua icona e non scade mai, ma non è un'app installata:
+niente notifiche push, niente HealthKit, niente presenza nella libreria app.
+Utile per provare subito, non è l'obiettivo.
+
+Il necessario è già nel repo: `src/app/manifest.ts` e `src/app/apple-icon.tsx`
+(iOS pretende un PNG 180×180 per la Home, non accetta SVG).
+
+### Stato di verifica
+
+Quello che è stato verificato davvero, e quello che no:
+
+| | |
+|---|---|
+| `capacitor.config.ts` legge `APP_URL` e fallisce con un messaggio chiaro se manca | verificato |
+| `npx cap add ios` genera il progetto e ci scrive dentro l'URL giusto | verificato |
+| Il workflow è YAML valido e i suoi script bash sono sintatticamente corretti | verificato |
+| Strada C: manifest servito, PNG 180×180 generato, tag Apple presenti | verificato |
+| **Il workflow non è mai stato eseguito** | **da provare** |
+
+L'ultima riga conta: `xcodebuild` gira solo su macOS, che qui non c'era. Il
+workflow tiene conto del fatto che Capacitor 8 usa Swift Package Manager (c'è
+un `.xcodeproj`, non un `.xcworkspace` da CocoaPods) e che lo schema Xcode non
+è condiviso nel progetto generato, quindi ripiega sul target; stampa anche
+schemi e target prima di compilare, così al primo errore si vede subito cosa
+manca. Ma il primo giro potrebbe comunque richiedere un aggiustamento.
 
 ## Struttura
 
@@ -230,6 +233,9 @@ src/
     plan.ts              linee guida del PT
     seed-data.ts         tasti rapidi + programma di allenamento
     queries.ts           letture dal database
+capacitor.config.ts      configurazione dell'app nativa (URL da APP_URL)
+capacitor-www/           pagina mostrata se il server non risponde
+.github/workflows/       pipeline che compila l'IPA su runner macOS
 drizzle/                 migration SQL
 scripts/seed.ts          script di seed
 ```

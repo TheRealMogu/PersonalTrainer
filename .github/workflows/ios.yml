@@ -1,0 +1,100 @@
+name: Compila IPA per iPhone
+
+# Si avvia a mano dalla scheda Actions. Non gira a ogni push: i runner macOS
+# su repo private consumano minuti con moltiplicatore 10x.
+on:
+  workflow_dispatch:
+    inputs:
+      app_url:
+        description: "URL pubblico dell'app (es. https://tuo-progetto.vercel.app)"
+        required: true
+        type: string
+
+jobs:
+  ipa:
+    runs-on: macos-15
+    timeout-minutes: 40
+
+    steps:
+      - name: Scarica il codice
+        uses: actions/checkout@v4
+
+      - name: Prepara Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Installa le dipendenze
+        run: npm ci
+
+      - name: Controlla che l'URL sia valido
+        env:
+          APP_URL: ${{ inputs.app_url }}
+        run: |
+          if [[ ! "$APP_URL" =~ ^https:// ]]; then
+            echo "APP_URL deve iniziare per https:// — ricevuto: $APP_URL"
+            exit 1
+          fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$APP_URL" || echo "000")
+          echo "$APP_URL risponde $code"
+          if [[ "$code" == "000" ]]; then
+            echo "L'URL non risponde: l'app compilata mostrerebbe solo la pagina di errore."
+            exit 1
+          fi
+
+      - name: Genera il progetto iOS
+        env:
+          APP_URL: ${{ inputs.app_url }}
+        run: |
+          npx cap add ios
+          npx cap sync ios
+
+      - name: Mostra schemi e target disponibili
+        run: xcodebuild -list -project ios/App/App.xcodeproj || true
+
+      - name: Compila (senza firma)
+        run: |
+          set -o pipefail
+          # Capacitor 8 usa Swift Package Manager: c'e' un .xcodeproj, non un
+          # .xcworkspace da CocoaPods. Lo schema non e' condiviso nel progetto
+          # generato, quindi se manca si ripiega sul target, che esiste sempre.
+          common=(
+            -project ios/App/App.xcodeproj
+            -configuration Release
+            -sdk iphoneos
+            -derivedDataPath "$PWD/build"
+            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGN_IDENTITY=""
+            CODE_SIGN_ENTITLEMENTS=""
+          )
+          if xcodebuild -list -project ios/App/App.xcodeproj 2>/dev/null | sed -n '/Schemes:/,$p' | grep -qx "        App"; then
+            echo "Compilo con lo schema App"
+            xcodebuild "${common[@]}" -scheme App build
+          else
+            echo "Schema non condiviso: compilo con il target App"
+            xcodebuild "${common[@]}" -target App build
+          fi
+
+      - name: Impacchetta l'IPA
+        run: |
+          app_path=$(find build/Build/Products -maxdepth 2 -name "App.app" -type d | head -1)
+          if [[ -z "$app_path" ]]; then
+            echo "App.app non trovata: la compilazione non ha prodotto il binario."
+            find build/Build/Products -maxdepth 3 2>/dev/null || true
+            exit 1
+          fi
+          echo "Trovata: $app_path"
+          rm -rf Payload && mkdir -p Payload
+          cp -R "$app_path" Payload/
+          zip -qry PersonalTrainer-unsigned.ipa Payload
+          echo "IPA pronto: $(du -h PersonalTrainer-unsigned.ipa | cut -f1)"
+
+      - name: Pubblica l'IPA come artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PersonalTrainer-ipa
+          path: PersonalTrainer-unsigned.ipa
+          retention-days: 30
+          if-no-files-found: error
