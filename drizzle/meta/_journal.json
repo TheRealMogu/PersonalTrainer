@@ -8,6 +8,13 @@
       "when": 1789113927869,
       "tag": "0000_dapper_jigsaw",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789218688634,
+      "tag": "0001_steady_champions",
+      "breakpoints": true
     }
   ]
 }

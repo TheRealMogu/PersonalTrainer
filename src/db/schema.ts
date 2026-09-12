@@ -66,8 +66,51 @@ export const workoutExercises = pgTable(
   (table) => [index("workout_exercises_day_idx").on(table.dayId)],
 );
 
+/**
+ * Una seduta di allenamento: si apre quando inizi, si chiude quando premi
+ * Fine. `endedAt` nullo significa "in corso", cosi' riaprendo l'app la ritrovi
+ * dove l'avevi lasciata.
+ */
+export const workoutSessions = pgTable(
+  "workout_sessions",
+  {
+    id: serial("id").primaryKey(),
+    dayId: integer("day_id")
+      .notNull()
+      .references(() => workoutDays.id, { onDelete: "cascade" }),
+    day: date("day").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+    endedAt: timestamp("ended_at", { withTimezone: true }),
+  },
+  (table) => [index("workout_sessions_day_idx").on(table.day)],
+);
+
+/** Una serie eseguita: il carico e le ripetizioni che hai davvero fatto. */
+export const workoutSets = pgTable(
+  "workout_sets",
+  {
+    id: serial("id").primaryKey(),
+    sessionId: integer("session_id")
+      .notNull()
+      .references(() => workoutSessions.id, { onDelete: "cascade" }),
+    exerciseId: integer("exercise_id")
+      .notNull()
+      .references(() => workoutExercises.id, { onDelete: "cascade" }),
+    setNumber: integer("set_number").notNull(),
+    weight: real("weight").notNull(),
+    reps: integer("reps").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("workout_sets_session_idx").on(table.sessionId),
+    index("workout_sets_exercise_idx").on(table.exerciseId),
+  ],
+);
+
 export type Meal = typeof meals.$inferSelect;
 export type NewMeal = typeof meals.$inferInsert;
 export type QuickFood = typeof quickFoods.$inferSelect;
 export type WorkoutDay = typeof workoutDays.$inferSelect;
 export type WorkoutExercise = typeof workoutExercises.$inferSelect;
+export type WorkoutSession = typeof workoutSessions.$inferSelect;
+export type WorkoutSet = typeof workoutSets.$inferSelect;

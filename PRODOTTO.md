@@ -57,8 +57,8 @@ prodotto, non una mancanza di funzionalità.
 | Correggere un pasto già inserito | 2 tocchi | elimina + reinserisci | **da fare** |
 | Annullare un errore | 1 tocco | 1 | ok |
 | Entrare nell'app | 0 tocchi dopo il primo accesso | 0 | ok |
-| Segnare il carico di una serie | 2 tocchi | impossibile | **da fare** |
-| Vedere il carico dell'ultima volta | 0 tocchi | impossibile | **da fare** |
+| Segnare il carico di una serie | 2 tocchi | 1 (campi già pronti) | ok |
+| Vedere il carico dell'ultima volta | 0 tocchi | 0 | ok |
 | Sapere cosa mi entra ancora | 0 tocchi | da calcolare a mente | **da fare** |
 
 Due regole che valgono sempre:
@@ -105,7 +105,9 @@ e va difesa a ogni aggiunta.
   target, aggiunta da tasti rapidi o a mano, eliminazione annullabile,
   navigazione fra i giorni.
 - **Piano** — i target e le regole del PT.
-- **Allenamento** — il programma T1, in sola lettura.
+- **Allenamento** — il programma T1 e la seduta vera: cronometro, serie con
+  carico e ripetizioni, timer di recupero, volume sollevato, e il carico
+  dell'ultima volta già proposto nei campi.
 - **Storico** — media giornaliera e andamento su 7 o 30 giorni, con i giorni
   entro il target.
 
@@ -113,23 +115,7 @@ e va difesa a ogni aggiunta.
 
 L'ordine è per quanto pesa ogni giorno, non per quanto è difficile.
 
-### 1. Registrare l'allenamento
-
-Oggi la scheda è un foglio stampato: si legge e basta. In palestra serve
-sapere **con quanti chili hai fatto la stessa cosa l'altra volta**, ed è
-esattamente ciò per cui oggi apriresti un'altra app.
-
-Cosa deve fare:
-
-- accanto a ogni esercizio, il carico dell'ultima volta, senza toccare niente;
-- segnare una serie: peso e ripetizioni, due tocchi, con il valore precedente
-  già proposto come punto di partenza;
-- lo storico per esercizio, per vedere se il carico sale.
-
-Richiede una tabella nuova (`workout_sets`: esercizio, data, serie, peso,
-ripetizioni) e una schermata di esecuzione della giornata.
-
-### 2. Quantità sui tasti rapidi
+### 1. Quantità sui tasti rapidi
 
 Una banana e mezza, 180 g di pollo invece di 150, mezza porzione di riso.
 Oggi o è la porzione esatta o è il form manuale con cinque campi: è il motivo
@@ -139,7 +125,7 @@ Cosa deve fare: tenere premuto (o un tocco sul "+") apre un selettore di
 quantità con la porzione base già impostata; i macro si ricalcolano da soli.
 Due tocchi in tutto.
 
-### 3. Cosa mi entra ancora
+### 2. Cosa mi entra ancora
 
 Diretta conseguenza del budget. A cena ti restano 600 kcal e 70 g di proteine:
 l'app sa già cosa hai fra i tasti rapidi, quindi può dirti quali ci stanno
@@ -148,12 +134,22 @@ dentro e quali no, senza che tu faccia i conti.
 Non è un consiglio nutrizionale, è una sottrazione fatta da chi ha i numeri
 sotto mano.
 
-### 4. Correggere un pasto
+### 3. Correggere un pasto
 
 Oggi si elimina e si reinserisce. Sbagliare a digitare un numero capita, e
 rifare tutto da capo scoraggia dal correggere — così il dato resta sbagliato.
 
-### 5. Momenti della giornata
+### 4. Momenti della giornata
+
+### 5. Grafico della progressione per esercizio
+
+Il volume per seduta c'è già. Manca la curva per singolo esercizio, per
+vedere se la panca sale davvero nel tempo: la macchina dei grafici è la
+stessa dello Storico.
+
+### 6. Tema scuro automatico
+
+Che segua l'impostazione dell'iPhone: di giorno chiaro, in palestra scuro.
 
 Raggruppare in colazione / pranzo / cena / spuntini. Serve meno di quanto
 sembra finché i pasti sono pochi, ma diventa utile per capire *dove* se ne
