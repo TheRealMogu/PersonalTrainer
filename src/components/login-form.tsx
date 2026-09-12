@@ -18,7 +18,7 @@ export function LoginForm() {
           autoComplete="current-password"
           autoFocus
           required
-          className="min-h-11 w-full rounded-xl border border-hairline bg-canvas px-3 py-2.5 outline-none focus:border-accent"
+          className="min-h-11 w-full rounded-xl border border-hairline bg-raised px-3 py-2.5 outline-none focus:border-accent"
         />
       </label>
 
@@ -31,7 +31,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-4 min-h-11 w-full rounded-xl bg-accent py-3 text-[15px] font-semibold text-white active:opacity-80 disabled:opacity-50"
+        className="mt-4 min-h-11 w-full rounded-xl bg-accent py-3 text-[15px] font-semibold text-on-accent active:opacity-80 disabled:opacity-50"
       >
         {pending ? "Verifico…" : "Entra"}
       </button>

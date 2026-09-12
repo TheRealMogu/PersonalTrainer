@@ -15,6 +15,13 @@
       "when": 1789218688634,
       "tag": "0001_steady_champions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789225911013,
+      "tag": "0002_stale_hercules",
+      "breakpoints": true
     }
   ]
 }

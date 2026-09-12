@@ -4,8 +4,10 @@ import { useOptimistic, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { addMeal, deleteMeal, restoreMeal, type MealInput } from "@/app/actions";
 import type { Meal, QuickFood } from "@/db/schema";
+import type { MealSlot } from "@/lib/meal-slots";
 import { buildProgress, sumMacros } from "@/lib/nutrition";
 import { Card } from "./card";
+import { CalorieRing } from "./calorie-ring";
 import { MacroBar } from "./macro-bar";
 import { ManualMealForm } from "./manual-meal-form";
 import { MealList } from "./meal-list";
@@ -30,10 +32,12 @@ export function Diary({
   day,
   meals,
   quickFoods,
+  defaultSlot,
 }: {
   day: string;
   meals: Meal[];
   quickFoods: QuickFood[];
+  defaultSlot: MealSlot;
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -99,7 +103,9 @@ export function Diary({
 
       const result = await restoreMeal({
         day: meal.day,
+        slot: meal.slot as MealSlot,
         name: meal.name,
+        quantity: meal.quantity,
         kcal: meal.kcal,
         carbs: meal.carbs,
         protein: meal.protein,
@@ -116,9 +122,10 @@ export function Diary({
 
   return (
     <>
-      <Card title="Riepilogo">
-        <div className="divide-y divide-hairline">
-          {progress.map((item) => (
+      <Card>
+        <CalorieRing progress={progress[0]} />
+        <div className="mt-4 divide-y divide-hairline border-t border-hairline pt-1">
+          {progress.slice(1).map((item) => (
             <MacroBar key={item.key} progress={item} />
           ))}
         </div>
@@ -129,9 +136,23 @@ export function Diary({
       </Card>
 
       <Card title="Aggiungi">
-        <QuickFoods foods={quickFoods} onAdd={handleAdd} />
+        <QuickFoods
+          foods={quickFoods}
+          defaultSlot={defaultSlot}
+          onAdd={(food, quantity, slot) =>
+            handleAdd({
+              slot,
+              name: food.name,
+              quantity,
+              kcal: food.kcal * quantity,
+              carbs: food.carbs * quantity,
+              protein: food.protein * quantity,
+              fat: food.fat * quantity,
+            })
+          }
+        />
         <div className="mt-4 border-t border-hairline pt-4">
-          <ManualMealForm onAdd={handleAdd} />
+          <ManualMealForm defaultSlot={defaultSlot} onAdd={handleAdd} />
         </div>
       </Card>
 

@@ -13,6 +13,14 @@ const RADIUS = 4;
 
 const WEEKDAY_INITIALS = ["D", "L", "M", "M", "G", "V", "S"];
 
+/** Lo stesso colore che il macro ha nel diario: l'identita' non cambia schermata. */
+const MACRO_COLOR: Record<MacroKey, string> = {
+  kcal: "var(--color-kcal)",
+  carbs: "var(--color-carbs)",
+  protein: "var(--color-protein)",
+  fat: "var(--color-fat)",
+};
+
 function weekdayInitial(iso: string): string {
   return WEEKDAY_INITIALS[new Date(`${iso}T00:00:00Z`).getUTCDay()];
 }
@@ -106,7 +114,7 @@ export function MacroHistoryChart({
               {height > 0 ? (
                 <path
                   d={barPath(x, y, barWidth, height)}
-                  fill={isOver ? "var(--color-over)" : "var(--color-accent)"}
+                  fill={isOver ? "var(--color-over)" : MACRO_COLOR[macro]}
                 />
               ) : null}
               {index % labelEvery === 0 ? (

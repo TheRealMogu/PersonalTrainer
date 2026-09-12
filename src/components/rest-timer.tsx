@@ -36,8 +36,8 @@ export function RestTimer({ onClose }: { onClose: () => void }) {
       className="fixed inset-x-0 z-20 px-5"
       style={{ bottom: "calc(4.25rem + env(safe-area-inset-bottom))" }}
     >
-      <div className="mx-auto w-full max-w-md overflow-hidden rounded-2xl bg-ink/95 text-white shadow-lg backdrop-blur">
-        <div className="h-1 w-full bg-white/15">
+      <div className="mx-auto w-full max-w-md overflow-hidden rounded-2xl bg-overlay/95 text-on-overlay shadow-lg backdrop-blur">
+        <div className="h-1 w-full bg-overlay-track">
           <div
             className={`h-full transition-[width] duration-500 ${done ? "bg-over" : "bg-accent"}`}
             style={{ width: `${percent}%` }}
@@ -46,7 +46,7 @@ export function RestTimer({ onClose }: { onClose: () => void }) {
 
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="min-w-0 flex-1">
-            <p className="text-[12px] text-white/70">{done ? "Recupero finito" : "Recupero"}</p>
+            <p className="text-[12px] text-on-overlay/70">{done ? "Recupero finito" : "Recupero"}</p>
             <p className="text-[22px] font-semibold leading-tight tabular-nums">
               {formatElapsed(left)}
             </p>
@@ -55,7 +55,7 @@ export function RestTimer({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={addTime}
-            className="h-11 shrink-0 rounded-xl bg-white/15 px-3 text-[13px] font-semibold"
+            className="h-11 shrink-0 rounded-xl bg-overlay-track px-3 text-[13px] font-semibold"
           >
             +{EXTRA_STEP}s
           </button>

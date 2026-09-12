@@ -53,13 +53,14 @@ prodotto, non una mancanza di funzionalità.
 | Vedere quanto mi resta | 0 tocchi (apro l'app) | 0 | ok |
 | Vedere cosa ho mangiato | 0 tocchi | 0 | ok |
 | Aggiungere un cibo ricorrente | 1 tocco | 1 | ok |
-| Aggiungere lo stesso cibo in quantità diversa | 2 tocchi | ~8 (form manuale) | **da fare** |
+| Aggiungere lo stesso cibo in quantità diversa | 2 tocchi | 2 (tasto "+" → quantità) | ok |
 | Correggere un pasto già inserito | 2 tocchi | elimina + reinserisci | **da fare** |
 | Annullare un errore | 1 tocco | 1 | ok |
 | Entrare nell'app | 0 tocchi dopo il primo accesso | 0 | ok |
 | Segnare il carico di una serie | 2 tocchi | 1 (campi già pronti) | ok |
 | Vedere il carico dell'ultima volta | 0 tocchi | 0 | ok |
 | Sapere cosa mi entra ancora | 0 tocchi | da calcolare a mente | **da fare** |
+| Capire dove sono finite le calorie | 0 tocchi | 0 (totale per pasto) | ok |
 
 Due regole che valgono sempre:
 
@@ -101,59 +102,38 @@ e va difesa a ogni aggiunta.
   chiude la password. Sessione lunga un anno, così si digita una volta per
   dispositivo.
 
-- **Diario** — barre per kcal e macro con quanto rimane e lo stato oltre
-  target, aggiunta da tasti rapidi o a mano, eliminazione annullabile,
-  navigazione fra i giorni.
+- **Diario** — anello delle calorie con quanto resta al centro, barre dei
+  macro con un colore ciascuno, pasti divisi per momento della giornata col
+  totale di ognuno, quantità variabili (½, 1½, 0,75…), eliminazione
+  annullabile, navigazione fra i giorni.
 - **Piano** — i target e le regole del PT.
 - **Allenamento** — il programma T1 e la seduta vera: cronometro, serie con
   carico e ripetizioni, timer di recupero, volume sollevato, e il carico
   dell'ultima volta già proposto nei campi.
 - **Storico** — media giornaliera e andamento su 7 o 30 giorni, con i giorni
-  entro il target.
+  entro il target. Stessi colori del diario.
+- **Tema chiaro e scuro** che segue l'impostazione dell'iPhone.
 
 ## Cosa manca, in ordine
 
 L'ordine è per quanto pesa ogni giorno, non per quanto è difficile.
 
-### 1. Quantità sui tasti rapidi
-
-Una banana e mezza, 180 g di pollo invece di 150, mezza porzione di riso.
-Oggi o è la porzione esatta o è il form manuale con cinque campi: è il motivo
-per cui i giorni storti non verrebbero registrati.
-
-Cosa deve fare: tenere premuto (o un tocco sul "+") apre un selettore di
-quantità con la porzione base già impostata; i macro si ricalcolano da soli.
-Due tocchi in tutto.
-
-### 2. Cosa mi entra ancora
-
-Diretta conseguenza del budget. A cena ti restano 600 kcal e 70 g di proteine:
-l'app sa già cosa hai fra i tasti rapidi, quindi può dirti quali ci stanno
-dentro e quali no, senza che tu faccia i conti.
-
-Non è un consiglio nutrizionale, è una sottrazione fatta da chi ha i numeri
-sotto mano.
-
-### 3. Correggere un pasto
-
-Oggi si elimina e si reinserisce. Sbagliare a digitare un numero capita, e
-rifare tutto da capo scoraggia dal correggere — così il dato resta sbagliato.
-
-### 4. Momenti della giornata
-
-### 5. Grafico della progressione per esercizio
+### 1. Grafico della progressione per esercizio
 
 Il volume per seduta c'è già. Manca la curva per singolo esercizio, per
 vedere se la panca sale davvero nel tempo: la macchina dei grafici è la
 stessa dello Storico.
 
-### 6. Tema scuro automatico
+### 2. Cosa mi entra ancora
 
-Che segua l'impostazione dell'iPhone: di giorno chiaro, in palestra scuro.
+Diretta conseguenza del budget. A cena ti restano 600 kcal e 70 g di
+proteine: l'app sa cosa hai fra i tasti rapidi, quindi può dirti quali ci
+stanno dentro, senza che tu faccia i conti.
 
-Raggruppare in colazione / pranzo / cena / spuntini. Serve meno di quanto
-sembra finché i pasti sono pochi, ma diventa utile per capire *dove* se ne
-vanno le calorie. Richiede una colonna in più e una migration.
+### 3. Correggere un pasto
+
+Oggi si elimina e si reinserisce. Sbagliare a digitare un numero capita, e
+rifare tutto da capo scoraggia dal correggere — così il dato resta sbagliato.
 
 ## Regole di design non negoziabili
 
@@ -171,6 +151,12 @@ Valgono per ogni aggiunta futura.
 7. **Mobile prima di tutto.** Si prova a 320 px prima di dire che è finito.
 8. **Il rosso è solo per il fuori target.** Se lo si usa per le cose ordinarie,
    quando serve davvero non lo si vede più.
+9. **Un colore per macro, uguale su ogni schermata.** Carboidrati ambra,
+   proteine viola, grassi verde, calorie blu. I colori sono stati validati
+   per la separazione su daltonismo, in chiaro e in scuro: non si cambiano a
+   occhio.
+10. **Il colore non è mai l'unico segnale.** Accanto a ogni pallino c'è il
+    nome del macro, e il fuori target si legge anche dalla scritta.
 
 ## Come si verifica che sia davvero comodo
 

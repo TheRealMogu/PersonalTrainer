@@ -104,7 +104,7 @@ export function WorkoutSession({
         <button
           type="button"
           onClick={handleEnd}
-          className="min-h-11 shrink-0 rounded-full bg-accent px-5 text-[15px] font-semibold text-white active:opacity-80"
+          className="min-h-11 shrink-0 rounded-full bg-accent px-5 text-[15px] font-semibold text-on-accent active:opacity-80"
         >
           Fine
         </button>

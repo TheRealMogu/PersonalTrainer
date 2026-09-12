@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { MealInput } from "@/app/actions";
+import { MEAL_SLOTS, SLOT_LABELS, type MealSlot } from "@/lib/meal-slots";
 
 const EMPTY = { name: "", kcal: "", carbs: "", protein: "", fat: "" };
 
@@ -21,11 +22,14 @@ function parseNumber(value: string): number {
 }
 
 export function ManualMealForm({
+  defaultSlot,
   onAdd,
 }: {
+  defaultSlot: MealSlot;
   onAdd: (meal: Omit<MealInput, "day">) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [slot, setSlot] = useState<MealSlot>(defaultSlot);
   const [values, setValues] = useState(EMPTY);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,7 +57,7 @@ export function ManualMealForm({
     }
 
     setError(null);
-    onAdd({ name: values.name, ...numbers });
+    onAdd({ slot, name: values.name, quantity: 1, ...numbers });
     setValues(EMPTY);
     setOpen(false);
   }
@@ -63,7 +67,7 @@ export function ManualMealForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="min-h-11 w-full rounded-xl border border-dashed border-hairline py-3 text-[15px] font-medium text-accent active:bg-canvas"
+        className="min-h-11 w-full rounded-xl border border-dashed border-hairline py-3 text-[15px] font-medium text-accent active:bg-raised"
       >
         Aggiungi manualmente
       </button>
@@ -82,9 +86,26 @@ export function ManualMealForm({
           required
           maxLength={120}
           autoFocus
-          className="w-full rounded-xl border border-hairline bg-canvas px-3 py-2.5 outline-none focus:border-accent"
+          className="min-h-11 w-full rounded-xl border border-hairline bg-raised px-3 py-2.5 outline-none focus:border-accent"
         />
       </label>
+
+      <div className="flex gap-2">
+        {MEAL_SLOTS.map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setSlot(value)}
+            className={`h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors ${
+              slot === value
+                ? "bg-accent text-on-accent"
+                : "border border-hairline bg-raised text-muted"
+            }`}
+          >
+            {SLOT_LABELS[value]}
+          </button>
+        ))}
+      </div>
 
       <div className="grid grid-cols-2 gap-3">
         {NUMERIC_FIELDS.map(({ field, label, unit }) => (
@@ -98,7 +119,7 @@ export function ManualMealForm({
               value={values[field]}
               onChange={(event) => update(field, event.target.value)}
               placeholder="0"
-              className="w-full rounded-xl border border-hairline bg-canvas px-3 py-2.5 tabular-nums outline-none focus:border-accent"
+              className="min-h-11 w-full rounded-xl border border-hairline bg-raised px-3 py-2.5 tabular-nums outline-none focus:border-accent"
             />
           </label>
         ))}
@@ -109,7 +130,7 @@ export function ManualMealForm({
       <div className="flex gap-2 pt-1">
         <button
           type="submit"
-          className="min-h-11 flex-1 rounded-xl bg-accent py-3 text-[15px] font-semibold text-white active:opacity-80"
+          className="min-h-11 flex-1 rounded-xl bg-accent py-3 text-[15px] font-semibold text-on-accent active:opacity-80"
         >
           Salva
         </button>
@@ -120,7 +141,7 @@ export function ManualMealForm({
             setValues(EMPTY);
             setError(null);
           }}
-          className="min-h-11 rounded-xl border border-hairline px-5 text-[15px] font-medium text-muted active:bg-canvas"
+          className="min-h-11 rounded-xl border border-hairline px-5 text-[15px] font-medium text-muted active:bg-raised"
         >
           Annulla
         </button>
