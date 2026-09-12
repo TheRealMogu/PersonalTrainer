@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { addMeal } from "@/app/actions";
+import { useState } from "react";
+import type { MealInput } from "@/app/actions";
 
 const EMPTY = { name: "", kcal: "", carbs: "", protein: "", fat: "" };
 
@@ -21,12 +20,14 @@ function parseNumber(value: string): number {
   return Number(value.replace(",", "."));
 }
 
-export function ManualMealForm({ day }: { day: string }) {
-  const router = useRouter();
+export function ManualMealForm({
+  onAdd,
+}: {
+  onAdd: (meal: Omit<MealInput, "day">) => void;
+}) {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState(EMPTY);
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
 
   function update(field: Field, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
@@ -34,27 +35,27 @@ export function ManualMealForm({ day }: { day: string }) {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!values.name.trim()) {
+      setError("Il nome del pasto è obbligatorio.");
+      return;
+    }
+
+    const numbers = {
+      kcal: parseNumber(values.kcal),
+      carbs: parseNumber(values.carbs),
+      protein: parseNumber(values.protein),
+      fat: parseNumber(values.fat),
+    };
+    if (Object.values(numbers).some((value) => !Number.isFinite(value) || value < 0)) {
+      setError("I valori devono essere numeri non negativi.");
+      return;
+    }
+
     setError(null);
-
-    startTransition(async () => {
-      const result = await addMeal({
-        day,
-        name: values.name,
-        kcal: parseNumber(values.kcal),
-        carbs: parseNumber(values.carbs),
-        protein: parseNumber(values.protein),
-        fat: parseNumber(values.fat),
-      });
-
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-
-      setValues(EMPTY);
-      setOpen(false);
-      router.refresh();
-    });
+    onAdd({ name: values.name, ...numbers });
+    setValues(EMPTY);
+    setOpen(false);
   }
 
   if (!open) {
@@ -62,7 +63,7 @@ export function ManualMealForm({ day }: { day: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="w-full rounded-xl border border-dashed border-hairline py-3 text-[15px] font-medium text-accent active:bg-canvas"
+        className="min-h-11 w-full rounded-xl border border-dashed border-hairline py-3 text-[15px] font-medium text-accent active:bg-canvas"
       >
         Aggiungi manualmente
       </button>
@@ -108,10 +109,9 @@ export function ManualMealForm({ day }: { day: string }) {
       <div className="flex gap-2 pt-1">
         <button
           type="submit"
-          disabled={pending}
-          className="flex-1 rounded-xl bg-accent py-3 text-[15px] font-semibold text-white active:opacity-80 disabled:opacity-50"
+          className="min-h-11 flex-1 rounded-xl bg-accent py-3 text-[15px] font-semibold text-white active:opacity-80"
         >
-          {pending ? "Salvo…" : "Salva"}
+          Salva
         </button>
         <button
           type="button"
@@ -120,7 +120,7 @@ export function ManualMealForm({ day }: { day: string }) {
             setValues(EMPTY);
             setError(null);
           }}
-          className="rounded-xl border border-hairline px-5 text-[15px] font-medium text-muted active:bg-canvas"
+          className="min-h-11 rounded-xl border border-hairline px-5 text-[15px] font-medium text-muted active:bg-canvas"
         >
           Annulla
         </button>

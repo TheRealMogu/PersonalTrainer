@@ -1,10 +1,30 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { formatDayLabel, shiftIsoDate, todayIso } from "@/lib/date";
 
 function hrefForDay(day: string, today: string) {
   return day === today ? "/" : `/?day=${day}`;
+}
+
+const ARROW_CLASS =
+  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface text-accent shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-opacity active:opacity-60";
+
+/**
+ * Il cambio giorno e' una navigazione lato server: su rete lenta passa circa
+ * un secondo e mezzo con ancora il giorno vecchio a schermo. Questo indicatore
+ * segnala che il tocco e' stato raccolto.
+ */
+function NavPending() {
+  const { pending } = useLinkStatus();
+  return (
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute inset-0 rounded-full border-2 border-hairline border-t-accent transition-opacity ${
+        pending ? "animate-spin opacity-100" : "opacity-0"
+      }`}
+    />
+  );
 }
 
 export function DayNav({ day }: { day: string }) {
@@ -17,9 +37,10 @@ export function DayNav({ day }: { day: string }) {
       <Link
         href={hrefForDay(previous, today)}
         aria-label="Giorno precedente"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface text-accent shadow-[0_1px_2px_rgba(0,0,0,0.04)] active:opacity-60"
+        className={`relative ${ARROW_CLASS}`}
       >
         <Chevron direction="left" />
+        <NavPending />
       </Link>
 
       <div className="min-w-0 flex-1 px-2 text-center">
@@ -27,20 +48,21 @@ export function DayNav({ day }: { day: string }) {
           {formatDayLabel(day, today)}
         </h1>
         {day !== today ? (
-          <Link href="/" className="text-[13px] text-accent">
+          <Link href="/" className="inline-block py-1 text-[13px] text-accent">
             Torna a oggi
           </Link>
         ) : (
-          <p className="text-[13px] text-muted">Diario</p>
+          <p className="py-1 text-[13px] text-muted">Diario</p>
         )}
       </div>
 
       <Link
         href={hrefForDay(next, today)}
         aria-label="Giorno successivo"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface text-accent shadow-[0_1px_2px_rgba(0,0,0,0.04)] active:opacity-60"
+        className={`relative ${ARROW_CLASS}`}
       >
         <Chevron direction="right" />
+        <NavPending />
       </Link>
     </div>
   );

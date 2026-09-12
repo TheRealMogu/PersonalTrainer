@@ -177,7 +177,10 @@ src/
     storico/page.tsx     Storico (?giorni=7|30)
     actions.ts           Server Actions: aggiungi / elimina pasto
     globals.css          tema Tailwind (palette, tipografia di sistema)
-  components/            componenti UI
+  components/
+    diary.tsx            stato ottimistico del diario (riepilogo, pasti, aggiunta)
+    undo-toast.tsx       annullamento di un'eliminazione
+    ...                  resto della UI
   db/
     schema.ts            tabelle Drizzle
     index.ts             client Neon

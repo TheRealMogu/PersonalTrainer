@@ -58,6 +58,38 @@ export async function addMeal(input: MealInput): Promise<ActionResult> {
   return { ok: true };
 }
 
+/**
+ * Reinserisce un pasto appena eliminato mantenendone l'orario originale,
+ * cosi' dopo un "Annulla" torna al suo posto nella lista e non in fondo.
+ */
+export async function restoreMeal(
+  input: MealInput & { createdAt: string },
+): Promise<ActionResult> {
+  const error = validate(input);
+  if (error) return { ok: false, error };
+
+  const createdAt = new Date(input.createdAt);
+  if (Number.isNaN(createdAt.getTime())) return { ok: false, error: "Orario non valido." };
+
+  try {
+    await db.insert(meals).values({
+      day: input.day,
+      name: input.name.trim(),
+      kcal: Math.round(input.kcal),
+      carbs: input.carbs,
+      protein: input.protein,
+      fat: input.fat,
+      createdAt,
+    });
+  } catch (cause) {
+    console.error("restoreMeal fallita", cause);
+    return { ok: false, error: "Ripristino non riuscito." };
+  }
+
+  revalidatePath("/");
+  return { ok: true };
+}
+
 export async function deleteMeal(id: number, day: string): Promise<ActionResult> {
   if (!Number.isInteger(id) || id <= 0) return { ok: false, error: "Pasto non valido." };
   if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };
