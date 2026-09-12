@@ -50,7 +50,26 @@ Stack: Next.js (App Router) + TypeScript, Tailwind CSS, Drizzle ORM, Neon
 
 `.env.local` è in `.gitignore`: la connection string non finisce mai nel repo.
 
-## 2. Girare in locale
+## 2. Impostare l'accesso
+
+L'app è protetta da una password: senza, chiunque conosca l'indirizzo
+potrebbe leggere e modificare il diario. Servono due variabili:
+
+```dotenv
+APP_PASSWORD="la password che scegli tu"
+AUTH_SECRET="32 byte casuali"     # openssl rand -base64 32
+```
+
+`APP_PASSWORD` è quella che digiti nella schermata di accesso. `AUTH_SECRET`
+firma il cookie di sessione: cambiandolo, tutte le sessioni aperte decadono.
+
+La sessione dura un anno, quindi la password si inserisce una volta sola per
+dispositivo. Per uscire: scheda **Piano** → *Esci*.
+
+Senza `AUTH_SECRET` l'app non si apre affatto: meglio bloccarsi che restare
+aperta per una variabile dimenticata.
+
+## 3. Girare in locale
 
 ```bash
 npm install
@@ -98,7 +117,7 @@ Dopo una modifica basta rilanciare `npm run db:seed`.
 Le linee guida del Piano stanno in `src/lib/plan.ts` e i target in
 `src/lib/targets.ts` (contenuto statico, non serve il database).
 
-## 3. Deploy su Vercel
+## 4. Deploy su Vercel
 
 1. Pusha il repo su GitHub.
 2. Su [vercel.com](https://vercel.com) → **Add New → Project**, importa il repo.
@@ -107,6 +126,9 @@ Le linee guida del Piano stanno in `src/lib/plan.ts` e i target in
    stessa stringa di Neon, per gli ambienti *Production*, *Preview* e
    *Development*.
 4. **Deploy**.
+
+Ricordati di aggiungere anche `APP_PASSWORD` e `AUTH_SECRET` fra le variabili
+d'ambiente, oltre a `DATABASE_URL`: senza, il deploy risponde con un errore.
 
 > Se il progetto Neon è collegato tramite l'integrazione Vercel–Neon, la
 > variabile viene iniettata in automatico: verifica solo che il nome sia
@@ -119,7 +141,7 @@ npm run db:generate   # committa il file .sql generato
 npm run db:migrate    # applicalo a Neon dalla tua macchina
 ```
 
-## 4. Metterla sull'iPhone
+## 5. Metterla sull'iPhone
 
 L'obiettivo è un'**app vera** (`.ipa`) installata sul telefono, non un
 segnalibro. Ci sono tre modi, con costi molto diversi.
@@ -143,17 +165,14 @@ diario.
 **1. Compila l'IPA.** Scheda **Actions** → *Compila IPA per iPhone* → **Run
 workflow**. A fine esecuzione scarichi l'artifact `PersonalTrainer-ipa`.
 
-La compilazione gira su un runner macOS di GitHub. **La repo è privata, quindi
-i minuti macOS contano 10×**: una build da ~10 minuti ne consuma ~100 dei 2.000
-gratuiti mensili, cioè una ventina di build al mese. In pratica bastano,
-perché l'IPA si ricompila quasi mai (vedi punto 4).
+La compilazione gira su un runner macOS di GitHub, **gratis** perché la repo è
+pubblica.
 
-> **Non rendere pubblica la repo per risparmiare minuti.** Su repo pubblica i
-> minuti macOS sono gratis, ma diventano pubblici anche i log delle run e **gli
-> artifact**: l'IPA è scaricabile da chiunque e contiene l'URL della tua app.
-> Siccome l'app non ha autenticazione, chiunque potrebbe leggere e modificare
-> il tuo diario. Il secret protegge i log, non l'artifact. Se un giorno vuoi la
-> repo pubblica, prima serve un minimo di autenticazione sull'app.
+> **Perché la password conta, su repo pubblica.** L'artifact IPA è scaricabile
+> da chiunque e contiene l'URL della tua app, scritto in `capacitor.config.json`
+> dentro il bundle. Il secret nasconde l'URL dai log, non dall'artifact: è la
+> schermata di accesso a impedire che chi trova l'indirizzo entri nel diario.
+> Non togliere l'autenticazione finché la repo è pubblica.
 
 **2. Installalo.** L'IPA non è firmato: lo firma il tuo Apple ID tramite uno
 strumento di sideload, tipicamente **AltStore** o **SideStore**. Si installano
@@ -228,6 +247,7 @@ src/
     storico/page.tsx     Storico (?giorni=7|30)
     actions.ts           Server Actions: aggiungi / elimina pasto
     globals.css          tema Tailwind (palette, tipografia di sistema)
+    login/               schermata di accesso
     manifest.ts          manifest PWA (installazione da Safari)
     apple-icon.tsx       icona 180x180 per la Home di iOS, generata in build
   components/
@@ -242,9 +262,12 @@ src/
     nutrition.ts         somma macro e calcolo progresso
     date.ts              utility sulle date (YYYY-MM-DD)
     history.ts           intervalli, medie e scala dei grafici
+    auth.ts              firma e verifica del cookie di sessione
     plan.ts              linee guida del PT
     seed-data.ts         tasti rapidi + programma di allenamento
     queries.ts           letture dal database
+  proxy.ts               chiude ogni rotta a chi non ha sessione
+assets/                  icona e splash da cui nascono quelle dell'app iOS
 capacitor.config.ts      configurazione dell'app nativa (URL da APP_URL)
 capacitor-www/           pagina mostrata se il server non risponde
 .github/workflows/       pipeline che compila l'IPA su runner macOS

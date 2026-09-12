@@ -13,6 +13,9 @@ const TABS = [
 export function TabBar() {
   const pathname = usePathname();
 
+  // Sulla schermata di accesso non c'e' niente da navigare.
+  if (pathname === "/login") return null;
+
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-10 border-t border-hairline bg-surface/85 backdrop-blur-xl"

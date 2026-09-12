@@ -9,13 +9,16 @@ export const contentType = "image/png";
 
 const ACCENT = "#0071e3";
 
-/** Manubrio disegnato con rettangoli: niente testo, quindi nessun font da caricare. */
+/**
+ * Manubrio disegnato con rettangoli: niente testo, quindi nessun font da
+ * caricare. Stesse proporzioni di assets/icon.png, che alimenta l'app nativa.
+ */
 export default function AppleIcon() {
   const bar = (width: number, height: number) => ({
     width,
     height,
     background: "#ffffff",
-    borderRadius: 6,
+    borderRadius: 4,
   });
 
   return new ImageResponse(
@@ -27,15 +30,16 @@ export default function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 10,
           background: ACCENT,
         }}
       >
-        <div style={bar(14, 46)} />
-        <div style={bar(18, 86)} />
-        <div style={bar(40, 14)} />
-        <div style={bar(18, 86)} />
-        <div style={bar(14, 46)} />
+        <div style={bar(17, 43)} />
+        <div style={{ width: 4 }} />
+        <div style={bar(24, 74)} />
+        <div style={bar(43, 13)} />
+        <div style={bar(24, 74)} />
+        <div style={{ width: 4 }} />
+        <div style={bar(17, 43)} />
       </div>
     ),
     size,
