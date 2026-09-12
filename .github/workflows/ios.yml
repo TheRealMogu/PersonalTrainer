@@ -1,13 +1,20 @@
 name: Compila IPA per iPhone
 
-# Si avvia a mano dalla scheda Actions. Non gira a ogni push: i runner macOS
-# su repo private consumano minuti con moltiplicatore 10x.
-# L'URL arriva dal secret APP_URL (Settings -> Secrets and variables ->
-# Actions), non da un campo digitato: GitHub maschera i secret nei log, un
-# input no. L'app non ha login, quindi chi conosce l'indirizzo puo' scrivere
-# nel diario.
+# Si avvia a mano: Actions -> "Compila IPA per iPhone" -> "Run workflow".
+#
+# L'URL dell'app si puo' dare in due modi: scrivendolo nel campo qui sotto
+# (la via rapida) oppure una volta sola come secret APP_URL. Se manca
+# entrambi, la compilazione va avanti lo stesso con un segnaposto: serve a
+# vedere che la pipeline funziona e ad avere l'app sul telefono. Mostrera'
+# la pagina "non riesco a raggiungere il server" finche' non si rifa' la
+# build con l'URL vero.
 on:
   workflow_dispatch:
+    inputs:
+      app_url:
+        description: "URL del deploy (vuoto = usa il secret APP_URL, o un segnaposto)"
+        required: false
+        type: string
 
 jobs:
   ipa:
@@ -27,31 +34,52 @@ jobs:
       - name: Installa le dipendenze
         run: npm ci
 
-      - name: Controlla che l'URL sia valido
+      - name: Decidi quale URL usare
+        id: url
         env:
-          APP_URL: ${{ secrets.APP_URL }}
+          INPUT_URL: ${{ inputs.app_url }}
+          SECRET_URL: ${{ secrets.APP_URL }}
         run: |
-          # Nessun echo dell'URL: finirebbe nei log della run.
-          if [[ -z "$APP_URL" ]]; then
-            echo "Manca il secret APP_URL."
-            echo "Impostalo in Settings -> Secrets and variables -> Actions,"
-            echo "con l'URL del deploy (es. https://tuo-progetto.vercel.app)."
-            exit 1
+          scelto="$INPUT_URL"
+          origine="campo del modulo"
+          if [[ -z "$scelto" ]]; then
+            scelto="$SECRET_URL"
+            origine="secret APP_URL"
           fi
-          if [[ ! "$APP_URL" =~ ^https:// ]]; then
-            echo "APP_URL deve iniziare per https://"
-            exit 1
+          if [[ -z "$scelto" ]]; then
+            scelto="https://esempio-non-configurato.invalid"
+            origine="segnaposto"
+            {
+              echo "### Nessun URL configurato"
+              echo ""
+              echo "L'IPA verrà compilato lo stesso, ma l'app mostrerà la pagina"
+              echo "\"non riesco a raggiungere il server\"."
+              echo ""
+              echo "Per averla funzionante: rilancia questo workflow scrivendo"
+              echo "l'URL del deploy nel campo, oppure impostalo una volta sola"
+              echo "in Settings → Secrets and variables → Actions come \`APP_URL\`."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
-          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$APP_URL" || echo "000")
-          echo "Il server risponde: $code"
-          if [[ "$code" == "000" ]]; then
-            echo "L'URL non risponde: l'app compilata mostrerebbe solo la pagina di errore."
+
+          if [[ ! "$scelto" =~ ^https:// ]]; then
+            echo "L'URL deve iniziare per https:// — ricevuto qualcosa di diverso."
             exit 1
           fi
 
+          # Il controllo di raggiungibilita' avvisa, non blocca: sapere che il
+          # server non risponde e' utile, ma non e' un buon motivo per negare
+          # l'IPA a chi il deploy non l'ha ancora fatto.
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$scelto" || echo "000")
+          echo "Il server risponde: $code (origine URL: $origine)"
+          if [[ "$code" == "000" ]]; then
+            echo "::warning::L'URL non risponde. L'IPA verrà comunque compilato."
+          fi
+
+          echo "value=$scelto" >> "$GITHUB_OUTPUT"
+
       - name: Genera il progetto iOS
         env:
-          APP_URL: ${{ secrets.APP_URL }}
+          APP_URL: ${{ steps.url.outputs.value }}
         run: |
           npx cap add ios
           npx cap sync ios
@@ -98,7 +126,14 @@ jobs:
           rm -rf Payload && mkdir -p Payload
           cp -R "$app_path" Payload/
           zip -qry PersonalTrainer-unsigned.ipa Payload
-          echo "IPA pronto: $(du -h PersonalTrainer-unsigned.ipa | cut -f1)"
+          size=$(du -h PersonalTrainer-unsigned.ipa | cut -f1)
+          echo "IPA pronto: $size"
+          {
+            echo "### IPA pronto ($size)"
+            echo ""
+            echo "Scaricalo qui sotto da **Artifacts → PersonalTrainer-ipa**,"
+            echo "poi installalo con AltStore o SideStore."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Pubblica l'IPA come artifact
         uses: actions/upload-artifact@v4

@@ -1,0 +1,41 @@
+name: Controlli
+
+# Gira a ogni push e su ogni pull request: sono i controlli che finora
+# venivano fatti a mano. Un progetto serio non si fida della memoria.
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  controlli:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Controllo dei tipi
+        run: npm run typecheck
+
+      - name: Build
+        # Valori finti: la build non si collega al database, ma le variabili
+        # devono esistere o l'app si ferma di proposito all'avvio.
+        env:
+          DATABASE_URL: "postgresql://finto:finto@ep-finto.neon.tech/db?sslmode=require"
+          APP_PASSWORD: "finta"
+          AUTH_SECRET: "finto-segreto-per-la-build"
+        run: npm run build

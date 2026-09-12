@@ -15,9 +15,12 @@ personale.
 Stack: Next.js (App Router) + TypeScript, Tailwind CSS, Drizzle ORM, Neon
 (Postgres serverless). Deploy su Vercel, wrapping iOS con Capacitor.
 
-> **[PRODOTTO.md](PRODOTTO.md)** — cosa deve essere questa app, come si misura
-> la comodità d'uso, cosa manca e in che ordine. Da leggere prima di aggiungere
-> funzionalità.
+> **[PRODOTTO.md](PRODOTTO.md)** — cosa deve essere questa app e come si misura
+> la comodità d'uso. Da leggere prima di aggiungere funzionalità.
+>
+> **[ROADMAP.md](ROADMAP.md)** — cosa non è ancora a posto, in ordine di
+> quanto fa male: portarla sul telefono, non perdere i dati, gestire gli
+> errori.
 
 ## Target giornalieri
 
@@ -168,14 +171,20 @@ segnalibro. Ci sono tre modi, con costi molto diversi.
 
 Nessun Mac, nessun account Apple Developer a pagamento.
 
-**0. Imposta l'URL una volta sola.** Settings → *Secrets and variables* →
-Actions → **New repository secret**, nome `APP_URL`, valore l'URL del deploy
-Vercel. È un secret e non un campo digitato perché GitHub maschera i secret
-nei log: l'app non ha login, quindi chi conosce l'indirizzo può scrivere nel
-diario.
+**1. Compila l'IPA.** Scheda **Actions** → nella colonna di sinistra
+*Compila IPA per iPhone* → pulsante **Run workflow** in alto a destra →
+di nuovo **Run workflow** nel riquadro che si apre.
 
-**1. Compila l'IPA.** Scheda **Actions** → *Compila IPA per iPhone* → **Run
-workflow**. A fine esecuzione scarichi l'artifact `PersonalTrainer-ipa`.
+Nel campo puoi scrivere l'URL del deploy. **Puoi anche lasciarlo vuoto**: la
+compilazione va avanti lo stesso e ottieni un'app installabile che mostra
+"non riesco a raggiungere il server" finché non la ricompili con l'URL vero.
+Serve a vedere subito che la pipeline funziona.
+
+In alternativa l'URL si imposta una volta sola in Settings → *Secrets and
+variables* → Actions → **New repository secret**, nome `APP_URL`.
+
+A fine esecuzione (~10 minuti) scarichi l'artifact `PersonalTrainer-ipa` dal
+fondo della pagina della run.
 
 La compilazione gira su un runner macOS di GitHub, **gratis** perché la repo è
 pubblica.
