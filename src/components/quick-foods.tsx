@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { QuickFood } from "@/db/schema";
 import type { MealSlot } from "@/lib/meal-slots";
+import { alreadyOver, fitsInRemaining, type MacroTotals } from "@/lib/nutrition";
+import { MACRO_LABELS } from "@/lib/targets";
 import { QuantitySheet } from "./quantity-sheet";
 
 /** Oltre questa soglia il tocco e' "tenuto premuto" e apre le quantita'. */
@@ -16,13 +18,16 @@ const LONG_PRESS_MS = 400;
 export function QuickFoods({
   foods,
   defaultSlot,
+  totals,
   onAdd,
 }: {
   foods: QuickFood[];
   defaultSlot: MealSlot;
+  totals: MacroTotals;
   onAdd: (food: QuickFood, quantity: number, slot: MealSlot) => void;
 }) {
   const [sheetFor, setSheetFor] = useState<QuickFood | null>(null);
+  const [soloCheCiSta, setSoloCheCiSta] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressed = useRef(false);
 
@@ -39,6 +44,16 @@ export function QuickFoods({
     timer.current = null;
   }
 
+  // Il verdetto si ricalcola a ogni pasto aggiunto: e' la sottrazione che
+  // faresti a mente, fatta da chi ha gia' i numeri.
+  const verdicts = useMemo(
+    () => new Map(foods.map((food) => [food.id, fitsInRemaining(totals, food)])),
+    [foods, totals],
+  );
+  const quantiCiStanno = [...verdicts.values()].filter((v) => v.fits).length;
+  const giaOltre = useMemo(() => alreadyOver(totals), [totals]);
+  const visible = soloCheCiSta ? foods.filter((food) => verdicts.get(food.id)?.fits) : foods;
+
   if (foods.length === 0) {
     return (
       <p className="text-[15px] text-muted">
@@ -49,8 +64,39 @@ export function QuickFoods({
 
   return (
     <>
+      <button
+        type="button"
+        onClick={() => setSoloCheCiSta((value) => !value)}
+        aria-pressed={soloCheCiSta}
+        className={`mb-3 min-h-11 w-full rounded-xl px-4 text-[13px] font-medium transition-colors ${
+          soloCheCiSta
+            ? "bg-accent text-on-accent"
+            : "border border-hairline bg-raised text-muted"
+        }`}
+      >
+        {soloCheCiSta
+          ? `Mostro solo i ${quantiCiStanno} che ci stanno`
+          : `Cosa mi entra ancora (${quantiCiStanno} su ${foods.length})`}
+      </button>
+
+      {giaOltre.length > 0 ? (
+        <p className="mb-3 text-[13px] text-muted">
+          {giaOltre.length === 1
+            ? `${MACRO_LABELS[giaOltre[0]]} già oltre il target`
+            : `Già oltre il target: ${giaOltre.map((key) => MACRO_LABELS[key].toLowerCase()).join(", ")}`}
+          . Qui sotto conta solo dove hai ancora margine.
+        </p>
+      ) : null}
+
+      {visible.length === 0 ? (
+        <p className="text-[15px] text-muted">
+          Niente ci sta più dentro senza sforare. Puoi aggiungerlo lo stesso: il
+          diario registra, non giudica.
+        </p>
+      ) : null}
+
       <div className="grid grid-cols-2 items-stretch gap-2">
-        {foods.map((food) => (
+        {visible.map((food) => (
           <div key={food.id} className="relative">
             <button
               type="button"
@@ -67,7 +113,17 @@ export function QuickFoods({
               className="flex min-h-16 w-full flex-col justify-between rounded-xl border border-hairline bg-surface px-3 py-2.5 pr-10 text-left transition active:scale-[0.98] active:bg-raised"
             >
               <span className="text-[15px] font-medium leading-tight">{food.name}</span>
-              <span className="mt-1.5 text-[13px] tabular-nums text-muted">{food.kcal} kcal</span>
+              <span className="mt-1.5 text-[13px] tabular-nums text-muted">
+                {food.kcal} kcal
+                {verdicts.get(food.id)?.fits === false ? (
+                  <span className="ml-1.5 text-over">
+                    sfora {verdicts
+                      .get(food.id)!
+                      .exceeds.map((key) => MACRO_LABELS[key].toLowerCase())
+                      .join(", ")}
+                  </span>
+                ) : null}
+              </span>
             </button>
 
             {/* Bersaglio esplicito per le quantita': il tocco lungo non si scopre da solo. */}

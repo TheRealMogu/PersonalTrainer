@@ -64,3 +64,33 @@ export function buildProgress(totals: MacroTotals): MacroProgress[] {
     };
   });
 }
+
+export type FitVerdict = {
+  /** Vero se non fa passare oltre il target nessun macro che ancora ci sta. */
+  fits: boolean;
+  /** I macro che questo alimento farebbe sforare, per dirlo invece di colorare. */
+  exceeds: MacroKey[];
+};
+
+/**
+ * Se un alimento "ci sta ancora" in quello che resta della giornata.
+ *
+ * I macro gia' oltre target non vengono contati: se hai gia' sforato i
+ * carboidrati, qualunque cosa li peggiora, e segnalarlo su ogni alimento
+ * farebbe sembrare tutto proibito senza aiutare a scegliere. Conta solo dove
+ * hai ancora margine.
+ *
+ * Non e' un consiglio nutrizionale: e' la sottrazione che faresti a mente,
+ * fatta da chi ha gia' i numeri sotto mano.
+ */
+export function fitsInRemaining(totals: MacroTotals, item: MacroSource): FitVerdict {
+  const exceeds = MACRO_ORDER.filter(
+    (key) => totals[key] <= DAILY_TARGETS[key] && totals[key] + item[key] > DAILY_TARGETS[key],
+  );
+  return { fits: exceeds.length === 0, exceeds };
+}
+
+/** I macro gia' oltre target, da dire una volta sola invece che su ogni alimento. */
+export function alreadyOver(totals: MacroTotals): MacroKey[] {
+  return MACRO_ORDER.filter((key) => totals[key] > DAILY_TARGETS[key]);
+}

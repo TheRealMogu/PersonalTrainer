@@ -184,3 +184,77 @@ export async function getRecentSessions(limit = 20) {
     .orderBy(desc(workoutSessions.startedAt))
     .limit(limit);
 }
+
+export type ExerciseProgressPoint = {
+  day: string;
+  bestOneRepMax: number;
+  volume: number;
+  topWeight: number;
+  topReps: number;
+};
+
+export type ExerciseProgress = {
+  exerciseId: number;
+  name: string;
+  points: ExerciseProgressPoint[];
+};
+
+/**
+ * Andamento per esercizio: una riga per seduta, col massimale stimato piu'
+ * alto e il volume totale. Serve a rispondere a "la panca sta salendo?", che
+ * guardando le singole serie non si capisce.
+ */
+export async function getExerciseProgress(limitPerExercise = 12): Promise<ExerciseProgress[]> {
+  const rows = await db
+    .select({
+      exerciseId: workoutSets.exerciseId,
+      name: workoutExercises.name,
+      day: workoutSessions.day,
+      weight: workoutSets.weight,
+      reps: workoutSets.reps,
+    })
+    .from(workoutSets)
+    .innerJoin(workoutExercises, eq(workoutSets.exerciseId, workoutExercises.id))
+    .innerJoin(workoutSessions, eq(workoutSets.sessionId, workoutSessions.id))
+    .orderBy(asc(workoutSessions.day), asc(workoutSets.setNumber));
+
+  // Raggruppa per esercizio e per giornata, tenendo la serie migliore.
+  const byExercise = new Map<number, { name: string; days: Map<string, ExerciseProgressPoint> }>();
+
+  for (const row of rows) {
+    const oneRm = row.weight > 0 && row.reps > 0 ? row.weight * (1 + row.reps / 30) : 0;
+    let entry = byExercise.get(row.exerciseId);
+    if (!entry) {
+      entry = { name: row.name, days: new Map() };
+      byExercise.set(row.exerciseId, entry);
+    }
+
+    const point = entry.days.get(row.day);
+    if (!point) {
+      entry.days.set(row.day, {
+        day: row.day,
+        bestOneRepMax: oneRm,
+        volume: row.weight * row.reps,
+        topWeight: row.weight,
+        topReps: row.reps,
+      });
+    } else {
+      point.volume += row.weight * row.reps;
+      if (oneRm > point.bestOneRepMax) {
+        point.bestOneRepMax = oneRm;
+        point.topWeight = row.weight;
+        point.topReps = row.reps;
+      }
+    }
+  }
+
+  return [...byExercise.entries()]
+    .map(([exerciseId, entry]) => ({
+      exerciseId,
+      name: entry.name,
+      points: [...entry.days.values()].slice(-limitPerExercise),
+    }))
+    // Solo esercizi con almeno due sedute: con un punto solo non c'e' andamento.
+    .filter((item) => item.points.length >= 2)
+    .sort((a, b) => a.name.localeCompare(b.name, "it"));
+}

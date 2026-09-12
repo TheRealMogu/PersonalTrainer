@@ -101,6 +101,53 @@ export async function restoreMeal(
   return { ok: true };
 }
 
+/**
+ * Cambia la quantita' di un pasto gia' inserito, riscalando i macro dalla
+ * porzione base. Sbagliare a digitare capita: se correggere costa quanto
+ * rifare tutto, il dato sbagliato resta li'.
+ */
+export async function updateMealQuantity(
+  id: number,
+  day: string,
+  quantity: number,
+): Promise<ActionResult> {
+  if (!Number.isInteger(id) || id <= 0) return { ok: false, error: "Pasto non valido." };
+  if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };
+  if (!Number.isFinite(quantity) || quantity <= 0 || quantity > 20) {
+    return { ok: false, error: "La quantità deve stare fra 0 e 20 porzioni." };
+  }
+
+  try {
+    const [current] = await db
+      .select()
+      .from(meals)
+      .where(and(eq(meals.id, id), eq(meals.day, day)));
+
+    if (!current) return { ok: false, error: "Pasto non trovato." };
+
+    // I macro salvati sono gia' moltiplicati: si torna alla porzione base
+    // prima di riscalare, altrimenti l'errore si accumula a ogni modifica.
+    const factor = quantity / current.quantity;
+
+    await db
+      .update(meals)
+      .set({
+        quantity,
+        kcal: Math.round(current.kcal * factor),
+        carbs: current.carbs * factor,
+        protein: current.protein * factor,
+        fat: current.fat * factor,
+      })
+      .where(eq(meals.id, id));
+  } catch (cause) {
+    console.error("updateMealQuantity fallita", cause);
+    return { ok: false, error: "Modifica non riuscita. Riprova." };
+  }
+
+  revalidatePath("/");
+  return { ok: true };
+}
+
 export async function deleteMeal(id: number, day: string): Promise<ActionResult> {
   if (!Number.isInteger(id) || id <= 0) return { ok: false, error: "Pasto non valido." };
   if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };

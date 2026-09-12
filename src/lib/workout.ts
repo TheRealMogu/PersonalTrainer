@@ -72,3 +72,23 @@ export function formatElapsed(seconds: number): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
 }
+
+/**
+ * Massimale stimato con la formula di Epley: carico × (1 + ripetizioni/30).
+ *
+ * Serve perche' "80 kg × 5" e "70 kg × 10" non sono confrontabili a occhio,
+ * ma dicono cose simili sulla forza. Normalizzando si vede se il carico sale
+ * davvero nei mesi, non solo se oggi hai messo un disco in piu'.
+ *
+ * E' una stima, non una misura: serve a confrontare sedute fra loro, non a
+ * dirti quanto alzi davvero in singola.
+ */
+export function estimatedOneRepMax(set: Pick<LoggedSet, "weight" | "reps">): number {
+  if (set.weight <= 0 || set.reps <= 0) return 0;
+  return set.weight * (1 + set.reps / 30);
+}
+
+/** Il massimale stimato piu' alto di una seduta: la serie che conta davvero. */
+export function bestOneRepMax(sets: Pick<LoggedSet, "weight" | "reps">[]): number {
+  return sets.reduce((best, set) => Math.max(best, estimatedOneRepMax(set)), 0);
+}

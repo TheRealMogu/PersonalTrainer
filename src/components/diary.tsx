@@ -2,12 +2,19 @@
 
 import { useOptimistic, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { addMeal, deleteMeal, restoreMeal, type MealInput } from "@/app/actions";
+import {
+  addMeal,
+  deleteMeal,
+  restoreMeal,
+  updateMealQuantity,
+  type MealInput,
+} from "@/app/actions";
 import type { Meal, QuickFood } from "@/db/schema";
 import type { MealSlot } from "@/lib/meal-slots";
 import { buildProgress, sumMacros } from "@/lib/nutrition";
 import { Card } from "./card";
 import { CalorieRing } from "./calorie-ring";
+import { EditMealSheet } from "./edit-meal-sheet";
 import { MacroBar } from "./macro-bar";
 import { ManualMealForm } from "./manual-meal-form";
 import { MealList } from "./meal-list";
@@ -17,7 +24,8 @@ import { UndoToast } from "./undo-toast";
 type OptimisticAction =
   | { type: "add"; meal: Meal }
   | { type: "remove"; id: number }
-  | { type: "restore"; meal: Meal };
+  | { type: "restore"; meal: Meal }
+  | { type: "replace"; meal: Meal };
 
 /** Secondi in cui resta disponibile l'annullamento di un'eliminazione. */
 const UNDO_SECONDS = 6;
@@ -43,6 +51,7 @@ export function Diary({
   const [, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [undoable, setUndoable] = useState<Meal | null>(null);
+  const [editing, setEditing] = useState<Meal | null>(null);
   const tempId = useRef(-1);
 
   const [optimisticMeals, applyOptimistic] = useOptimistic(
@@ -53,6 +62,8 @@ export function Diary({
           return [...state, action.meal];
         case "remove":
           return state.filter((meal) => meal.id !== action.id);
+        case "replace":
+          return state.map((meal) => (meal.id === action.meal.id ? action.meal : meal));
         case "restore":
           return [...state, action.meal].sort(
             (a, b) => a.createdAt.getTime() - b.createdAt.getTime() || a.id - b.id,
@@ -61,7 +72,8 @@ export function Diary({
     },
   );
 
-  const progress = buildProgress(sumMacros(optimisticMeals));
+  const totals = sumMacros(optimisticMeals);
+  const progress = buildProgress(totals);
 
   function handleAdd(input: Omit<MealInput, "day">) {
     setError(null);
@@ -91,6 +103,32 @@ export function Diary({
         return;
       }
       setUndoable(meal);
+      router.refresh();
+    });
+  }
+
+  function handleEdit(meal: Meal, quantity: number) {
+    setEditing(null);
+    setError(null);
+    startTransition(async () => {
+      const factor = quantity / meal.quantity;
+      applyOptimistic({
+        type: "replace",
+        meal: {
+          ...meal,
+          quantity,
+          kcal: Math.round(meal.kcal * factor),
+          carbs: meal.carbs * factor,
+          protein: meal.protein * factor,
+          fat: meal.fat * factor,
+        },
+      });
+
+      const result = await updateMealQuantity(meal.id, day, quantity);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
       router.refresh();
     });
   }
@@ -132,13 +170,18 @@ export function Diary({
       </Card>
 
       <Card title={`Pasti (${optimisticMeals.length})`}>
-        <MealList meals={optimisticMeals} onDelete={handleDelete} />
+        <MealList
+          meals={optimisticMeals}
+          onEdit={setEditing}
+          onDelete={handleDelete}
+        />
       </Card>
 
       <Card title="Aggiungi">
         <QuickFoods
           foods={quickFoods}
           defaultSlot={defaultSlot}
+          totals={totals}
           onAdd={(food, quantity, slot) =>
             handleAdd({
               slot,
@@ -160,6 +203,19 @@ export function Diary({
         <p role="alert" className="mb-4 px-1 text-[13px] text-over">
           {error}
         </p>
+      ) : null}
+
+      {editing ? (
+        <EditMealSheet
+          meal={editing}
+          onConfirm={(quantity) => handleEdit(editing, quantity)}
+          onDelete={() => {
+            const meal = editing;
+            setEditing(null);
+            handleDelete(meal);
+          }}
+          onClose={() => setEditing(null)}
+        />
       ) : null}
 
       {undoable ? (

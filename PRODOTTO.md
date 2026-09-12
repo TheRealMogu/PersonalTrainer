@@ -54,12 +54,12 @@ prodotto, non una mancanza di funzionalità.
 | Vedere cosa ho mangiato | 0 tocchi | 0 | ok |
 | Aggiungere un cibo ricorrente | 1 tocco | 1 | ok |
 | Aggiungere lo stesso cibo in quantità diversa | 2 tocchi | 2 (tasto "+" → quantità) | ok |
-| Correggere un pasto già inserito | 2 tocchi | elimina + reinserisci | **da fare** |
+| Correggere un pasto già inserito | 2 tocchi | 2 (tocca la riga → quantità) | ok |
 | Annullare un errore | 1 tocco | 1 | ok |
 | Entrare nell'app | 0 tocchi dopo il primo accesso | 0 | ok |
 | Segnare il carico di una serie | 2 tocchi | 1 (campi già pronti) | ok |
 | Vedere il carico dell'ultima volta | 0 tocchi | 0 | ok |
-| Sapere cosa mi entra ancora | 0 tocchi | da calcolare a mente | **da fare** |
+| Sapere cosa mi entra ancora | 0 tocchi | 0 (conteggio sempre visibile) | ok |
 | Capire dove sono finite le calorie | 0 tocchi | 0 (totale per pasto) | ok |
 
 Due regole che valgono sempre:
@@ -111,29 +111,24 @@ e va difesa a ogni aggiunta.
   carico e ripetizioni, timer di recupero, volume sollevato, e il carico
   dell'ultima volta già proposto nei campi.
 - **Storico** — media giornaliera e andamento su 7 o 30 giorni, con i giorni
-  entro il target. Stessi colori del diario.
+  entro il target. Stessi colori del diario. In fondo la **progressione in
+  palestra**: massimale stimato per esercizio, seduta dopo seduta.
 - **Tema chiaro e scuro** che segue l'impostazione dell'iPhone.
 
-## Cosa manca, in ordine
+## Cosa resta fuori, di proposito
 
-L'ordine è per quanto pesa ogni giorno, non per quanto è difficile.
+Tutte le voci della prima lista sono state chiuse. Quello che resta è quello
+che abbiamo deciso di **non** fare, e vale la pena tenerlo scritto:
 
-### 1. Grafico della progressione per esercizio
+- **illustrazioni anatomiche per esercizio** — sono materiale su licenza, non
+  si producono;
+- **percentuali di "prontezza muscolare"** — è un modello inventato: un
+  numero che sembra una misura e non lo è;
+- **istruzioni su come eseguire gli esercizi** — le ha già date il PT, e
+  riscriverle peggio non aiuta.
 
-Il volume per seduta c'è già. Manca la curva per singolo esercizio, per
-vedere se la panca sale davvero nel tempo: la macchina dei grafici è la
-stessa dello Storico.
-
-### 2. Cosa mi entra ancora
-
-Diretta conseguenza del budget. A cena ti restano 600 kcal e 70 g di
-proteine: l'app sa cosa hai fra i tasti rapidi, quindi può dirti quali ci
-stanno dentro, senza che tu faccia i conti.
-
-### 3. Correggere un pasto
-
-Oggi si elimina e si reinserisce. Sbagliare a digitare un numero capita, e
-rifare tutto da capo scoraggia dal correggere — così il dato resta sbagliato.
+Se un giorno servisse altro, il metro resta la tabella dei gesti: si aggiunge
+solo quello che abbassa un costo che oggi è alto.
 
 ## Regole di design non negoziabili
 
@@ -157,6 +152,11 @@ Valgono per ogni aggiunta futura.
    occhio.
 10. **Il colore non è mai l'unico segnale.** Accanto a ogni pallino c'è il
     nome del macro, e il fuori target si legge anche dalla scritta.
+11. **Non si incolpa l'utente per quello che è già successo.** Se un macro è
+    già oltre, non lo si segnala su ogni alimento: si dice una volta sola e
+    si conta solo dove c'è ancora margine.
+12. **Le stime si dichiarano.** Il massimale è calcolato, non misurato, e la
+    schermata lo scrive.
 
 ## Come si verifica che sia davvero comodo
 

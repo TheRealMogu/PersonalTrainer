@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  bestOneRepMax,
+  estimatedOneRepMax,
   formatElapsed,
   formatWeight,
   groupByExercise,
@@ -103,5 +105,43 @@ describe("formatElapsed", () => {
 
   it("non va sotto zero", () => {
     assert.equal(formatElapsed(-10), "00:00");
+  });
+});
+
+describe("massimale stimato", () => {
+  it("segue la formula di Epley", () => {
+    assert.equal(estimatedOneRepMax({ weight: 100, reps: 1 }), 100 * (1 + 1 / 30));
+    assert.equal(estimatedOneRepMax({ weight: 100, reps: 30 }), 200);
+  });
+
+  it("rende confrontabili serie diverse", () => {
+    const pesante = estimatedOneRepMax({ weight: 80, reps: 5 });
+    const leggera = estimatedOneRepMax({ weight: 70, reps: 10 });
+    // 80x5 -> 93.3 ; 70x10 -> 93.3 : quasi lo stesso lavoro, ed e' il punto
+    assert.ok(Math.abs(pesante - leggera) < 1, `${pesante} vs ${leggera}`);
+  });
+
+  it("sale se sale il carico a parita' di ripetizioni", () => {
+    assert.ok(
+      estimatedOneRepMax({ weight: 82.5, reps: 5 }) > estimatedOneRepMax({ weight: 80, reps: 5 }),
+    );
+  });
+
+  it("vale zero senza carico o senza ripetizioni", () => {
+    assert.equal(estimatedOneRepMax({ weight: 0, reps: 10 }), 0);
+    assert.equal(estimatedOneRepMax({ weight: 50, reps: 0 }), 0);
+  });
+
+  it("bestOneRepMax prende la serie migliore, non l'ultima", () => {
+    const sets = [
+      { weight: 60, reps: 10 },
+      { weight: 90, reps: 3 },
+      { weight: 50, reps: 12 },
+    ];
+    assert.equal(bestOneRepMax(sets), estimatedOneRepMax({ weight: 90, reps: 3 }));
+  });
+
+  it("su lista vuota fa zero", () => {
+    assert.equal(bestOneRepMax([]), 0);
   });
 });

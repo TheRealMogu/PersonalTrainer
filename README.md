@@ -9,7 +9,8 @@ personale.
 - **Piano** — target giornaliero, regole generali e integrazione.
 - **Allenamento** — programma Team Schiavi, settimana T1 (3 giornate).
 - **Storico** — media giornaliera e andamento dei macro su 7 o 30 giorni, con
-  linea del target e vista tabellare.
+  linea del target e vista tabellare, più la progressione del massimale
+  stimato per ogni esercizio.
 
 Stack: Next.js (App Router) + TypeScript, Tailwind CSS, Drizzle ORM, Neon
 (Postgres serverless). Deploy su Vercel, wrapping iOS con Capacitor.
