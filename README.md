@@ -274,6 +274,7 @@ src/
     date.ts              utility sulle date (YYYY-MM-DD)
     history.ts           intervalli, medie e scala dei grafici
     workout.ts           volume, proposta del carico, durate
+    meal-slots.ts        momenti della giornata e raggruppamento
     auth.ts              firma e verifica del cookie di sessione
     plan.ts              linee guida del PT
     seed-data.ts         tasti rapidi + programma di allenamento
@@ -291,7 +292,7 @@ scripts/seed.ts          script di seed
 
 | Tabella | Contenuto |
 |---|---|
-| `meals` | pasti del diario (`day`, `name`, `kcal`, `carbs`, `protein`, `fat`) |
+| `meals` | pasti del diario (`day`, `slot`, `quantity`, `name`, macro) |
 | `workout_sessions` | sedute di allenamento (`end_at` nullo = in corso) |
 | `workout_sets` | serie eseguite: carico e ripetizioni |
 | `quick_foods` | cibi ricorrenti dei tasti rapidi |

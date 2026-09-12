@@ -85,7 +85,7 @@ export function ExerciseCard({
                 onClick={() => onDelete(set.id)}
                 aria-label={`Elimina serie ${set.setNumber} di ${exercise.name}`}
                 disabled={disabled}
-                className="-mr-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted active:bg-canvas disabled:opacity-40"
+                className="-mr-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted active:bg-raised disabled:opacity-40"
               >
                 <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                   <path
@@ -112,7 +112,7 @@ export function ExerciseCard({
             onChange={(event) => setWeight(event.target.value)}
             placeholder="0"
             aria-label={`Carico per ${exercise.name}`}
-            className="h-11 w-full rounded-xl border border-hairline bg-canvas px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent"
+            className="h-11 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent"
           />
         </label>
 
@@ -125,7 +125,7 @@ export function ExerciseCard({
             onChange={(event) => setReps(event.target.value)}
             placeholder={exercise.reps}
             aria-label={`Ripetizioni per ${exercise.name}`}
-            className="h-11 w-full rounded-xl border border-hairline bg-canvas px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent"
+            className="h-11 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent"
           />
         </label>
 
@@ -134,7 +134,7 @@ export function ExerciseCard({
           onClick={handleLog}
           disabled={disabled}
           aria-label={`Segna la serie di ${exercise.name}`}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent text-white active:opacity-80 disabled:opacity-50"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent active:opacity-80 disabled:opacity-50"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path

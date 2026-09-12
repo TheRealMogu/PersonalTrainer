@@ -26,7 +26,7 @@ export function StartWorkoutButton({ dayId, label }: { dayId: number; label: str
             router.refresh();
           })
         }
-        className="min-h-11 w-full rounded-xl bg-accent text-[15px] font-semibold text-white active:opacity-80 disabled:opacity-50"
+        className="min-h-11 w-full rounded-xl bg-accent text-[15px] font-semibold text-on-accent active:opacity-80 disabled:opacity-50"
       >
         {pending ? "Apro…" : "Inizia"}
       </button>

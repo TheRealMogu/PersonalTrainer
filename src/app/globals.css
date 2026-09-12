@@ -1,22 +1,79 @@
 @import "tailwindcss";
 
+/*
+ * Tema chiaro e scuro.
+ *
+ * Il tema scuro non e' il chiaro rovesciato: i colori dei macro hanno una
+ * banda di luminosita' diversa per restare leggibili sul fondo nero, e sono
+ * stati validati separatamente per la separazione su daltonismo.
+ */
 @theme {
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
     system-ui, sans-serif;
 
+  /* superfici e testo */
+  --color-canvas: #f2f2f7;
+  --color-surface: #ffffff;
+  --color-raised: #f7f7fa;
+  --color-hairline: #e3e3e8;
+  --color-reference: #b8b8bd;
   --color-ink: #1c1c1e;
   --color-muted: #6e6e73;
-  --color-hairline: #e5e5ea;
-  --color-surface: #ffffff;
-  --color-canvas: #f5f5f7;
+
+  /* azione e stato */
   --color-accent: #0071e3;
-  --color-over: #ff3b30;
-  /* riferimento del target: piu' marcato della griglia, che resta recessiva */
-  --color-reference: #b8b8bd;
+  --color-over: #d92d20;
+  --color-on-accent: #ffffff;
+
+  /* un colore per macro, coerente su tutte le schermate */
+  --color-kcal: #0071e3;
+  --color-carbs: #c2700a;
+  --color-protein: #7048d8;
+  --color-fat: #0d8f66;
+
+  /* fondo delle tracce: lo stesso colore, molto diluito */
+  --color-track: #e3e3e8;
+
+  /* sovrapposizioni (annulla, recupero): sempre scure, anche di giorno */
+  --color-overlay: #2c2c2e;
+  --color-on-overlay: #ffffff;
+  --color-overlay-track: #4a4a4d;
+}
+
+/*
+ * Tema scuro: si sovrascrivono le variabili, non si ridichiara `@theme`.
+ * Un secondo blocco `@theme` non e' condizionale — sostituisce il primo in
+ * fase di build, e il tema chiaro sparisce del tutto (successo davvero).
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-canvas: #000000;
+    --color-surface: #1c1c1e;
+    --color-raised: #2c2c2e;
+    --color-hairline: #38383a;
+    --color-reference: #5a5a5e;
+    --color-ink: #f2f2f7;
+    --color-muted: #9b9ba1;
+
+    --color-accent: #3d8ee8;
+    --color-over: #ff6b5e;
+    --color-on-accent: #ffffff;
+
+    --color-kcal: #3d8ee8;
+    --color-carbs: #c07818;
+    --color-protein: #8f6fe6;
+    --color-fat: #18a578;
+
+    --color-track: #38383a;
+
+    --color-overlay: #3a3a3c;
+    --color-on-overlay: #ffffff;
+    --color-overlay-track: #58585c;
+  }
 }
 
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
 }
 
 html,
@@ -37,4 +94,14 @@ input,
 select,
 textarea {
   font-size: 16px;
+}
+
+/* Chi ha chiesto meno animazioni non deve vedere barre e anelli muoversi. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

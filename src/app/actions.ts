@@ -5,12 +5,15 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { meals } from "@/db/schema";
 import { isIsoDate } from "@/lib/date";
+import { isMealSlot, type MealSlot } from "@/lib/meal-slots";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
 export type MealInput = {
   day: string;
+  slot: MealSlot;
   name: string;
+  quantity: number;
   kcal: number;
   carbs: number;
   protein: number;
@@ -19,6 +22,10 @@ export type MealInput = {
 
 function validate(input: MealInput): string | null {
   if (!isIsoDate(input.day)) return "Data non valida.";
+  if (!isMealSlot(input.slot)) return "Momento della giornata non valido.";
+  if (!Number.isFinite(input.quantity) || input.quantity <= 0 || input.quantity > 20) {
+    return "La quantità deve stare fra 0 e 20 porzioni.";
+  }
   if (!input.name.trim()) return "Il nome del pasto è obbligatorio.";
   if (input.name.trim().length > 120) return "Il nome del pasto è troppo lungo.";
 
@@ -43,7 +50,9 @@ export async function addMeal(input: MealInput): Promise<ActionResult> {
   try {
     await db.insert(meals).values({
       day: input.day,
+      slot: input.slot,
       name: input.name.trim(),
+      quantity: input.quantity,
       kcal: Math.round(input.kcal),
       carbs: input.carbs,
       protein: input.protein,
@@ -74,7 +83,9 @@ export async function restoreMeal(
   try {
     await db.insert(meals).values({
       day: input.day,
+      slot: input.slot,
       name: input.name.trim(),
+      quantity: input.quantity,
       kcal: Math.round(input.kcal),
       carbs: input.carbs,
       protein: input.protein,

@@ -1,5 +1,6 @@
 import {
   date,
+  pgEnum,
   index,
   integer,
   pgTable,
@@ -8,6 +9,14 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+
+/** I momenti della giornata, nell'ordine in cui si mangia. */
+export const mealSlotEnum = pgEnum("meal_slot", [
+  "colazione",
+  "pranzo",
+  "cena",
+  "spuntino",
+]);
 
 /**
  * Pasti registrati nel diario, uno per riga, raggruppati per giornata.
@@ -18,7 +27,10 @@ export const meals = pgTable(
   {
     id: serial("id").primaryKey(),
     day: date("day").notNull(),
+    slot: mealSlotEnum("slot").notNull().default("spuntino"),
     name: text("name").notNull(),
+    /** Quante porzioni: 1 = quella base, 0.5 = mezza, 2 = doppia. */
+    quantity: real("quantity").notNull().default(1),
     kcal: integer("kcal").notNull(),
     carbs: real("carbs").notNull(),
     protein: real("protein").notNull(),

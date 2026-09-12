@@ -15,7 +15,7 @@ export function RangeFilter({ active }: { active: number }) {
             aria-current={selected ? "true" : undefined}
             className={`rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors ${
               selected
-                ? "bg-accent text-white"
+                ? "bg-accent text-on-accent"
                 : "border border-hairline bg-surface text-muted"
             }`}
           >
