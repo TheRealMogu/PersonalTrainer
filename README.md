@@ -119,37 +119,67 @@ npm run db:generate   # committa il file .sql generato
 npm run db:migrate    # applicalo a Neon dalla tua macchina
 ```
 
-## 4. Wrappare con Capacitor per iOS
+## 4. Metterla sull'iPhone
 
-L'app usa Server Components e Server Actions, quindi ha bisogno di un server:
-la strada più semplice è far puntare Capacitor al deploy Vercel, invece di
-esportare un bundle statico. La webview mostra l'app remota e il risultato è
-un'app installabile sull'iPhone.
+Ci sono due strade, e **non sono equivalenti in costo**. Leggi entrambe prima
+di scegliere.
 
-Serve un Mac con Xcode.
+### Strada A — Aggiungi a Home (subito, gratis, senza Mac)
+
+L'app è già una PWA installabile. Dopo il deploy su Vercel:
+
+1. Apri il sito con **Safari** sull'iPhone (non Chrome: solo Safari installa).
+2. Tocca **Condividi** → **Aggiungi a Home**.
+3. Conferma il nome.
+
+Ottieni un'icona sulla Home che apre l'app **a tutto schermo**, senza barra
+degli indirizzi, con la sua schermata di avvio. Da usare è indistinguibile da
+un'app scaricata dallo Store.
+
+Quello che serve è già nel repo: `src/app/manifest.ts` (`display: standalone`)
+e `src/app/apple-icon.tsx`, che genera in build il PNG 180×180 che iOS vuole
+per l'icona — iOS non accetta SVG per la Home.
+
+Limiti da conoscere:
+
+- **Serve connessione.** Le pagine sono renderizzate dal server, quindi senza
+  rete l'app non si apre. Vale anche per la Strada B.
+- Niente notifiche push né accesso a HealthKit.
+- L'aggiornamento è automatico: dopo ogni deploy su Vercel l'app è aggiornata,
+  non c'è niente da reinstallare.
+
+### Strada B — App nativa con Capacitor (serve un Mac e 99 $/anno)
+
+Ha senso solo se in futuro servono notifiche push, HealthKit o la
+pubblicazione sull'App Store. Per il solo uso personale la Strada A basta.
+
+Cosa serve prima di iniziare:
+
+- un **Mac con Xcode** (i comandi `cap` per iOS non girano su Windows o Linux);
+- un **account Apple Developer**, 99 $/anno, se vuoi tenere l'app installata
+  oltre sette giorni: con un ID gratuito il certificato scade e l'app smette
+  di aprirsi finché non la reinstalli;
+- il **deploy su Vercel già fatto**, perché serve l'URL.
 
 ```bash
 npm install @capacitor/core @capacitor/ios
 npm install -D @capacitor/cli
 ```
 
-`capacitor.config.json` è già nel repo: sostituisci l'URL con il dominio del
-tuo deploy Vercel.
+In `capacitor.config.json` sostituisci l'URL con il dominio del tuo deploy.
+Il `webDir` punta a `public/`, che deve esistere: nel repo c'è già.
 
 ```json
 {
   "appId": "com.personaltrainer.app",
   "appName": "Personal Trainer",
   "webDir": "public",
-  "server": {
-    "url": "https://il-tuo-progetto.vercel.app",
-    "cleartext": false
-  },
+  "server": { "url": "https://il-tuo-progetto.vercel.app", "cleartext": false },
   "ios": { "contentInset": "always" }
 }
 ```
 
-Poi:
+Poi, sul Mac:
 
 ```bash
 npx cap add ios
@@ -157,17 +187,19 @@ npx cap sync ios
 npx cap open ios     # apre Xcode
 ```
 
-In Xcode seleziona il tuo team in **Signing & Capabilities**, collega
-l'iPhone e premi **Run**. L'icona dell'app si imposta da
+In Xcode: **Signing & Capabilities** → seleziona il tuo team, collega
+l'iPhone, premi **Run**. L'icona dell'app si imposta da
 `App/Assets.xcassets/AppIcon`.
 
-Dopo ogni deploy su Vercel l'app mobile è già aggiornata: la webview carica
-la versione online, non serve ricompilare. Va rifatto `npx cap sync ios` solo
-se cambi la configurazione o i plugin nativi.
+L'app carica il sito remoto nella webview, quindi dopo ogni deploy su Vercel è
+già aggiornata. `npx cap sync ios` serve solo se cambi configurazione o plugin
+nativi.
 
-> **Alternativa senza Xcode:** apri il sito su Safari e usa *Condividi →
-> Aggiungi a Home*. L'app parte a tutto schermo grazie ai meta tag
-> `apple-web-app` già presenti in `src/app/layout.tsx`.
+> **Nota sullo stato di verifica:** la Strada A è stata verificata (manifest
+> servito correttamente, icona PNG 180×180 generata, tag `apple-touch-icon` e
+> `apple-mobile-web-app-*` presenti nell'HTML). La Strada B **non è stata
+> eseguita**: richiede un Mac, che non era disponibile. I comandi sono quelli
+> standard di Capacitor, ma vanno provati.
 
 ## Struttura
 
@@ -181,6 +213,8 @@ src/
     storico/page.tsx     Storico (?giorni=7|30)
     actions.ts           Server Actions: aggiungi / elimina pasto
     globals.css          tema Tailwind (palette, tipografia di sistema)
+    manifest.ts          manifest PWA (installazione da Safari)
+    apple-icon.tsx       icona 180x180 per la Home di iOS, generata in build
   components/
     diary.tsx            stato ottimistico del diario (riepilogo, pasti, aggiunta)
     undo-toast.tsx       annullamento di un'eliminazione

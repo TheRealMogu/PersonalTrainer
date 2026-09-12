@@ -5,11 +5,13 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Personal Trainer",
   description: "Diario alimentare e programma di allenamento",
+  applicationName: "Personal Trainer",
   appleWebApp: {
     capable: true,
-    title: "Personal Trainer",
+    title: "Trainer",
     statusBarStyle: "default",
   },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
