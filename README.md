@@ -14,6 +14,10 @@ personale.
 Stack: Next.js (App Router) + TypeScript, Tailwind CSS, Drizzle ORM, Neon
 (Postgres serverless). Deploy su Vercel, wrapping iOS con Capacitor.
 
+> **[PRODOTTO.md](PRODOTTO.md)** — cosa deve essere questa app, come si misura
+> la comodità d'uso, cosa manca e in che ordine. Da leggere prima di aggiungere
+> funzionalità.
+
 ## Target giornalieri
 
 | | |
