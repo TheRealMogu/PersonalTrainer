@@ -84,9 +84,14 @@ npm run db:seed      # carica tasti rapidi e programma di allenamento
 npm run dev          # http://localhost:3000
 ```
 
-Il seed è idempotente: svuota e ricarica `quick_foods`, `workout_days` e
-`workout_exercises`. **Non tocca `meals`**, quindi si può rilanciare senza
-perdere il diario.
+Il seed ricarica sempre i tasti rapidi. **Non tocca `meals`**, e se trova
+serie di allenamento già registrate **lascia stare il programma**: gli
+esercizi sono riferiti dalle serie con `ON DELETE CASCADE`, quindi rifarlo
+cancellerebbe lo storico dei carichi. Per forzare comunque:
+
+```bash
+npm run db:seed -- --forza-allenamento
+```
 
 ### Script disponibili
 
@@ -268,6 +273,7 @@ src/
     nutrition.ts         somma macro e calcolo progresso
     date.ts              utility sulle date (YYYY-MM-DD)
     history.ts           intervalli, medie e scala dei grafici
+    workout.ts           volume, proposta del carico, durate
     auth.ts              firma e verifica del cookie di sessione
     plan.ts              linee guida del PT
     seed-data.ts         tasti rapidi + programma di allenamento
@@ -286,6 +292,8 @@ scripts/seed.ts          script di seed
 | Tabella | Contenuto |
 |---|---|
 | `meals` | pasti del diario (`day`, `name`, `kcal`, `carbs`, `protein`, `fat`) |
+| `workout_sessions` | sedute di allenamento (`end_at` nullo = in corso) |
+| `workout_sets` | serie eseguite: carico e ripetizioni |
 | `quick_foods` | cibi ricorrenti dei tasti rapidi |
 | `workout_days` | giornate del programma |
 | `workout_exercises` | esercizi con serie e ripetizioni |

@@ -1,7 +1,8 @@
 import "./load-env";
 import { neon } from "@neondatabase/serverless";
+import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
-import { quickFoods, workoutDays, workoutExercises } from "../src/db/schema";
+import { quickFoods, workoutDays, workoutExercises, workoutSets } from "../src/db/schema";
 import { QUICK_FOODS_SEED, WORKOUT_SEED } from "../src/lib/seed-data";
 
 async function main() {
@@ -12,17 +13,43 @@ async function main() {
 
   const db = drizzle(neon(connectionString));
 
-  console.log("Svuoto le tabelle di riferimento…");
-  await db.delete(workoutExercises);
-  await db.delete(workoutDays);
+  // I tasti rapidi non sono riferiti da nessuno: si possono sempre rifare.
+  console.log(`Ricarico ${QUICK_FOODS_SEED.length} tasti rapidi…`);
   await db.delete(quickFoods);
-
-  console.log(`Inserisco ${QUICK_FOODS_SEED.length} tasti rapidi…`);
   await db.insert(quickFoods).values(
     QUICK_FOODS_SEED.map((food, index) => ({ ...food, sortOrder: index })),
   );
 
+  /*
+   * Le serie registrate puntano agli esercizi con ON DELETE CASCADE: rifare
+   * il programma cancellerebbe tutto lo storico dei carichi. Meglio fermarsi
+   * e dirlo che perdere mesi di allenamenti in silenzio.
+   */
+  const [{ count: loggedSets }] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(workoutSets);
+
+  const forza = process.argv.includes("--forza-allenamento");
+
+  if (loggedSets > 0 && !forza) {
+    console.log(
+      `\nTrovate ${loggedSets} serie gia' registrate: lascio il programma com'e'.`,
+    );
+    console.log(
+      "Rifarlo cancellerebbe lo storico dei carichi. Per forzare comunque:",
+    );
+    console.log("  npm run db:seed -- --forza-allenamento\n");
+    console.log("Seed completato (solo tasti rapidi).");
+    return;
+  }
+
+  if (loggedSets > 0) {
+    console.log(`Forzato: cancello ${loggedSets} serie registrate.`);
+  }
+
   console.log(`Inserisco ${WORKOUT_SEED.length} giornate di allenamento…`);
+  await db.delete(workoutExercises);
+  await db.delete(workoutDays);
   for (const [dayIndex, day] of WORKOUT_SEED.entries()) {
     const [inserted] = await db
       .insert(workoutDays)
