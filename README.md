@@ -49,6 +49,9 @@ Stack: Next.js (App Router) + TypeScript, Tailwind CSS, Drizzle ORM, Neon
    ```
 
 `.env.local` è in `.gitignore`: la connection string non finisce mai nel repo.
+Lo leggono sia l'app sia gli script da riga di comando (`db:migrate`,
+`db:seed`); in alternativa va bene anche un `.env`, ma `.env.local` ha la
+precedenza.
 
 ## 2. Impostare l'accesso
 
@@ -70,6 +73,9 @@ Senza `AUTH_SECRET` l'app non si apre affatto: meglio bloccarsi che restare
 aperta per una variabile dimenticata.
 
 ## 3. Girare in locale
+
+Serve **Node 20.9 o superiore** (Node 22 se vuoi usare anche i comandi
+Capacitor in locale; per il solo sviluppo web non servono).
 
 ```bash
 npm install

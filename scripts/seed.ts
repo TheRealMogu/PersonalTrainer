@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "./load-env";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { quickFoods, workoutDays, workoutExercises } from "../src/db/schema";
