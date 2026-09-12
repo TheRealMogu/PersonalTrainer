@@ -18,9 +18,11 @@ function formatQuantity(quantity: number): string | null {
  */
 export function MealList({
   meals,
+  onEdit,
   onDelete,
 }: {
   meals: Meal[];
+  onEdit: (meal: Meal) => void;
   onDelete: (meal: Meal) => void;
 }) {
   if (meals.length === 0) {
@@ -53,7 +55,12 @@ export function MealList({
                 const quantity = formatQuantity(meal.quantity);
                 return (
                   <li key={meal.id} className="flex items-center gap-2 py-1">
-                    <div className="min-w-0 flex-1 py-1.5">
+                    <button
+                      type="button"
+                      onClick={() => onEdit(meal)}
+                      aria-label={`Modifica ${meal.name}`}
+                      className="min-w-0 flex-1 py-1.5 text-left active:opacity-60"
+                    >
                       <p className="truncate text-[15px] font-medium">
                         {meal.name}
                         {quantity ? (
@@ -66,7 +73,7 @@ export function MealList({
                         {meal.kcal} kcal · C {formatMacro(meal.carbs, "carbs")} · P{" "}
                         {formatMacro(meal.protein, "protein")} · G {formatMacro(meal.fat, "fat")}
                       </p>
-                    </div>
+                    </button>
                     <button
                       type="button"
                       onClick={() => onDelete(meal)}

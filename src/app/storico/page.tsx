@@ -1,11 +1,12 @@
 import { Card } from "@/components/card";
+import { ExerciseProgressChart } from "@/components/exercise-progress-chart";
 import { MacroHistoryChart, MacroHistoryTable } from "@/components/macro-history-chart";
 import { MacroStatTile } from "@/components/macro-stat-tile";
 import { PageHeader } from "@/components/page-header";
 import { RangeFilter } from "@/components/range-filter";
 import { todayIso } from "@/lib/date";
 import { buildDateRange, buildHistoryStats, fillMissingDays } from "@/lib/history";
-import { getDailyTotals } from "@/lib/queries";
+import { getDailyTotals, getExerciseProgress } from "@/lib/queries";
 import { MACRO_LABELS, MACRO_ORDER } from "@/lib/targets";
 
 export const dynamic = "force-dynamic";
@@ -28,7 +29,10 @@ export default async function StoricoPage({
 
   const today = todayIso();
   const dates = buildDateRange(today, range);
-  const rows = await getDailyTotals(dates[0], today);
+  const [rows, exerciseProgress] = await Promise.all([
+    getDailyTotals(dates[0], today),
+    getExerciseProgress(),
+  ]);
   const days = fillMissingDays(rows, dates);
   const stats = buildHistoryStats(days);
 
@@ -93,6 +97,20 @@ export default async function StoricoPage({
           </Card>
         </>
       )}
+
+      {exerciseProgress.length > 0 ? (
+        <Card title="Progressione in palestra">
+          <div className="space-y-8">
+            {exerciseProgress.map((progress) => (
+              <ExerciseProgressChart key={progress.exerciseId} progress={progress} />
+            ))}
+          </div>
+          <p className="mt-4 text-[13px] text-muted">
+            Il massimale stimato mette sulla stessa scala serie diverse: 80 kg × 5
+            e 70 kg × 10 valgono quasi uguale. È una stima, non una misura.
+          </p>
+        </Card>
+      ) : null}
     </main>
   );
 }
