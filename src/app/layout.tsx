@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { TabBar } from "@/components/tab-bar";
 import "./globals.css";
@@ -30,6 +31,12 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <div className="mx-auto w-full max-w-md px-5">{children}</div>
         <TabBar />
+        {/*
+          Conteggio delle visite di Vercel. Va acceso anche dal pannello del
+          progetto (Analytics -> Enable), altrimenti lo script non raccoglie
+          niente. Non usa cookie e non identifica la persona.
+        */}
+        <Analytics />
       </body>
     </html>
   );

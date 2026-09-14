@@ -1,8 +1,10 @@
 import { DayNav } from "@/components/day-nav";
+import { DbErrorPanel } from "@/components/db-error-panel";
 import { Diary } from "@/components/diary";
 import { isIsoDate, todayIso } from "@/lib/date";
 import { slotForHour } from "@/lib/meal-slots";
 import { getMealsByDay, getQuickFoods } from "@/lib/queries";
+import type { Meal, QuickFood } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +16,21 @@ export default async function DiarioPage({
   const { day: requested } = await searchParams;
   const day = requested && isIsoDate(requested) ? requested : todayIso();
 
-  const [meals, quickFoods] = await Promise.all([getMealsByDay(day), getQuickFoods()]);
+  let meals: Meal[];
+  let quickFoods: QuickFood[];
+  try {
+    [meals, quickFoods] = await Promise.all([getMealsByDay(day), getQuickFoods()]);
+  } catch (error) {
+    // Si registra comunque nei log del server: nascondere l'errore all'utente
+    // non vuol dire nasconderlo a chi deve ripararlo.
+    console.error("[diario] lettura dei dati fallita:", error);
+    return (
+      <main>
+        <DayNav day={day} />
+        <DbErrorPanel error={error} />
+      </main>
+    );
+  }
 
   // Il momento proposto segue l'ora italiana: alle otto si registra colazione.
   const hourInRome = Number(

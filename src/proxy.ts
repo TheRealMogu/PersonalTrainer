@@ -83,11 +83,16 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   /*
-   * Fuori dal controllo restano solo gli asset statici e le icone: iOS le
-   * scarica prima che ci sia una sessione, e senza icona l'app installata
-   * resta senza faccia. Non espongono dati.
+   * Fuori dal controllo restano solo gli asset statici, le icone e gli
+   * endpoint della piattaforma: iOS le icone le scarica prima che ci sia una
+   * sessione, e senza icona l'app installata resta senza faccia. Non
+   * espongono dati.
+   *
+   * `_vercel` e' lo script del conteggio visite: passando dal controllo
+   * verrebbe rimandato al login e riceverebbe una pagina HTML al posto del
+   * Javascript.
    */
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon|manifest.webmanifest).*)",
+    "/((?!_next/static|_next/image|_vercel|favicon.ico|icon.svg|apple-icon|manifest.webmanifest).*)",
   ],
 };

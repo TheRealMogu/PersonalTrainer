@@ -1,4 +1,5 @@
 import { Card } from "@/components/card";
+import { DbErrorPanel } from "@/components/db-error-panel";
 import { PageHeader } from "@/components/page-header";
 import { StartWorkoutButton } from "@/components/start-workout-button";
 import { WorkoutSession } from "@/components/workout-session";
@@ -14,38 +15,63 @@ import type { LoggedSet } from "@/lib/workout";
 
 export const dynamic = "force-dynamic";
 
-export default async function AllenamentoPage() {
+/**
+ * Tutte le letture in un posto solo, cosi' il try/catch avvolge i dati e non
+ * il render: un errore di disegno non deve travestirsi da problema di
+ * database.
+ */
+async function caricaDati() {
   const [days, open] = await Promise.all([getWorkout(), getOpenSession()]);
 
   // Allenamento in corso: la pagina diventa la schermata di esecuzione.
-  if (open) {
-    const day = days.find((item) => item.id === open.dayId);
-    if (day) {
-      const [sets, previous] = await Promise.all([
-        getSessionSets(open.id),
-        getPreviousSets(
-          day.exercises.map((exercise) => exercise.id),
-          open.id,
-        ),
-      ]);
+  const dayInCorso = open ? days.find((item) => item.id === open.dayId) : undefined;
 
-      const lastTime: Record<number, LoggedSet[]> = {};
-      for (const [exerciseId, list] of previous) lastTime[exerciseId] = list;
+  if (open && dayInCorso) {
+    const [sets, previous] = await Promise.all([
+      getSessionSets(open.id),
+      getPreviousSets(
+        dayInCorso.exercises.map((exercise) => exercise.id),
+        open.id,
+      ),
+    ]);
 
-      return (
-        <WorkoutSession
-          session={open}
-          label={day.label}
-          focus={day.focus}
-          exercises={day.exercises}
-          sets={sets}
-          lastTime={lastTime}
-        />
-      );
-    }
+    const lastTime: Record<number, LoggedSet[]> = {};
+    for (const [exerciseId, list] of previous) lastTime[exerciseId] = list;
+
+    return { stato: "in-corso", session: open, day: dayInCorso, sets, lastTime } as const;
   }
 
-  const recent = await getRecentSessions(5);
+  return { stato: "elenco", days, recent: await getRecentSessions(5) } as const;
+}
+
+export default async function AllenamentoPage() {
+  let dati: Awaited<ReturnType<typeof caricaDati>>;
+  try {
+    dati = await caricaDati();
+  } catch (error) {
+    console.error("[allenamento] lettura dei dati fallita:", error);
+    return (
+      <main>
+        <PageHeader title="Allenamento" subtitle="Team Schiavi · settimana T1" />
+        <DbErrorPanel error={error} />
+      </main>
+    );
+  }
+
+  if (dati.stato === "in-corso") {
+    return (
+      <WorkoutSession
+        session={dati.session}
+        label={dati.day.label}
+        focus={dati.day.focus}
+        exercises={dati.day.exercises}
+        sets={dati.sets}
+        lastTime={dati.lastTime}
+      />
+    );
+  }
+
+  const { days, recent } = dati;
 
   return (
     <main>
