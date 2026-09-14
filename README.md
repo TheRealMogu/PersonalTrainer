@@ -198,10 +198,29 @@ pubblica.
 **2. Installalo.** L'IPA non è firmato: lo firma il tuo Apple ID tramite uno
 strumento di sideload. Quale, dipende dal computer che hai.
 
-*Da Windows o Mac* — **[AltStore](https://altstore.io)** ufficiale: installi
-AltServer sul computer, colleghi l'iPhone via USB, e da AltStore installi
-l'IPA. È la strada più semplice, e il rinnovo a 7 giorni avviene da solo
-finché telefono e computer stanno sulla stessa rete Wi-Fi.
+*Da Windows* — **[AltStore](https://altstore.io)** ufficiale, la strada più
+semplice. Il rinnovo a 7 giorni avviene da solo finché telefono e computer
+stanno sulla stessa rete Wi-Fi.
+
+1. Installa **iTunes e iCloud scaricandoli da `apple.com`**, *non* dal
+   Microsoft Store: le versioni dello Store non funzionano con AltServer, ed
+   è il punto in cui si blocca la maggior parte delle persone.
+2. Scarica **AltServer** da [altstore.io](https://altstore.io), estrai lo zip
+   e lancia `setup.exe`.
+3. Collega l'iPhone via USB e tocca **Autorizza** sul telefono.
+4. Apri iTunes e attiva la **sincronizzazione Wi-Fi** per il dispositivo:
+   serve al rinnovo automatico senza cavo.
+5. Su iOS 16 o più recente, attiva **Impostazioni → Privacy e sicurezza →
+   Modalità sviluppatore** (il telefono si riavvia).
+6. Icona di AltServer nella barra di Windows → **Install AltStore** → scegli
+   il dispositivo → Apple ID e password (vanno ai server Apple).
+7. Sul telefono: **Impostazioni → Generali → VPN e gestione dispositivo** →
+   il tuo profilo → **Autorizza**.
+8. Per installare il nostro IPA: tieni premuto il tasto **Windows** mentre
+   clicchi l'icona di AltServer, compare **"Sideload .ipa…"**.
+
+*Da Mac* — stessa cosa, senza il passaggio 1: AltServer usa i componenti di
+sistema già presenti.
 
 *Da Linux* — AltStore ufficiale **non esiste**. Ci sono port della comunità
 che funzionano ma sono più artigianali:
