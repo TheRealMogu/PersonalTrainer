@@ -403,6 +403,9 @@ Si ripara dalla propria macchina, non da Vercel:
 npm run db:migrate
 ```
 
+Il comando applica **tutte** le migration mancanti in un colpo solo: non serve
+lanciarlo una volta per ognuna.
+
 Le migration **non girano al deploy**, di proposito: applicare da sole
 modifiche allo schema a ogni push è il modo più rapido per perdere dei dati.
 Quindi ogni volta che cambia `src/db/schema.ts` va lanciato a mano.

@@ -43,19 +43,36 @@ export async function startSession(dayId: number): Promise<SessionResult> {
   }
 }
 
+/** Lunghezza massima dell'identificativo: un UUID ne occupa 36. */
+const MAX_CLIENT_ID = 64;
+
+/**
+ * Registra una serie.
+ *
+ * `clientId` lo genera il telefono prima di inviare, e serve a una cosa sola:
+ * rendere sicuro riprovare. In palestra la rete cade a meta' invio, e senza
+ * un identificativo il secondo tentativo non ha modo di sapere se il primo
+ * era arrivato: o si perde la serie, o se ne scrivono due. Con
+ * l'identificativo, il secondo tentativo trova la riga gia' li' e non fa
+ * niente.
+ */
 export async function logSet(input: {
   sessionId: number;
   exerciseId: number;
   weight: number;
   reps: number;
+  clientId?: string;
 }): Promise<ActionResult> {
-  const { sessionId, exerciseId, weight, reps } = input;
+  const { sessionId, exerciseId, weight, reps, clientId } = input;
 
   if (!Number.isFinite(weight) || weight < 0 || weight > MAX_WEIGHT_KG) {
     return { ok: false, error: `Il carico deve stare fra 0 e ${MAX_WEIGHT_KG} kg.` };
   }
   if (!Number.isInteger(reps) || reps < 1 || reps > MAX_REPS) {
     return { ok: false, error: `Le ripetizioni devono stare fra 1 e ${MAX_REPS}.` };
+  }
+  if (clientId !== undefined && (typeof clientId !== "string" || clientId.length > MAX_CLIENT_ID)) {
+    return { ok: false, error: "Identificativo della serie non valido." };
   }
 
   try {
@@ -67,13 +84,18 @@ export async function logSet(input: {
 
     const next = existing.reduce((max, row) => Math.max(max, row.setNumber), 0) + 1;
 
-    await db.insert(workoutSets).values({
-      sessionId,
-      exerciseId,
-      setNumber: next,
-      weight,
-      reps,
-    });
+    await db
+      .insert(workoutSets)
+      .values({
+        sessionId,
+        exerciseId,
+        setNumber: next,
+        weight,
+        reps,
+        clientId: clientId ?? null,
+      })
+      // Serie gia' arrivata: il riprova non ne scrive una seconda.
+      .onConflictDoNothing({ target: workoutSets.clientId });
   } catch (cause) {
     console.error("logSet fallita", cause);
     return { ok: false, error: "Serie non salvata. Riprova." };

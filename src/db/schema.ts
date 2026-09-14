@@ -8,6 +8,7 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 /** I momenti della giornata, nell'ordine in cui si mangia. */
@@ -111,11 +112,23 @@ export const workoutSets = pgTable(
     setNumber: integer("set_number").notNull(),
     weight: real("weight").notNull(),
     reps: integer("reps").notNull(),
+    /**
+     * Identificativo generato dal telefono prima di inviare la serie.
+     *
+     * Serve per riprovare senza duplicare: se la rete cade dopo che il
+     * database ha scritto ma prima che la risposta torni indietro, il
+     * secondo tentativo trova lo stesso identificativo e non fa niente.
+     * Nullo sulle serie registrate prima che esistesse.
+     */
+    clientId: text("client_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     index("workout_sets_session_idx").on(table.sessionId),
     index("workout_sets_exercise_idx").on(table.exerciseId),
+    // Unico fra i non nulli: Postgres tratta ogni NULL come diverso dagli
+    // altri, quindi le serie vecchie non danno fastidio.
+    uniqueIndex("workout_sets_client_id_key").on(table.clientId),
   ],
 );
 
