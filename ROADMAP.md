@@ -23,6 +23,11 @@ installato su un telefono**, quindi non sappiamo se si apre.
 **Non è mai stato verificato su un telefono vero**: tutte le prove sono in
 Chromium con viewport da iPhone. Safari non è Chromium.
 
+**Il primo deploy ha trovato due cose**, entrambe sistemate: la build si
+fermava se mancava una variabile d'ambiente, e quando il database era
+indietro con le migration l'app rispondeva con un codice numerico e basta.
+Adesso dice cosa fare.
+
 ---
 
 ## 1. Portarla davvero sul telefono
@@ -57,9 +62,13 @@ storia è la lacuna più grave dopo il punto 1.
 
 L'app presuppone che tutto vada bene. Non è vero.
 
-- [ ] **Pagina di errore.** Se Neon non risponde, adesso esce l'errore
-      generico di Next. Serve `error.tsx` che dica cosa è successo in
-      italiano e offra "riprova".
+- [x] **Pagina di errore.** Fatto. Le tre schermate che leggono il database
+      ora intercettano l'errore e dicono in italiano cosa è successo, con
+      "Riprova". Distinguono tre casi: database indietro con le migration
+      (e mostrano il comando), database irraggiungibile, variabile non
+      impostata. La diagnosi si fa sul server perché in produzione Next
+      nasconde il messaggio al browser e lascia solo un codice. C'è anche un
+      `error.tsx` come rete di sicurezza per tutto il resto.
 - [ ] **Stato di caricamento.** `loading.tsx` per le navigazioni lente:
       oggi c'è solo l'indicatore sulle frecce del giorno.
 - [ ] **Ritentare le scritture fallite.** Se il salvataggio di un pasto

@@ -1,4 +1,5 @@
 import { Card } from "@/components/card";
+import { DbErrorPanel } from "@/components/db-error-panel";
 import { ExerciseProgressChart } from "@/components/exercise-progress-chart";
 import { MacroHistoryChart, MacroHistoryTable } from "@/components/macro-history-chart";
 import { MacroStatTile } from "@/components/macro-stat-tile";
@@ -29,10 +30,23 @@ export default async function StoricoPage({
 
   const today = todayIso();
   const dates = buildDateRange(today, range);
-  const [rows, exerciseProgress] = await Promise.all([
-    getDailyTotals(dates[0], today),
-    getExerciseProgress(),
-  ]);
+  let rows: Awaited<ReturnType<typeof getDailyTotals>>;
+  let exerciseProgress: Awaited<ReturnType<typeof getExerciseProgress>>;
+  try {
+    [rows, exerciseProgress] = await Promise.all([
+      getDailyTotals(dates[0], today),
+      getExerciseProgress(),
+    ]);
+  } catch (error) {
+    console.error("[storico] lettura dei dati fallita:", error);
+    return (
+      <main>
+        <PageHeader title="Storico" subtitle={`Ultimi ${range} giorni`} />
+        <DbErrorPanel error={error} />
+      </main>
+    );
+  }
+
   const days = fillMissingDays(rows, dates);
   const stats = buildHistoryStats(days);
 
