@@ -136,6 +136,12 @@ Nessuna è bloccante, tutte sono state pesate col metro dei gesti.
       file di seed e da un comando.
 - [ ] **Duplicare un giorno.** "Oggi ho mangiato come ieri" è comune e oggi
       costa un pasto alla volta.
+- [x] **Diario più denso e più vivo.** Fatto: le tre barre a tutta larghezza
+      sono diventate tre riquadri affiancati, in cima c'è la striscia degli
+      ultimi sette giorni (tocchi un giorno e ci vai), toccando un macro si
+      apre il dettaglio con da dove arriva e cosa ci sta ancora, i tasti
+      rapidi mostrano anche i macro e non solo le calorie, e i numeri
+      scorrono invece di saltare.
 - [ ] **Note sulla seduta.** "Spalla che tira" vale più di tre decimali sul
       carico.
 - [ ] **Riordinare gli esercizi** della giornata, se in palestra la macchina

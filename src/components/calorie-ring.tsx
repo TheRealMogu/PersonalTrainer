@@ -1,4 +1,5 @@
 import { formatMacro, type MacroProgress } from "@/lib/nutrition";
+import { AnimatedNumber } from "./animated-number";
 
 const SIZE = 168;
 const STROKE = 14;
@@ -55,13 +56,13 @@ export function CalorieRing({ progress }: { progress: MacroProgress }) {
         </svg>
 
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span
-            className={`text-[44px] font-semibold leading-none tracking-tight ${
+          <AnimatedNumber
+            value={isOver ? over : remaining}
+            format={(valore) => formatMacro(valore, "kcal")}
+            className={`text-[44px] font-semibold leading-none tracking-tight tabular-nums ${
               isOver ? "text-over" : ""
             }`}
-          >
-            {formatMacro(isOver ? over : remaining, "kcal")}
-          </span>
+          />
           <span className="mt-1 text-[13px] text-muted">
             {isOver ? "oltre il target" : "kcal rimaste"}
           </span>
@@ -69,7 +70,12 @@ export function CalorieRing({ progress }: { progress: MacroProgress }) {
       </div>
 
       <p className="mt-3 text-[13px] tabular-nums text-muted">
-        <span className="font-semibold text-ink">{formatMacro(consumed, "kcal")}</span> di {target} kcal
+        <AnimatedNumber
+          value={consumed}
+          format={(valore) => formatMacro(valore, "kcal")}
+          className="font-semibold text-ink"
+        />{" "}
+        di {target} kcal
       </p>
     </div>
   );

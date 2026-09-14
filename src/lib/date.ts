@@ -55,3 +55,18 @@ export function formatDayLabel(iso: string, today = todayIso()): string {
   if (iso === shiftIsoDate(today, 1)) return "Domani";
   return FORMATTER.format(new Date(`${iso}T00:00:00Z`));
 }
+
+/** Iniziali dei giorni, dal lunedi'. */
+const INIZIALI_GIORNI = ["L", "M", "M", "G", "V", "S", "D"] as const;
+
+/**
+ * Iniziale del giorno della settimana, per le etichette strette.
+ *
+ * Non passa da `Date.getDay()` per evitare il fuso: la data e' gia' una
+ * stringa ISO senza ora, e va letta come tale.
+ */
+export function weekdayInitial(iso: string): string {
+  const giorni = Math.floor(Date.parse(`${iso}T00:00:00Z`) / 86_400_000);
+  // Il 1970-01-01 era un giovedi': +3 sposta l'indice a partire dal lunedi'.
+  return INIZIALI_GIORNI[(((giorni + 3) % 7) + 7) % 7];
+}

@@ -12,10 +12,12 @@ import {
 import type { Meal, QuickFood } from "@/db/schema";
 import type { MealSlot } from "@/lib/meal-slots";
 import { buildProgress, sumMacros } from "@/lib/nutrition";
+import type { MacroKey } from "@/lib/targets";
 import { Card } from "./card";
 import { CalorieRing } from "./calorie-ring";
 import { EditMealSheet } from "./edit-meal-sheet";
-import { MacroBar } from "./macro-bar";
+import { MacroSheet } from "./macro-sheet";
+import { MacroTile } from "./macro-tile";
 import { ManualMealForm } from "./manual-meal-form";
 import { MealList } from "./meal-list";
 import { QuickFoods } from "./quick-foods";
@@ -52,6 +54,7 @@ export function Diary({
   const [error, setError] = useState<string | null>(null);
   const [undoable, setUndoable] = useState<Meal | null>(null);
   const [editing, setEditing] = useState<Meal | null>(null);
+  const [macroAperto, setMacroAperto] = useState<MacroKey | null>(null);
   const tempId = useRef(-1);
 
   const [optimisticMeals, applyOptimistic] = useOptimistic(
@@ -162,9 +165,14 @@ export function Diary({
     <>
       <Card>
         <CalorieRing progress={progress[0]} />
-        <div className="mt-4 divide-y divide-hairline border-t border-hairline pt-1">
+        {/*
+          Tre riquadri affiancati invece di tre barre impilate: la domanda
+          "quanto mi resta" si legge tutta insieme, e ognuno si tocca per
+          sapere da dove arriva e cosa ci sta ancora.
+        */}
+        <div className="mt-4 grid grid-cols-3 gap-2 border-t border-hairline pt-4">
           {progress.slice(1).map((item) => (
-            <MacroBar key={item.key} progress={item} />
+            <MacroTile key={item.key} progress={item} onOpen={setMacroAperto} />
           ))}
         </div>
       </Card>
@@ -215,6 +223,15 @@ export function Diary({
             handleDelete(meal);
           }}
           onClose={() => setEditing(null)}
+        />
+      ) : null}
+
+      {macroAperto ? (
+        <MacroSheet
+          progress={progress.find((item) => item.key === macroAperto)!}
+          meals={optimisticMeals}
+          foods={quickFoods}
+          onClose={() => setMacroAperto(null)}
         />
       ) : null}
 

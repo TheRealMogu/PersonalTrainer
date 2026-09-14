@@ -3,6 +3,7 @@
 import type { Meal } from "@/db/schema";
 import { groupBySlot, MEAL_SLOTS, SLOT_LABELS } from "@/lib/meal-slots";
 import { formatMacro, sumMacros } from "@/lib/nutrition";
+import { MACRO_LABELS, MACRO_ORDER } from "@/lib/targets";
 
 function formatQuantity(quantity: number): string | null {
   if (quantity === 1) return null;
@@ -69,9 +70,25 @@ export function MealList({
                           </span>
                         ) : null}
                       </p>
-                      <p className="mt-0.5 text-[13px] tabular-nums text-muted">
-                        {meal.kcal} kcal · C {formatMacro(meal.carbs, "carbs")} · P{" "}
-                        {formatMacro(meal.protein, "protein")} · G {formatMacro(meal.fat, "fat")}
+                      {/*
+                        Pallini colorati invece delle sigle C/P/G: sono gli
+                        stessi colori dei macro in tutta l'app, mentre le
+                        iniziali non dicono niente a chi non le conosce. Il
+                        nome per esteso resta nell'etichetta accessibile.
+                      */}
+                      <p className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[13px] tabular-nums text-muted">
+                        <span>{meal.kcal} kcal</span>
+                        {MACRO_ORDER.slice(1).map((key) => (
+                          <span key={key} className="flex items-center gap-1">
+                            <span
+                              aria-hidden="true"
+                              className="h-1.5 w-1.5 rounded-full"
+                              style={{ background: `var(--color-${key})` }}
+                            />
+                            <span className="sr-only">{MACRO_LABELS[key]} </span>
+                            {formatMacro(meal[key], key)}
+                          </span>
+                        ))}
                       </p>
                     </button>
                     <button
