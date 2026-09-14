@@ -29,3 +29,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .vercel
+
+# Skill installate da strumenti esterni (per esempio uipro-cli): sono
+# strumenti locali di chi sviluppa, non codice del progetto. Pesano un mega
+# di CSV e script altrui, e la repo e' pubblica.
+# Le impostazioni del progetto, se servissero, stanno in .claude/settings.json
+# e quelle si committano.
+.claude/skills/
