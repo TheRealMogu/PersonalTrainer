@@ -64,11 +64,19 @@ potrebbe leggere e modificare il diario. Servono due variabili:
 
 ```dotenv
 APP_PASSWORD="la password che scegli tu"
-AUTH_SECRET="32 byte casuali"     # openssl rand -base64 32
+AUTH_SECRET="il risultato di: openssl rand -base64 32"
 ```
 
 `APP_PASSWORD` è quella che digiti nella schermata di accesso. `AUTH_SECRET`
 firma il cookie di sessione: cambiandolo, tutte le sessioni aperte decadono.
+
+> **`AUTH_SECRET` va riempita con l'output del comando, non col comando.**
+> Si lancia `openssl rand -base64 32` e si incolla la riga che stampa (una cosa
+> tipo `tK9v…=`). Scriverci dentro `openssl rand -base64 32` o
+> `(openssl rand -base64 32)` fa partire l'app lo stesso — è una stringa valida
+> — ma è una stringa **pubblica**, scritta in questo file: chiunque potrebbe
+> firmarsi un cookie valido ed entrare senza sapere la password. In quel caso
+> rigenerala e rifai il deploy.
 
 La sessione dura un anno, quindi la password si inserisce una volta sola per
 dispositivo. Per uscire: scheda **Piano** → *Esci*.
@@ -144,7 +152,7 @@ Le linee guida del Piano stanno in `src/lib/plan.ts` e i target in
    |---|---|
    | `DATABASE_URL` | la stringa di connessione di Neon (la stessa del punto 1) |
    | `APP_PASSWORD` | la password con cui entri nell'app |
-   | `AUTH_SECRET` | una stringa lunga e casuale: `openssl rand -base64 32` |
+   | `AUTH_SECRET` | **l'output** di `openssl rand -base64 32`, non il comando |
 
 4. **Deploy**.
 
@@ -369,3 +377,35 @@ scripts/seed.ts          script di seed
 
 `day` è una `DATE` pura: il diario è per data, senza complicazioni di fuso
 orario.
+
+## Quando qualcosa non va
+
+I due errori che si incontrano davvero, e cosa vogliono dire.
+
+### «L'app non è configurata: manca…»
+
+Le variabili non ci sono, oppure ci sono ma il deploy è più vecchio di loro.
+Il proxy le legge quando l'app viene **compilata**, quindi dopo averle
+aggiunte serve **Deployments → ⋯ → Redeploy**. Aggiungerle e ricaricare la
+pagina non basta.
+
+### «A server error occurred» con un codice numerico
+
+È la pagina di errore di Vercel: l'app è partita, ma una query è fallita.
+Il motivo quasi sempre è che **il database è indietro con le migration**:
+il codice cerca colonne che su Neon non esistono ancora.
+
+Sintomo tipico nei log: `column "slot" does not exist`.
+
+Si ripara dalla propria macchina, non da Vercel:
+
+```bash
+npm run db:migrate
+```
+
+Le migration **non girano al deploy**, di proposito: applicare da sole
+modifiche allo schema a ogni push è il modo più rapido per perdere dei dati.
+Quindi ogni volta che cambia `src/db/schema.ts` va lanciato a mano.
+
+Per vedere l'errore vero invece del codice: su Vercel, **Logs** del progetto,
+oppure **Deployments → il deploy → Runtime Logs**.
