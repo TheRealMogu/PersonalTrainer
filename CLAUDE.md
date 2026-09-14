@@ -104,6 +104,22 @@ Prima di aprire una PR girano tutti e quattro i controlli, come in CI
 (`.github/workflows/ci.yml`). L'IPA si compila a mano da Actions →
 *Compila IPA per iPhone*.
 
+## Se ci sono altre skill installate
+
+In `.claude/skills/` possono esserci skill di design installate da strumenti
+esterni (per esempio `uipro-cli`). Sono utili per partire da zero su un sito
+nuovo, ma il loro database e' tarato su pagine vetrina: propone palette
+preconfezionate, glassmorphism, "Hero + Features + CTA", e vuole creare un
+proprio `design-system/MASTER.md` come fonte di verita'.
+
+**Qui vincono `PRODOTTO.md` e questo file.** Le nostre regole non sono scelte
+di gusto: i colori dei macro sono stati validati per la separazione su
+daltonismo in chiaro e in scuro, i contrasti misurati, i bersagli contati in
+pixel. Una proposta generica non le sostituisce.
+
+Dove una skill esterna contraddice una regola di `PRODOTTO.md`, si segue
+`PRODOTTO.md`. Dove tace, si puo' usare quello che propone.
+
 ## Come si lavora qui
 
 - Si sviluppa sul branch indicato dalla sessione, mai direttamente su main.
