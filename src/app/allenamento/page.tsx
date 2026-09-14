@@ -10,7 +10,8 @@ import {
   getSessionSets,
   getWorkout,
 } from "@/lib/queries";
-import { formatVolume } from "@/lib/workout";
+import { formatDayLabel } from "@/lib/date";
+import { formatVolume, suggestNextDayId } from "@/lib/workout";
 import type { LoggedSet } from "@/lib/workout";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +42,16 @@ async function caricaDati() {
     return { stato: "in-corso", session: open, day: dayInCorso, sets, lastTime } as const;
   }
 
-  return { stato: "elenco", days, recent: await getRecentSessions(5) } as const;
+  const recent = await getRecentSessions(5);
+
+  // La rotazione si legge dallo storico: l'ultima seduta conclusa decide
+  // quale giornata proporre adesso.
+  const suggestedId = suggestNextDayId(
+    days.map((day) => day.id),
+    recent[0]?.dayId ?? null,
+  );
+
+  return { stato: "elenco", days, recent, suggestedId } as const;
 }
 
 export default async function AllenamentoPage() {
@@ -71,11 +81,41 @@ export default async function AllenamentoPage() {
     );
   }
 
-  const { days, recent } = dati;
+  const { days, recent, suggestedId } = dati;
+  const suggested = days.find((day) => day.id === suggestedId);
+  const ultima = recent[0];
 
   return (
     <main>
       <PageHeader title="Allenamento" subtitle="Team Schiavi · settimana T1" />
+
+      {/*
+        Quale giornata tocca: e' la domanda con cui si entra in palestra, e
+        prima stava solo nella memoria di chi si allena. Resta un
+        suggerimento: le giornate qui sotto sono tutte avviabili.
+      */}
+      {suggested ? (
+        <section className="mb-4 rounded-2xl bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+          <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-muted">
+            Tocca a te
+          </p>
+          <h2 className="mt-1.5 text-[22px] font-semibold leading-tight">
+            {suggested.label} — {suggested.focus}
+          </h2>
+          <p className="mt-1 text-[13px] text-muted">
+            {suggested.exercises.length} esercizi
+            {ultima
+              ? ` · ultima seduta: ${ultima.label}, ${formatDayLabel(ultima.day).toLowerCase()}`
+              : " · è la prima seduta"}
+          </p>
+          <div className="mt-4">
+            <StartWorkoutButton
+              dayId={suggested.id}
+              label={`${suggested.label} — ${suggested.focus}`}
+            />
+          </div>
+        </section>
+      ) : null}
 
       {days.length === 0 ? (
         <Card>
@@ -85,7 +125,10 @@ export default async function AllenamentoPage() {
         </Card>
       ) : (
         days.map((day) => (
-          <Card key={day.id} title={`${day.label} — ${day.focus}`}>
+          <Card
+            key={day.id}
+            title={`${day.label} — ${day.focus}${day.id === suggestedId ? " · consigliata" : ""}`}
+          >
             <ul className="mb-4 divide-y divide-hairline">
               {day.exercises.map((exercise) => (
                 <li
@@ -99,7 +142,11 @@ export default async function AllenamentoPage() {
                 </li>
               ))}
             </ul>
-            <StartWorkoutButton dayId={day.id} label={`${day.label} — ${day.focus}`} />
+            <StartWorkoutButton
+              dayId={day.id}
+              label={`${day.label} — ${day.focus}`}
+              variante="secondaria"
+            />
           </Card>
         ))
       )}

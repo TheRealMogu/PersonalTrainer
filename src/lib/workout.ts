@@ -92,3 +92,28 @@ export function estimatedOneRepMax(set: Pick<LoggedSet, "weight" | "reps">): num
 export function bestOneRepMax(sets: Pick<LoggedSet, "weight" | "reps">[]): number {
   return sets.reduce((best, set) => Math.max(best, estimatedOneRepMax(set)), 0);
 }
+
+/**
+ * Quale giornata tocca adesso.
+ *
+ * Il programma e' una rotazione: dopo Day 1 viene Day 2, dopo l'ultima si
+ * ricomincia. L'app lo sa gia' dallo storico, quindi non c'e' motivo di
+ * chiederlo a chi entra in palestra con il telefono in mano.
+ *
+ * E' un suggerimento, non un vincolo: le altre giornate restano tutte
+ * avviabili. Se hai saltato un giorno o vuoi rifare la stessa, decidi tu.
+ */
+export function suggestNextDayId(
+  orderedDayIds: readonly number[],
+  lastCompletedDayId: number | null,
+): number | null {
+  if (orderedDayIds.length === 0) return null;
+
+  const previous = lastCompletedDayId === null ? -1 : orderedDayIds.indexOf(lastCompletedDayId);
+
+  // Mai allenato, o l'ultima giornata non e' piu' nel programma: si riparte
+  // dalla prima invece di indovinare.
+  if (previous === -1) return orderedDayIds[0];
+
+  return orderedDayIds[(previous + 1) % orderedDayIds.length];
+}

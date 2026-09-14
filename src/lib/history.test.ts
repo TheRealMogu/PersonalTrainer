@@ -64,7 +64,7 @@ describe("isLogged", () => {
 describe("buildHistoryStats", () => {
   it("fa la media sui soli giorni registrati", () => {
     const days = [day("2026-09-18", 1000), day("2026-09-19", 0), day("2026-09-20", 2000)];
-    const stats = buildHistoryStats(days);
+    const stats = buildHistoryStats(days, "2026-09-21");
     assert.equal(stats.loggedDays, 2);
     assert.equal(stats.totalDays, 3);
     // 1500, non 1000: il giorno vuoto non entra nella media.
@@ -72,7 +72,7 @@ describe("buildHistoryStats", () => {
   });
 
   it("non divide per zero quando non c'e' nulla di registrato", () => {
-    const stats = buildHistoryStats([day("2026-09-20", 0), day("2026-09-19", 0)]);
+    const stats = buildHistoryStats([day("2026-09-20", 0), day("2026-09-19", 0)], "2026-09-21");
     assert.equal(stats.loggedDays, 0);
     assert.deepEqual(stats.averages, { kcal: 0, carbs: 0, protein: 0, fat: 0 });
     assert.equal(stats.daysWithinTarget.kcal, 0);
@@ -84,14 +84,57 @@ describe("buildHistoryStats", () => {
       day("2026-09-19", DAILY_TARGETS.kcal),
       day("2026-09-20", DAILY_TARGETS.kcal + 1),
     ];
-    assert.equal(buildHistoryStats(days).daysWithinTarget.kcal, 2);
+    assert.equal(buildHistoryStats(days, "2026-09-21").daysWithinTarget.kcal, 2);
   });
 
   it("non conta fra i giorni entro target quelli mai registrati", () => {
     const days = [day("2026-09-19", 0), day("2026-09-20", 1000)];
-    const stats = buildHistoryStats(days);
+    const stats = buildHistoryStats(days, "2026-09-21");
     assert.equal(stats.daysWithinTarget.kcal, 1);
     assert.equal(stats.daysWithinTarget.fat, 1);
+  });
+});
+
+describe("oggi non entra nelle statistiche", () => {
+  const OGGI = "2026-09-20";
+
+  it("non fa media su un giorno che non e' ancora finito", () => {
+    // Ieri 1800 kcal (giornata intera), oggi 200 (solo colazione).
+    const days = [day("2026-09-19", 1800), day(OGGI, 200)];
+    const stats = buildHistoryStats(days, OGGI);
+    // 1800, non 1000: oggi e' a meta' e non dice niente su come mangi.
+    assert.equal(stats.averages.kcal, 1800);
+    assert.equal(stats.loggedDays, 1);
+    assert.equal(stats.totalDays, 1);
+  });
+
+  it("non regala un giorno entro il target solo perche' e' a meta'", () => {
+    const days = [
+      day("2026-09-19", DAILY_TARGETS.kcal + 500),
+      day(OGGI, 100),
+    ];
+    const stats = buildHistoryStats(days, OGGI);
+    assert.equal(stats.daysWithinTarget.kcal, 0, "oggi non deve contare come riuscito");
+  });
+
+  it("dice se oggi ha gia' qualcosa, cosi' la schermata puo' spiegarlo", () => {
+    assert.equal(buildHistoryStats([day(OGGI, 500)], OGGI).todayLogged, true);
+    assert.equal(buildHistoryStats([day(OGGI, 0)], OGGI).todayLogged, false);
+    assert.equal(buildHistoryStats([day("2026-09-19", 500)], OGGI).todayLogged, false);
+  });
+
+  it("con il solo oggi registrato non ci sono medie da mostrare", () => {
+    const stats = buildHistoryStats([day("2026-09-19", 0), day(OGGI, 900)], OGGI);
+    assert.equal(stats.loggedDays, 0);
+    assert.equal(stats.averages.kcal, 0);
+    assert.equal(stats.todayLogged, true);
+  });
+
+  it("se oggi non e' nell'intervallo non cambia niente", () => {
+    const days = [day("2026-09-18", 1000), day("2026-09-19", 2000)];
+    const stats = buildHistoryStats(days, "2026-09-25");
+    assert.equal(stats.averages.kcal, 1500);
+    assert.equal(stats.totalDays, 2);
   });
 });
 

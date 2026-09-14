@@ -26,9 +26,12 @@ export function isLogged(totals: DailyTotals): boolean {
 }
 
 export type HistoryStats = {
-  /** Giorni con almeno un pasto registrato. */
+  /** Giorni conclusi con almeno un pasto registrato. */
   loggedDays: number;
+  /** Giorni conclusi nell'intervallo, cioe' senza contare oggi. */
   totalDays: number;
+  /** Oggi ha gia' qualcosa registrato: serve solo per spiegarlo a schermo. */
+  todayLogged: boolean;
   /**
    * Media sui soli giorni registrati: includere i giorni non compilati
    * abbasserebbe la media facendo sembrare di aver mangiato meno.
@@ -38,8 +41,21 @@ export type HistoryStats = {
   daysWithinTarget: Record<MacroKey, number>;
 };
 
-export function buildHistoryStats(days: DailyTotals[]): HistoryStats {
-  const logged = days.filter(isLogged);
+/**
+ * Statistiche sui giorni **conclusi**.
+ *
+ * Oggi resta fuori di proposito. A meta' giornata hai registrato un pasto su
+ * quattro: farlo entrare nella media la dimezza e fa sembrare che tu stia
+ * mangiando la meta' di quello che mangi. Peggio, "giorni entro il target"
+ * conterebbe oggi come riuscito solo perche' non e' ancora finito: un premio
+ * per una giornata che non e' successa.
+ *
+ * Nel grafico oggi si vede lo stesso: li' e' un dato, non una media.
+ */
+export function buildHistoryStats(days: DailyTotals[], today: string): HistoryStats {
+  const conclusi = days.filter((day) => day.day !== today);
+  const logged = conclusi.filter(isLogged);
+  const todayRow = days.find((day) => day.day === today);
 
   const averages = { kcal: 0, carbs: 0, protein: 0, fat: 0 } as MacroTotals;
   const daysWithinTarget = { kcal: 0, carbs: 0, protein: 0, fat: 0 } as Record<MacroKey, number>;
@@ -54,7 +70,8 @@ export function buildHistoryStats(days: DailyTotals[]): HistoryStats {
 
   return {
     loggedDays: logged.length,
-    totalDays: days.length,
+    totalDays: conclusi.length,
+    todayLogged: todayRow ? isLogged(todayRow) : false,
     averages,
     daysWithinTarget,
   };

@@ -61,6 +61,8 @@ prodotto, non una mancanza di funzionalità.
 | Vedere il carico dell'ultima volta | 0 tocchi | 0 | ok |
 | Sapere cosa mi entra ancora | 0 tocchi | 0 (conteggio sempre visibile) | ok |
 | Capire dove sono finite le calorie | 0 tocchi | 0 (totale per pasto) | ok |
+| Sapere quale allenamento tocca | 0 tocchi | 0 (scheda "Tocca a te") | ok |
+| Portarsi via i propri dati | 2 tocchi | 2 (Piano → scarica) | ok |
 
 Due regole che valgono sempre:
 
@@ -114,6 +116,9 @@ e va difesa a ogni aggiunta.
   entro il target. Stessi colori del diario. In fondo la **progressione in
   palestra**: massimale stimato per esercizio, seduta dopo seduta.
 - **Tema chiaro e scuro** che segue l'impostazione dell'iPhone.
+- **Export dei dati** — Piano → *I tuoi dati*: tutto in JSON, oppure pasti e
+  allenamenti in CSV. Un'app che accumula mesi di diario e non ti lascia
+  portarlo via te lo tiene in ostaggio.
 
 ## Cosa resta fuori, di proposito
 
@@ -157,6 +162,12 @@ Valgono per ogni aggiunta futura.
     si conta solo dove c'è ancora margine.
 12. **Le stime si dichiarano.** Il massimale è calcolato, non misurato, e la
     schermata lo scrive.
+13. **Una giornata a metà non è un dato.** Oggi si vede nei grafici, ma non
+    entra in medie né in conteggi di riuscita: a mezzogiorno hai registrato un
+    pasto su quattro, e farlo contare fa dire numeri falsi. Vale per ogni
+    statistica futura.
+14. **Quando ci sono più azioni, una sola è quella principale.** Quattro
+    pulsanti identici non dicono da dove cominciare.
 
 ## Come si verifica che sia davvero comodo
 

@@ -35,6 +35,34 @@ export default function PianoPage() {
         </Card>
       ))}
 
+      {/*
+        I dati restano tuoi. Se un giorno il progetto si ferma, o Neon cambia
+        idea sul piano gratuito, i mesi di diario devono poter uscire di qui.
+      */}
+      <Card title="I tuoi dati">
+        <p className="mb-4 text-[15px] leading-snug text-muted">
+          Scarica tutto quello che hai registrato. Il JSON è la copia completa;
+          i CSV si aprono in Excel o Numbers.
+        </p>
+        <ul className="space-y-2">
+          {[
+            { href: "/api/esporta", testo: "Copia completa (JSON)" },
+            { href: "/api/esporta?formato=pasti", testo: "Pasti (CSV)" },
+            { href: "/api/esporta?formato=serie", testo: "Allenamenti (CSV)" },
+          ].map((voce) => (
+            <li key={voce.href}>
+              <a
+                href={voce.href}
+                download
+                className="flex min-h-11 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent active:bg-raised"
+              >
+                {voce.testo}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Card>
+
       <Card title="Accesso">
         <LogoutButton />
       </Card>

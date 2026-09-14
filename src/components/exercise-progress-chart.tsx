@@ -37,7 +37,7 @@ export function ExerciseProgressChart({ progress }: { progress: ExerciseProgress
   return (
     <figure className="m-0">
       <figcaption className="mb-1 flex items-baseline justify-between gap-3">
-        <span className="min-w-0 flex-1 truncate text-[15px] font-medium">{progress.name}</span>
+        <span className="min-w-0 flex-1 text-[15px] font-medium leading-snug">{progress.name}</span>
         <span className="shrink-0 text-[13px] tabular-nums text-muted">
           {formatWeight(last.topWeight)} kg × {last.topReps}
         </span>

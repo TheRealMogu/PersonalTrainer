@@ -168,6 +168,7 @@ export async function getRecentSessions(limit = 20) {
   return db
     .select({
       id: workoutSessions.id,
+      dayId: workoutSessions.dayId,
       day: workoutSessions.day,
       label: workoutDays.label,
       focus: workoutDays.focus,
@@ -257,4 +258,34 @@ export async function getExerciseProgress(limitPerExercise = 12): Promise<Exerci
     // Solo esercizi con almeno due sedute: con un punto solo non c'e' andamento.
     .filter((item) => item.points.length >= 2)
     .sort((a, b) => a.name.localeCompare(b.name, "it"));
+}
+
+/**
+ * Tutto quello che hai registrato, per l'esportazione.
+ *
+ * Senza limite di righe di proposito: l'export serve proprio a portarsi via
+ * tutto. Per un diario personale sono qualche migliaio di righe, non milioni.
+ */
+export async function getAllMealsForExport() {
+  return db.select().from(meals).orderBy(asc(meals.day), asc(meals.createdAt), asc(meals.id));
+}
+
+export async function getAllSetsForExport() {
+  return db
+    .select({
+      sessionId: workoutSets.sessionId,
+      day: workoutSessions.day,
+      dayLabel: workoutDays.label,
+      focus: workoutDays.focus,
+      exercise: workoutExercises.name,
+      setNumber: workoutSets.setNumber,
+      weight: workoutSets.weight,
+      reps: workoutSets.reps,
+      createdAt: workoutSets.createdAt,
+    })
+    .from(workoutSets)
+    .innerJoin(workoutSessions, eq(workoutSets.sessionId, workoutSessions.id))
+    .innerJoin(workoutDays, eq(workoutSessions.dayId, workoutDays.id))
+    .innerJoin(workoutExercises, eq(workoutSets.exerciseId, workoutExercises.id))
+    .orderBy(asc(workoutSessions.day), asc(workoutSets.createdAt), asc(workoutSets.id));
 }

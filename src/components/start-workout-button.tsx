@@ -4,7 +4,20 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { startSession } from "@/app/allenamento/actions";
 
-export function StartWorkoutButton({ dayId, label }: { dayId: number; label: string }) {
+/**
+ * `principale` e' la giornata consigliata, in cima: e' l'azione con cui si
+ * entra in palestra. Le altre restano avviabili ma non competono con lei --
+ * quattro pulsanti pieni e identici non dicono da dove cominciare.
+ */
+export function StartWorkoutButton({
+  dayId,
+  label,
+  variante = "principale",
+}: {
+  dayId: number;
+  label: string;
+  variante?: "principale" | "secondaria";
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +39,11 @@ export function StartWorkoutButton({ dayId, label }: { dayId: number; label: str
             router.refresh();
           })
         }
-        className="min-h-11 w-full rounded-xl bg-accent text-[15px] font-semibold text-on-accent active:opacity-80 disabled:opacity-50"
+        className={`min-h-11 w-full rounded-xl text-[15px] font-semibold active:opacity-80 disabled:opacity-50 ${
+          variante === "principale"
+            ? "bg-accent text-on-accent"
+            : "border border-hairline text-accent active:bg-raised"
+        }`}
       >
         {pending ? "Apro…" : "Inizia"}
       </button>

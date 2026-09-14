@@ -48,7 +48,7 @@ export default async function StoricoPage({
   }
 
   const days = fillMissingDays(rows, dates);
-  const stats = buildHistoryStats(days);
+  const stats = buildHistoryStats(days, today);
 
   return (
     <main>
@@ -56,14 +56,25 @@ export default async function StoricoPage({
 
       <RangeFilter active={range} />
 
-      {stats.loggedDays === 0 ? (
+      {stats.loggedDays === 0 && !stats.todayLogged ? (
         <Card>
           <p className="text-[15px] text-muted">
             Nessun pasto registrato in questo periodo. Aggiungine dal diario e
             qui vedrai l&apos;andamento.
           </p>
         </Card>
-      ) : (
+      ) : null}
+
+      {stats.loggedDays === 0 && stats.todayLogged ? (
+        <Card>
+          <p className="text-[15px] text-muted">
+            Per ora c&apos;è solo oggi, che non è ancora finito: le medie
+            compaiono da domani. Qui sotto intanto vedi la giornata.
+          </p>
+        </Card>
+      ) : null}
+
+      {stats.loggedDays > 0 ? (
         <>
           <Card title="Media giornaliera">
             <div className="grid grid-cols-2 gap-2">
@@ -72,20 +83,12 @@ export default async function StoricoPage({
               ))}
             </div>
             <p className="mt-3 text-[13px] text-muted">
-              Media sui {stats.loggedDays} giorni registrati su {stats.totalDays}; lo
-              scarto è rispetto al target giornaliero. I giorni non compilati non
-              abbassano la media.
-            </p>
-          </Card>
-
-          <Card title="Andamento">
-            <div className="space-y-8">
-              {MACRO_ORDER.map((macro) => (
-                <MacroHistoryChart key={macro} macro={macro} days={days} />
-              ))}
-            </div>
-            <p className="mt-4 text-[13px] text-muted">
-              Le colonne oltre la linea del target sono in rosso.
+              {stats.loggedDays === 1
+                ? `Un solo giorno registrato sui ${stats.totalDays} conclusi`
+                : `Media su ${stats.loggedDays} giorni registrati sui ${stats.totalDays} conclusi`}
+              ; lo scarto è rispetto al target giornaliero. I giorni non
+              compilati non abbassano la media, e oggi non entra nel conto finché
+              non è finito.
             </p>
           </Card>
 
@@ -105,16 +108,33 @@ export default async function StoricoPage({
               ))}
             </dl>
           </Card>
+        </>
+      ) : null}
+
+      {/* Con niente registrato il grafico sarebbe una griglia vuota: non si mostra. */}
+      {stats.loggedDays > 0 || stats.todayLogged ? (
+        <>
+          <Card title="Andamento">
+            <div className="flex flex-col gap-8">
+              {MACRO_ORDER.map((macro) => (
+                <MacroHistoryChart key={macro} macro={macro} days={days} />
+              ))}
+            </div>
+            <p className="mt-4 text-[13px] text-muted">
+              Le colonne oltre la linea del target sono in rosso. L&apos;ultima
+              colonna è oggi, ancora in corso.
+            </p>
+          </Card>
 
           <Card title="I numeri">
             <MacroHistoryTable days={days} />
           </Card>
         </>
-      )}
+      ) : null}
 
       {exerciseProgress.length > 0 ? (
         <Card title="Progressione in palestra">
-          <div className="space-y-8">
+          <div className="flex flex-col gap-8">
             {exerciseProgress.map((progress) => (
               <ExerciseProgressChart key={progress.exerciseId} progress={progress} />
             ))}
