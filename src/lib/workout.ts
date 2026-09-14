@@ -1,7 +1,10 @@
 import type { WorkoutSet } from "@/db/schema";
 
 /** Una serie come la mostra la UI, senza i campi di servizio del database. */
-export type LoggedSet = Pick<WorkoutSet, "id" | "exerciseId" | "setNumber" | "weight" | "reps">;
+export type LoggedSet = Pick<WorkoutSet, "id" | "exerciseId" | "setNumber" | "weight" | "reps"> & {
+  /** Registrata ma non ancora arrivata al server: e' in coda sul telefono. */
+  inAttesa?: boolean;
+};
 
 /**
  * Volume di una serie: carico per ripetizioni. E' il numero che dice se stai
@@ -17,8 +20,24 @@ export function totalVolume(sets: Pick<LoggedSet, "weight" | "reps">[]): number 
 }
 
 /** Kilogrammi arrotondati per la UI: i decimali qui non dicono niente. */
+/**
+ * Il raggruppamento delle migliaia si dichiara invece di lasciarlo al
+ * predefinito.
+ *
+ * Con `useGrouping: "auto"` browser e server non danno la stessa cosa sui
+ * numeri di quattro cifre: Chromium scrive 2.935, Node scrive 2935 (regola
+ * CLDR `min2`, che raggruppa solo da cinque cifre in su). Il risultato erano
+ * due formati diversi nella stessa app -- "4548 kg" nella lista degli ultimi
+ * allenamenti, resa dal server, e "1.815 kg" nella testata della seduta, resa
+ * dal browser -- piu' un errore di idratazione a ogni apertura.
+ */
+const VOLUME = new Intl.NumberFormat("it-IT", {
+  useGrouping: "always",
+  maximumFractionDigits: 0,
+});
+
 export function formatVolume(kg: number): string {
-  return Math.round(kg).toLocaleString("it-IT");
+  return VOLUME.format(Math.round(kg));
 }
 
 /** I chili si scrivono con al massimo un decimale (i dischi da 0,5 esistono). */

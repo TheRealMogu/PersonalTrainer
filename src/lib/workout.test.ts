@@ -4,6 +4,7 @@ import {
   bestOneRepMax,
   estimatedOneRepMax,
   formatElapsed,
+  formatVolume,
   formatWeight,
   groupByExercise,
   parseWeight,
@@ -173,5 +174,27 @@ describe("quale giornata tocca", () => {
   it("senza programma non propone niente", () => {
     assert.equal(suggestNextDayId([], null), null);
     assert.equal(suggestNextDayId([], 10), null);
+  });
+});
+
+describe("formato del volume", () => {
+  it("raggruppa le migliaia anche a quattro cifre", () => {
+    // E' il caso su cui browser e server non erano d'accordo: Chromium
+    // scriveva 2.935, Node 2935. Con il raggruppamento dichiarato, uno solo.
+    assert.equal(formatVolume(2935), "2.935");
+    assert.equal(formatVolume(4548), "4.548");
+  });
+
+  it("raggruppa anche sopra le cinque cifre", () => {
+    assert.equal(formatVolume(12935), "12.935");
+  });
+
+  it("sotto il migliaio non mette niente", () => {
+    assert.equal(formatVolume(196), "196");
+    assert.equal(formatVolume(0), "0");
+  });
+
+  it("arrotonda all'intero: i grammi di volume non dicono niente", () => {
+    assert.equal(formatVolume(2934.6), "2.935");
   });
 });

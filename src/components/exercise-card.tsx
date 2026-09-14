@@ -79,6 +79,10 @@ export function ExerciseCard({
               <span className="flex-1 text-[15px] tabular-nums">
                 <strong className="font-semibold">{formatWeight(set.weight)}</strong> kg ×{" "}
                 <strong className="font-semibold">{set.reps}</strong>
+                {/* Non e' un errore: la serie c'e', deve solo ancora partire. */}
+                {set.inAttesa ? (
+                  <span className="ml-2 text-[13px] font-normal text-muted">da mandare</span>
+                ) : null}
               </span>
               <button
                 type="button"

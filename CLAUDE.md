@@ -72,6 +72,14 @@ Costate tempo una volta. Non ripaghiamole.
   torni a lanciare l'errore al momento dell'importazione, `next build`
   fallisce sulla prima pagina che tocca il database — e il messaggio
   incolpa quella pagina, non la variabile mancante.
+- **`toLocaleString` senza `useGrouping` esplicito non dà lo stesso risultato
+  su server e browser.** Sui numeri di quattro cifre Chromium scrive `2.935`
+  e Node `2935` (regola CLDR `min2`). Risultato: due formati diversi nella
+  stessa app e un errore di idratazione. Ogni formattazione di numeri
+  dichiara le proprie opzioni.
+- **Le serie in coda e quelle ottimistiche hanno entrambe id negativi.**
+  Vanno tenute in intervalli separati, o React segnala due chiavi uguali e il
+  cestino colpisce la riga sbagliata.
 - **La data si calcola su `Europe/Rome`** (`src/lib/date.ts`). Il server
   gira in UTC: senza, fra mezzanotte e le due il diario apre il giorno
   prima.

@@ -63,6 +63,7 @@ prodotto, non una mancanza di funzionalità.
 | Capire dove sono finite le calorie | 0 tocchi | 0 (totale per pasto) | ok |
 | Sapere quale allenamento tocca | 0 tocchi | 0 (scheda "Tocca a te") | ok |
 | Portarsi via i propri dati | 2 tocchi | 2 (Piano → scarica) | ok |
+| Segnare una serie senza segnale | 1 tocco | 1 (resta sul telefono) | ok |
 
 Due regole che valgono sempre:
 
@@ -168,6 +169,10 @@ Valgono per ogni aggiunta futura.
     statistica futura.
 14. **Quando ci sono più azioni, una sola è quella principale.** Quattro
     pulsanti identici non dicono da dove cominciare.
+15. **Quello che hai registrato non si perde per colpa della rete.** In
+    palestra il segnale manca: una serie segnata deve restare segnata, e
+    partire da sola dopo. Ogni scrittura che si può ritentare porta un
+    identificativo, altrimenti riprovare significa duplicare.
 
 ## Come si verifica che sia davvero comodo
 

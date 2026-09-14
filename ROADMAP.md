@@ -81,12 +81,20 @@ L'app presuppone che tutto vada bene. Non è vero.
 - [x] **Stato di caricamento.** Fatto: `loading.tsx` con uno scheletro delle
       stesse misure delle schede vere, così quando arrivano i dati non salta
       niente.
-- [ ] **Ritentare le scritture fallite.** Se il salvataggio di un pasto
-      fallisce compare l'errore, ma il pasto è perso: va tenuto in memoria e
-      offerto un "riprova".
-- [ ] **Funzionare senza rete.** Oggi senza connessione l'app non si apre
-      affatto. Per la palestra, dove il segnale manca, è un problema serio:
-      servirebbe una cache locale delle serie da sincronizzare dopo.
+- [x] **Ritentare le scritture fallite — serie di allenamento.** Fatto. Una
+      serie registrata senza rete resta sul telefono, si vede a schermo
+      marcata "da mandare" e riparte da sola quando la rete torna. Il
+      riprova è sicuro: ogni serie porta un identificativo generato dal
+      telefono, quindi se era già arrivata non se ne scrive una seconda.
+- [ ] **Ritentare le scritture fallite — pasti.** Il diario non ha ancora la
+      stessa rete di sicurezza: se il salvataggio fallisce compare l'errore e
+      il pasto è perso. Stesso meccanismo da portare lì.
+- [ ] **Aprirsi senza rete.** Metà fatta. Se l'app è **già aperta** e il
+      segnale cade — il caso normale in palestra, dove entri col segnale e lo
+      perdi in sala pesi — ora continua a funzionare e non perde niente. Se
+      invece la apri da chiusa senza rete, non parte affatto: per quello
+      serve un service worker che tenga in cache il guscio dell'app. È il
+      prossimo passo di questa voce.
 
 ## 4. Qualità che non si vede ma si sente
 
