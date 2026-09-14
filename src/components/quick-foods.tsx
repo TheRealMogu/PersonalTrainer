@@ -3,8 +3,8 @@
 import { useMemo, useRef, useState } from "react";
 import type { QuickFood } from "@/db/schema";
 import type { MealSlot } from "@/lib/meal-slots";
-import { alreadyOver, fitsInRemaining, type MacroTotals } from "@/lib/nutrition";
-import { MACRO_LABELS } from "@/lib/targets";
+import { alreadyOver, fitsInRemaining, formatMacro, type MacroTotals } from "@/lib/nutrition";
+import { MACRO_LABELS, MACRO_ORDER } from "@/lib/targets";
 import { QuantitySheet } from "./quantity-sheet";
 
 /** Oltre questa soglia il tocco e' "tenuto premuto" e apre le quantita'. */
@@ -113,7 +113,7 @@ export function QuickFoods({
               className="flex min-h-16 w-full flex-col justify-between rounded-xl border border-hairline bg-surface px-3 py-2.5 pr-10 text-left transition active:scale-[0.98] active:bg-raised"
             >
               <span className="text-[15px] font-medium leading-tight">{food.name}</span>
-              <span className="mt-1.5 text-[13px] tabular-nums text-muted">
+              <span className="mt-1.5 block text-[13px] tabular-nums text-muted">
                 {food.kcal} kcal
                 {verdicts.get(food.id)?.fits === false ? (
                   <span className="ml-1.5 text-over">
@@ -123,6 +123,25 @@ export function QuickFoods({
                       .join(", ")}
                   </span>
                 ) : null}
+              </span>
+
+              {/*
+                I macro sul tasto: senza, per sapere se un alimento era
+                proteico o grasso bisognava ricordarselo o aprire il foglio.
+                Puntini colorati invece delle iniziali C/P/G, che non
+                spiegano niente a chi non le conosce gia'.
+              */}
+              <span className="mt-1 flex items-center gap-2 text-[11px] tabular-nums text-muted">
+                {MACRO_ORDER.slice(1).map((key) => (
+                  <span key={key} className="flex items-center gap-1">
+                    <span
+                      aria-hidden="true"
+                      className="h-1.5 w-1.5 rounded-full"
+                      style={{ background: `var(--color-${key === "carbs" ? "carbs" : key})` }}
+                    />
+                    {formatMacro(food[key], key)}
+                  </span>
+                ))}
               </span>
             </button>
 

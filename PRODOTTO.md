@@ -64,6 +64,10 @@ prodotto, non una mancanza di funzionalità.
 | Sapere quale allenamento tocca | 0 tocchi | 0 (scheda "Tocca a te") | ok |
 | Portarsi via i propri dati | 2 tocchi | 2 (Piano → scarica) | ok |
 | Segnare una serie senza segnale | 1 tocco | 1 (resta sul telefono) | ok |
+| Sapere com'è andata la settimana | 0 tocchi | 0 (striscia in cima al diario) | ok |
+| Aprire un giorno passato | 1 tocco | 1 (dalla striscia) | ok |
+| Sapere da dove arriva un macro | 1 tocco | 1 (tocca il riquadro) | ok |
+| Sapere cosa ci sta nel margine di un macro | 1 tocco | 1 (stesso foglio) | ok |
 
 Due regole che valgono sempre:
 
@@ -117,6 +121,10 @@ e va difesa a ogni aggiunta.
   entro il target. Stessi colori del diario. In fondo la **progressione in
   palestra**: massimale stimato per esercizio, seduta dopo seduta.
 - **Tema chiaro e scuro** che segue l'impostazione dell'iPhone.
+- **Striscia della settimana** in cima al diario: gli ultimi sette giorni a
+  colpo d'occhio, e un tocco per aprirne uno.
+- **Dettaglio di un macro**: toccando un riquadro si vede da quali pasti
+  arriva e quante porzioni dei tuoi alimenti ci stanno ancora nel margine.
 - **Export dei dati** — Piano → *I tuoi dati*: tutto in JSON, oppure pasti e
   allenamenti in CSV. Un'app che accumula mesi di diario e non ti lascia
   portarlo via te lo tiene in ostaggio.
@@ -169,7 +177,10 @@ Valgono per ogni aggiunta futura.
     statistica futura.
 14. **Quando ci sono più azioni, una sola è quella principale.** Quattro
     pulsanti identici non dicono da dove cominciare.
-15. **Quello che hai registrato non si perde per colpa della rete.** In
+15. **I numeri si muovono, non saltano.** Quando un valore cambia scorre fino
+    a quello nuovo in circa 400 ms: il salto secco non dice di quanto sei
+    sceso. Si rispetta `prefers-reduced-motion`.
+16. **Quello che hai registrato non si perde per colpa della rete.** In
     palestra il segnale manca: una serie segnata deve restare segnata, e
     partire da sola dopo. Ogni scrittura che si può ritentare porta un
     identificativo, altrimenti riprovare significa duplicare.

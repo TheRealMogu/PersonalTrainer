@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { formatDayLabel, isIsoDate, shiftIsoDate, toIsoDate, todayIso } from "./date";
+import {
+  formatDayLabel,
+  isIsoDate,
+  shiftIsoDate,
+  toIsoDate,
+  todayIso,
+  weekdayInitial,
+} from "./date";
 
 describe("todayIso", () => {
   it("usa il fuso italiano, non quello del server", () => {
@@ -83,5 +90,38 @@ describe("toIsoDate", () => {
   it("formatta in UTC senza sfasare il giorno", () => {
     assert.equal(toIsoDate(new Date("2026-03-01T00:00:00Z")), "2026-03-01");
     assert.equal(toIsoDate(new Date("2026-12-31T23:59:59Z")), "2026-12-31");
+  });
+});
+
+describe("iniziale del giorno della settimana", () => {
+  it("riconosce i sette giorni", () => {
+    // 2026-09-14 e' un lunedi'.
+    const attese = [
+      ["2026-09-14", "L"],
+      ["2026-09-15", "M"],
+      ["2026-09-16", "M"],
+      ["2026-09-17", "G"],
+      ["2026-09-18", "V"],
+      ["2026-09-19", "S"],
+      ["2026-09-20", "D"],
+    ] as const;
+    for (const [iso, attesa] of attese) {
+      assert.equal(weekdayInitial(iso), attesa, iso);
+    }
+  });
+
+  it("torna a lunedi' dopo sette giorni", () => {
+    assert.equal(weekdayInitial("2026-09-21"), "L");
+  });
+
+  it("non sbaglia sul cambio dell'ora legale", () => {
+    // In Italia l'ora legale finisce il 25 ottobre 2026, di domenica.
+    assert.equal(weekdayInitial("2026-10-25"), "D");
+    assert.equal(weekdayInitial("2026-10-26"), "L");
+  });
+
+  it("regge anche le date prima del 1970", () => {
+    // Il 1969-12-31 era un mercoledi': l'indice diventa negativo e non deve rompersi.
+    assert.equal(weekdayInitial("1969-12-31"), "M");
   });
 });
