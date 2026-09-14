@@ -137,13 +137,30 @@ Le linee guida del Piano stanno in `src/lib/plan.ts` e i target in
 1. Pusha il repo su GitHub.
 2. Su [vercel.com](https://vercel.com) → **Add New → Project**, importa il repo.
    Vercel riconosce Next.js da solo, nessuna configurazione da cambiare.
-3. In **Settings → Environment Variables** aggiungi `DATABASE_URL` con la
-   stessa stringa di Neon, per gli ambienti *Production*, *Preview* e
-   *Development*.
+3. In **Settings → Environment Variables** aggiungi **tutte e tre** le
+   variabili, spuntando *Production*, *Preview* e *Development* per ognuna:
+
+   | Nome | Valore |
+   |---|---|
+   | `DATABASE_URL` | la stringa di connessione di Neon (la stessa del punto 1) |
+   | `APP_PASSWORD` | la password con cui entri nell'app |
+   | `AUTH_SECRET` | una stringa lunga e casuale: `openssl rand -base64 32` |
+
 4. **Deploy**.
 
-Ricordati di aggiungere anche `APP_PASSWORD` e `AUTH_SECRET` fra le variabili
-d'ambiente, oltre a `DATABASE_URL`: senza, il deploy risponde con un errore.
+Non è un passaggio facoltativo. Senza `DATABASE_URL` il deploy **fallisce in
+compilazione**, non al primo accesso, e il messaggio parla di una pagina a caso:
+
+```
+Error: Failed to collect configuration for /allenamento
+  [cause]: Error: DATABASE_URL non impostata.
+```
+
+Senza `APP_PASSWORD` o `AUTH_SECRET` la compilazione passa, ma il login
+risponde con un errore: mancano solo a chi entra, non a chi compila.
+
+Se cambi una variabile dopo il primo deploy, Vercel **non** ricompila da solo:
+vai su **Deployments → ⋯ → Redeploy**.
 
 > Se il progetto Neon è collegato tramite l'integrazione Vercel–Neon, la
 > variabile viene iniettata in automatico: verifica solo che il nome sia
