@@ -28,6 +28,12 @@ fermava se mancava una variabile d'ambiente, e quando il database era
 indietro con le migration l'app rispondeva con un codice numerico e basta.
 Adesso dice cosa fare.
 
+**Una revisione guardando le schermate una per una** ne ha trovate altre due,
+anche queste sistemate: lo Storico faceva la media contando anche oggi, che è
+un giorno a metà, e quindi mentiva tutti i giorni fino a mezzanotte; e i
+grafici erano attaccati fra loro perché `space-y` non arriva su figli con
+`m-0`. La seconda si vedeva a occhio da settimane e nessuno l'aveva misurata.
+
 ---
 
 ## 1. Portarla davvero sul telefono
@@ -53,8 +59,11 @@ storia è la lacuna più grave dopo il punto 1.
 
 - [ ] **Backup automatico.** Neon ha lo storico dei rami; va verificato che
       sia attivo sul piano gratuito e documentato come si recupera.
-- [ ] **Export dei dati** in CSV o JSON da dentro l'app. Se un giorno il
-      progetto muore, i dati restano tuoi.
+- [x] **Export dei dati.** Fatto. Piano → *I tuoi dati*: copia completa in
+      JSON, oppure pasti e allenamenti in CSV che si aprono in Excel. Il CSV
+      esce con BOM e CRLF, altrimenti Excel rompe le accentate. Provato
+      scaricando davvero i tre file. Da verificare dentro l'app iOS: WKWebView
+      tratta i download a modo suo.
 - [ ] **Migration di rollback.** Oggi le migration vanno solo avanti: un
       errore su `db:migrate` si ripara a mano.
 
@@ -69,8 +78,9 @@ L'app presuppone che tutto vada bene. Non è vero.
       impostata. La diagnosi si fa sul server perché in produzione Next
       nasconde il messaggio al browser e lascia solo un codice. C'è anche un
       `error.tsx` come rete di sicurezza per tutto il resto.
-- [ ] **Stato di caricamento.** `loading.tsx` per le navigazioni lente:
-      oggi c'è solo l'indicatore sulle frecce del giorno.
+- [x] **Stato di caricamento.** Fatto: `loading.tsx` con uno scheletro delle
+      stesse misure delle schede vere, così quando arrivano i dati non salta
+      niente.
 - [ ] **Ritentare le scritture fallite.** Se il salvataggio di un pasto
       fallisce compare l'errore, ma il pasto è perso: va tenuto in memoria e
       offerto un "riprova".
@@ -122,6 +132,9 @@ Nessuna è bloccante, tutte sono state pesate col metro dei gesti.
       carico.
 - [ ] **Riordinare gli esercizi** della giornata, se in palestra la macchina
       è occupata.
+- [x] **Quale giornata tocca.** Fatto: l'Allenamento apre su *Tocca a te* con
+      la giornata successiva a quella dell'ultima seduta. Resta un
+      suggerimento — le altre giornate sono tutte avviabili.
 
 ## 7. Cose che restano fuori, di proposito
 

@@ -8,6 +8,7 @@ import {
   groupByExercise,
   parseWeight,
   setVolume,
+  suggestNextDayId,
   suggestNextSet,
   totalVolume,
   type LoggedSet,
@@ -143,5 +144,34 @@ describe("massimale stimato", () => {
 
   it("su lista vuota fa zero", () => {
     assert.equal(bestOneRepMax([]), 0);
+  });
+});
+
+describe("quale giornata tocca", () => {
+  it("senza storico parte dalla prima", () => {
+    assert.equal(suggestNextDayId([10, 20, 30], null), 10);
+  });
+
+  it("dopo una giornata propone la successiva", () => {
+    assert.equal(suggestNextDayId([10, 20, 30], 10), 20);
+    assert.equal(suggestNextDayId([10, 20, 30], 20), 30);
+  });
+
+  it("dopo l'ultima ricomincia dalla prima", () => {
+    assert.equal(suggestNextDayId([10, 20, 30], 30), 10);
+  });
+
+  it("se l'ultima giornata non c'e' piu' nel programma riparte dalla prima", () => {
+    // Capita dopo un seed che rifa' le giornate con id nuovi.
+    assert.equal(suggestNextDayId([10, 20, 30], 99), 10);
+  });
+
+  it("con una sola giornata ripropone quella", () => {
+    assert.equal(suggestNextDayId([7], 7), 7);
+  });
+
+  it("senza programma non propone niente", () => {
+    assert.equal(suggestNextDayId([], null), null);
+    assert.equal(suggestNextDayId([], 10), null);
   });
 });
