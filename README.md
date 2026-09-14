@@ -96,6 +96,16 @@ npm run db:seed      # carica tasti rapidi e programma di allenamento
 npm run dev          # http://localhost:3000
 ```
 
+Per aprirla dal telefono sulla stessa rete di casa, aggiungi in `.env.local`
+l'indirizzo che `npm run dev` stampa accanto a **Network**:
+
+```dotenv
+DEV_ORIGINS="192.168.1.22"
+```
+
+Senza, Next blocca il ricaricamento automatico da indirizzi diversi da
+`localhost` e la pagina non si aggiorna più da sola.
+
 Il seed ricarica sempre i tasti rapidi. **Non tocca `meals`**, e se trova
 serie di allenamento già registrate **lascia stare il programma**: gli
 esercizi sono riferiti dalle serie con `ON DELETE CASCADE`, quindi rifarlo
