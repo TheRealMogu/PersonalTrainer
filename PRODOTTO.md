@@ -158,8 +158,12 @@ Valgono per ogni aggiunta futura.
    zero: zero vorrebbe dire digiuno.
 6. **Tutto in italiano**, anche i messaggi di errore.
 7. **Mobile prima di tutto.** Si prova a 320 px prima di dire che è finito.
-8. **Il rosso è solo per il fuori target.** Se lo si usa per le cose ordinarie,
-   quando serve davvero non lo si vede più.
+8. **Il rosso si usa per due cose sole: il fuori target, e un guasto che ti
+   ha fatto perdere qualcosa.** Mai per le azioni — nemmeno "Elimina" o
+   "Esci" — e mai per gli stati tecnici che occupano già tutta la schermata,
+   come il pannello di errore del database: lì il rosso non aggiunge niente e
+   fa sembrare una colpa quello che è un guasto. Se lo si usa per le cose
+   ordinarie, quando serve davvero non lo si vede più.
 9. **Un colore per macro, uguale su ogni schermata.** Carboidrati ambra,
    proteine viola, grassi verde, calorie blu. I colori sono stati validati
    per la separazione su daltonismo, in chiaro e in scuro: non si cambiano a

@@ -1,3 +1,4 @@
+import { weekdayInitial } from "@/lib/date";
 import { axisMax, isLogged, type DailyTotals } from "@/lib/history";
 import { formatMacro } from "@/lib/nutrition";
 import { DAILY_TARGETS, MACRO_LABELS, MACRO_UNITS, type MacroKey } from "@/lib/targets";
@@ -5,13 +6,15 @@ import { DAILY_TARGETS, MACRO_LABELS, MACRO_UNITS, type MacroKey } from "@/lib/t
 /* Geometria del grafico, in unita' del viewBox. */
 const WIDTH = 320;
 const PLOT_HEIGHT = 96;
-const AXIS_BAND = 16;
-const HEIGHT = PLOT_HEIGHT + AXIS_BAND;
+/*
+ * L'altezza del viewBox e' solo il grafico: le etichette dei giorni stanno
+ * fuori, in HTML. Dentro l'SVG venivano scalate insieme al disegno e su uno
+ * schermo da 320 px un `font-size="9"` finiva reso a 6,75 px.
+ */
+const HEIGHT = PLOT_HEIGHT;
 const BAR_GAP = 2; // gap nel colore della superficie fra colonne adiacenti
 const MAX_BAR_WIDTH = 18;
 const RADIUS = 4;
-
-const WEEKDAY_INITIALS = ["D", "L", "M", "M", "G", "V", "S"];
 
 /** Lo stesso colore che il macro ha nel diario: l'identita' non cambia schermata. */
 const MACRO_COLOR: Record<MacroKey, string> = {
@@ -20,10 +23,6 @@ const MACRO_COLOR: Record<MacroKey, string> = {
   protein: "var(--color-protein)",
   fat: "var(--color-fat)",
 };
-
-function weekdayInitial(iso: string): string {
-  return WEEKDAY_INITIALS[new Date(`${iso}T00:00:00Z`).getUTCDay()];
-}
 
 function dayOfMonth(iso: string): string {
   return String(Number(iso.slice(8, 10)));
@@ -50,9 +49,12 @@ function barPath(x: number, y: number, width: number, height: number): string {
 export function MacroHistoryChart({
   macro,
   days,
+  today,
 }: {
   macro: MacroKey;
   days: DailyTotals[];
+  /** Serve a smorzare la colonna di oggi: e' un giorno a meta', non un dato. */
+  today?: string;
 }) {
   const target = DAILY_TARGETS[macro];
   const max = axisMax(days, macro);
@@ -107,7 +109,6 @@ export function MacroHistoryChart({
           const x = index * band + (band - barWidth) / 2;
           const y = PLOT_HEIGHT - height;
           const isOver = value > target;
-          const label = compact ? dayOfMonth(day.day) : weekdayInitial(day.day);
 
           return (
             <g key={day.day}>
@@ -115,24 +116,31 @@ export function MacroHistoryChart({
                 <path
                   d={barPath(x, y, barWidth, height)}
                   fill={isOver ? "var(--color-over)" : MACRO_COLOR[macro]}
+                  /*
+                    Oggi e' smorzato, come nella striscia della settimana: la
+                    giornata non e' finita, e una colonna piena la farebbe
+                    leggere come un totale definitivo.
+                  */
+                  opacity={day.day === today ? 0.55 : 1}
                 />
-              ) : null}
-              {index % labelEvery === 0 ? (
-                <text
-                  x={x + barWidth / 2}
-                  y={HEIGHT - 4}
-                  textAnchor="middle"
-                  fontSize="9"
-                  fill="var(--color-muted)"
-                  style={{ fontVariantNumeric: "tabular-nums" }}
-                >
-                  {label}
-                </text>
               ) : null}
             </g>
           );
         })}
       </svg>
+
+      {/*
+        Etichette in HTML e non dentro l'SVG: qui i pixel sono quelli veri.
+        Le celle hanno la stessa larghezza delle bande del grafico, quindi
+        ogni etichetta resta sotto la sua colonna.
+      */}
+      <div className="mt-1 flex text-[11px] tabular-nums text-muted" aria-hidden="true">
+        {days.map((day, index) => (
+          <span key={day.day} className="flex-1 text-center">
+            {index % labelEvery === 0 ? (compact ? dayOfMonth(day.day) : weekdayInitial(day.day)) : ""}
+          </span>
+        ))}
+      </div>
     </figure>
   );
 }

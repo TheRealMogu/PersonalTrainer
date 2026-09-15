@@ -40,7 +40,7 @@ export function UndoToast({
         <button
           type="button"
           onClick={onUndo}
-          className="-my-2 shrink-0 px-2 py-2 text-[15px] font-semibold text-on-overlay"
+          className="-my-1 flex min-h-11 shrink-0 items-center px-3 text-[15px] font-semibold text-on-overlay"
         >
           Annulla
         </button>

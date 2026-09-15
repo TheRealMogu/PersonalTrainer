@@ -31,6 +31,9 @@ Sono in `PRODOTTO.md` per esteso. Il riassunto, perché non si perda:
    scuro — non si ritoccano a occhio.
 8. **Non si incolpa l'utente per quello che è già successo.** Se un macro è
    già oltre, lo si dice una volta, non su ogni alimento.
+9. **Il rosso è per il fuori target e per un guasto che ha perso qualcosa.**
+   Mai per un'azione — nemmeno "Elimina" — né per un pannello d'errore che
+   occupa già tutta la schermata.
 
 Questa non è un'app di menù, è un'app di budget: risponde a *quanto mi
 resta e cosa ci faccio*. Tutto ciò che non serve a quella domanda è peso

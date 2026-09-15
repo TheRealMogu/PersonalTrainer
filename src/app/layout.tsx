@@ -18,9 +18,19 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  /*
+   * Niente `maximumScale`: bloccare lo zoom impedisce di ingrandire a chi ha
+   * la vista ridotta. Era li' per evitare che Safari zoomasse entrando in un
+   * campo, ma quel caso e' gia' coperto da `globals.css`, che porta tutti gli
+   * input a 16px -- sotto quella soglia lo zoom scatta comunque.
+   */
   viewportFit: "cover",
-  themeColor: "#f5f5f7",
+  // La barra di sistema segue il tema: fissa sul chiaro, su fondo nero
+  // restava una striscia bianca sopra l'app.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f2f2f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
 export default function RootLayout({

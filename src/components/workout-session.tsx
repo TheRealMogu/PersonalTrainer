@@ -14,6 +14,7 @@ import {
   subscribe,
 } from "@/lib/pending-store";
 import { formatVolume, groupByExercise, totalVolume, type LoggedSet } from "@/lib/workout";
+import { AnimatedNumber } from "./animated-number";
 import { ExerciseCard } from "./exercise-card";
 import { RestTimer } from "./rest-timer";
 import { SessionTimer } from "./session-timer";
@@ -202,9 +203,14 @@ export function WorkoutSession({
       <header className="flex items-start justify-between gap-3 pt-12 pb-5">
         <div className="min-w-0 flex-1">
           <SessionTimer startedAt={session.startedAt.toISOString()} />
-          <p className="mt-1 truncate text-[13px] text-muted">
+          <p className="mt-1 text-[13px] leading-snug text-muted">
             {label} — {focus}
-            {volume > 0 ? ` · ${formatVolume(volume)} kg sollevati` : ""}
+            {volume > 0 ? (
+              <>
+                {" · "}
+                <AnimatedNumber value={volume} format={formatVolume} /> kg sollevati
+              </>
+            ) : null}
           </p>
         </div>
         <button

@@ -31,8 +31,13 @@ export function RestTimer({ onClose }: { onClose: () => void }) {
   }
 
   return (
+    /*
+      Niente `role="status"` sul contenitore: il numero cambia ogni secondo e
+      un lettore di schermo lo annuncerebbe sessanta volte per un recupero di
+      un minuto -- proprio in palestra, dove l'audio e' l'unico canale libero.
+      La zona viva e' solo la riga di stato, che cambia una volta sola.
+    */
     <div
-      role="status"
       className="fixed inset-x-0 z-20 px-5"
       style={{ bottom: "calc(4.25rem + env(safe-area-inset-bottom))" }}
     >
@@ -46,8 +51,11 @@ export function RestTimer({ onClose }: { onClose: () => void }) {
 
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="min-w-0 flex-1">
-            <p className="text-[12px] text-on-overlay/70">{done ? "Recupero finito" : "Recupero"}</p>
-            <p className="text-[22px] font-semibold leading-tight tabular-nums">
+            <p role="status" className="text-[12px] text-on-overlay/70">
+              {done ? "Recupero finito" : "Recupero"}
+            </p>
+            {/* Il numero resta visivo: chi non vede lo schermo ha l'annuncio sopra. */}
+            <p aria-hidden="true" className="text-[22px] font-semibold leading-tight tabular-nums">
               {formatElapsed(left)}
             </p>
           </div>
