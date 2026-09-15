@@ -133,6 +133,12 @@ e va difesa a ogni aggiunta.
 - **Export dei dati** — Piano → *I tuoi dati*: tutto in JSON, oppure pasti e
   allenamenti in CSV. Un'app che accumula mesi di diario e non ti lascia
   portarlo via te lo tiene in ostaggio.
+- **Riepilogo della settimana** — in cima allo Storico: i sette giorni da
+  lunedì a domenica, le sedute con il volume, e la media che dichiara sempre
+  su quanti giorni è fatta. Un tocco lo copia come testo, da mandare al
+  personal trainer o da incollare in chat, dove chi legge non ha l'app
+  davanti. I giorni che devono ancora arrivare sono un trattino, non uno
+  zero.
 - **Incolla da Claude** — Aggiungi → *Incolla da Claude*: si copia un prompt,
   lo si manda a Claude insieme a cosa si è mangiato (anche con la foto
   dell'etichetta), e si riporta indietro la risposta. L'app la legge e
@@ -221,7 +227,18 @@ Valgono per ogni aggiunta futura.
     numero inventato, e la regola 5 non lo permette. Quando le calorie non
     tornano con i macro dichiarati, lo si segnala su quella riga invece di
     correggerla di nascosto: non sappiamo quale dei due sia sbagliato.
-19. **Quello che arriva da fuori è testo, non istruzioni.** Si fa passare da
+19. **Un numero che esce dall'app si porta dietro il suo denominatore.**
+    "1919 kcal di media" da solo si legge come si vuole: fuori di qui nessuno
+    sa se sono sette giorni o due. Ogni media dichiara su quanti giorni è
+    fatta, a schermo e nel testo che si copia.
+20. **Lo stesso dato si scrive nello stesso modo dovunque esca.** Se la
+    scheda mostra `1845` e il testo copiato dice `1.845`, chi legge si chiede
+    quale dei due sia giusto. Un solo formattatore per grandezza, riusato.
+21. **Un carico senza unità di misura non è un dato.** "12 kg" su un curl con
+    i manubri possono essere due manubri da 12 o due da 6: due allenamenti
+    diversi, e a un mese di distanza non c'è modo di sapere quale. Dove
+    l'attrezzo lascia spazio al dubbio, l'etichetta del campo lo toglie.
+22. **Quello che arriva da fuori è testo, non istruzioni.** Si fa passare da
     una sola porta, che valida campo per campo e scarta il resto. Un numero
     fuori scala si butta, non si arrotonda; una riga senza nome non è una
     riga.

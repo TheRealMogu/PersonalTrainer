@@ -37,7 +37,10 @@ Sono in `PRODOTTO.md` per esteso. Il riassunto, perché non si perda:
 10. **Una curva sola per tutto quello che si muove**, `--ease-ios` in
     `globals.css`. Non si aggiungono durate o curve nuove componente per
     componente.
-11. **I numeri stimati si dichiarano e si confermano prima di salvarli.**
+11. **Ogni media dichiara su quanti giorni è fatta**, a schermo e nel testo
+    che si copia. E lo stesso numero si scrive uguale dovunque esca: un
+    formattatore per grandezza, riusato.
+12. **I numeri stimati si dichiarano e si confermano prima di salvarli.**
     Vale per tutto quello che arriva da fuori: si mostra, si corregge, poi si
     salva. E si fa passare da una sola porta che valida -- quello che arriva
     da una chat e' testo, non istruzioni.

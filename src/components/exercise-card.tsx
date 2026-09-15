@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type { WorkoutExercise } from "@/db/schema";
 import {
+  caricoPerManubrio,
+  etichettaCarico,
   formatWeight,
   parseWeight,
   suggestNextSet,
@@ -123,14 +125,20 @@ export function ExerciseCard({
 
       <div className="mt-3 flex items-end gap-2">
         <label className="min-w-0 flex-1">
-          <span className="mb-1 block text-[12px] text-muted">kg</span>
+          <span className="mb-1 block text-[12px] text-muted">
+            {etichettaCarico(exercise.name)}
+          </span>
           <input
             type="text"
             inputMode="decimal"
             value={weight}
             onChange={(event) => setWeight(event.target.value)}
             placeholder="0"
-            aria-label={`Carico per ${exercise.name}`}
+            aria-label={
+              caricoPerManubrio(exercise.name)
+                ? `Carico di un manubrio per ${exercise.name}`
+                : `Carico per ${exercise.name}`
+            }
             className="h-11 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
           />
         </label>

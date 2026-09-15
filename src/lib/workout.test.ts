@@ -5,6 +5,8 @@ import {
   estimatedOneRepMax,
   formatElapsed,
   formatVolume,
+  caricoPerManubrio,
+  etichettaCarico,
   formatWeight,
   groupByExercise,
   parseWeight,
@@ -196,5 +198,49 @@ describe("formato del volume", () => {
 
   it("arrotonda all'intero: i grammi di volume non dicono niente", () => {
     assert.equal(formatVolume(2934.6), "2.935");
+  });
+});
+
+describe("come si scrive il carico", () => {
+  it("chiede il peso di un manubrio quando sono manubri", () => {
+    for (const nome of [
+      "Curl manubri con rotazione in piedi",
+      "Spinte manubri panca piana",
+      "Lento avanti manubri",
+      "Spider curl con manubri prono su panca",
+      "French press manubri",
+      "Alzate laterali in piedi con manubri",
+    ]) {
+      assert.equal(caricoPerManubrio(nome), true, nome);
+      assert.equal(etichettaCarico(nome), "kg a manubrio", nome);
+    }
+  });
+
+  it("lascia stare tutto il resto, dove il carico è già quello totale", () => {
+    for (const nome of [
+      "Hack-squat",
+      "Leg extension",
+      "Chest incline",
+      "Push down fune",
+      "Alzate laterali al cavo singolo",
+      "Crunch machine",
+      "Pressa orizzontale",
+    ]) {
+      assert.equal(caricoPerManubrio(nome), false, nome);
+      assert.equal(etichettaCarico(nome), "kg", nome);
+    }
+  });
+
+  it("riconosce anche il singolare e le maiuscole", () => {
+    assert.equal(caricoPerManubrio("Curl con un Manubrio"), true);
+    assert.equal(caricoPerManubrio("MANUBRI"), true);
+  });
+
+  /*
+   * L'etichetta sta sopra a un campo largo circa un terzo dello schermo: se
+   * si allunga, va a capo e spinge giu' il pulsante della serie.
+   */
+  it("l'etichetta resta corta abbastanza per un telefono da 320 px", () => {
+    assert.ok(etichettaCarico("Curl manubri").length <= 14);
   });
 });

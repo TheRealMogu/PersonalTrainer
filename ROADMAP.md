@@ -183,6 +183,12 @@ leggibile qualcosa che oggi non lo è.
       in fondo, entrate di schermata e risposta al tocco condividono
       `--ease-ios` in `globals.css`, invece di avere ognuno la propria
       andatura. Misurato in Chromium a 320, 390 e 430 px, chiaro e scuro.
+- [x] **Riepilogo della settimana.** Fatto: in cima allo Storico, lunedì–
+      domenica, alimentazione e sedute, con un tasto che lo copia come testo.
+      Serve la domenica sera e per mandarlo al personal trainer.
+- [x] **Carico per manubrio invece di "kg".** Fatto: sugli esercizi che nel
+      programma dicono "manubri" il campo si chiama *kg a manubrio*. Prima
+      diceva solo "kg" e ogni serie registrata era ambigua.
 - [ ] **Card d'insight in linguaggio naturale sul diario.** Una riga che
       legge i numeri al posto tuo: "ti restano 1.390 kcal e 86 g di proteine —
       un petto di pollo e una colazione ci stanno". Oggi i numeri ci sono ma
@@ -197,6 +203,25 @@ leggibile qualcosa che oggi non lo è.
 - [ ] **Data toccabile nell'intestazione** che apre un selettore, invece delle
       sole frecce. La striscia della settimana copre già i sette giorni
       vicini; serve per andare più indietro.
+- [ ] **Il volume dovrebbe contare due manubri?** Oggi il volume è quello che
+      scrivi per ripetizioni, quindi sugli esercizi con i manubri conta un
+      braccio solo. È coerente settimana su settimana, quindi la progressione
+      si legge lo stesso, ma il totale di seduta mescola mezzi carichi e
+      carichi interi. Raddoppiarlo cambierebbe anche i numeri già registrati:
+      da decidere, non da fare di nascosto.
+- [ ] **Export filtrato per date.** Oggi *I tuoi dati* scarica tutto lo
+      storico. Per mandare una settimana sola serve aprire il CSV e tagliarlo
+      a mano.
+- [ ] **Separatore decimale dei macro.** I chili usano la virgola
+      (`formatWeight`), i macro il punto (`formatMacro`): "12,5 kg" e
+      "C 230.6" nella stessa schermata. Da uniformare sulla virgola.
+- [ ] **Dati da Apple Watch o Fitbit.** Le calorie bruciate e i passi
+      renderebbero il budget giornaliero vero invece che fisso. Costa parecchio:
+      per Apple Health serve un plugin HealthKit dentro il guscio Capacitor,
+      Xcode e un account sviluppatore a pagamento, e i dati non escono dal
+      telefono -- quindi niente lettura dal server. Fitbit è l'opposto: API
+      web con OAuth, si legge da Vercel, ma vuole un'app registrata e i token
+      da rinnovare. Nessuna delle due è un pomeriggio di lavoro.
 - [ ] **Un modo per tornare indietro dalla chat senza copiare a mano.** Oggi
       il giro è: copia il prompt, apri Claude, incolla, copia la risposta,
       torna, incolla. Sei gesti, di cui quattro sono trasporto. Da valutare
