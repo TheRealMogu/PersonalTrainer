@@ -189,6 +189,46 @@ Valgono per ogni aggiunta futura.
     partire da sola dopo. Ogni scrittura che si può ritentare porta un
     identificativo, altrimenti riprovare significa duplicare.
 
+## Come si struttura una schermata
+
+Ricavato guardando Bevel sul telefono, schermata per schermata, non da una
+guida generica. Quello che segue è il **come**, non il cosa: le regole sopra
+decidono se una cosa va fatta, questa parte dice come metterla a schermo.
+
+**Il titolo di sezione sta fuori dalla scheda.** Prima ogni scheda portava il
+proprio titolo dentro il riquadro, e due schede che parlano della stessa cosa
+restavano due oggetti separati. Col titolo fuori si legge "questo gruppo
+riguarda X" e le schede sotto sono i pezzi di X — è così che "Andamento" tiene
+insieme il grafico e la tabella, e "Il programma" le tre giornate.
+
+**Quello che si tocca lo dichiara.** Una freccia in alto a destra sulla
+scheda, o accanto all'etichetta. Prima le tessere dei macro si aprivano e
+l'unico modo di scoprirlo era toccarle per caso.
+
+**Gli stati vuoti dicono cosa fare**, non solo che è vuoto. "Giornata ancora
+vuota — hai l'intero budget a disposizione" più l'indicazione di dove agire,
+invece di "Nessun pasto registrato".
+
+**Un numero importante porta con sé una parola.** "−28% · Inferiore
+all'obiettivo" si legge in un colpo d'occhio, "−28%" no. La parola descrive,
+non giudica: "oltre il target", mai "hai sbagliato".
+
+**Le schede possono avere dimensioni diverse** nella stessa colonna: due a
+metà larghezza affiancate accanto a una intera. È quello che dà densità senza
+comprimere.
+
+### Cosa abbiamo rifiutato, e perché
+
+- **"Età biologica: 3,1 anni in più".** È un modello presentato come misura:
+  esattamente il numero inventato che la regola 5 vieta. Vale per qualunque
+  punteggio sintetico che sembri un dato.
+- **L'assistente in chat.** Fuori scopo: l'app deve rispondere da sola, non
+  farsi interrogare.
+- **I biomarcatori da sensori** (variabilità cardiaca, VO₂max). Non abbiamo
+  quei dati, e mostrarli vuoti riempie la schermata di niente.
+- **Lo sfondo sfocato sotto gli stati vuoti.** Decorazione: finge che ci sia
+  un contenuto che non c'è.
+
 ## Come si verifica che sia davvero comodo
 
 Non basta che la build passi.

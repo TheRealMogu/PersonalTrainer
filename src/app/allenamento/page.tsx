@@ -1,6 +1,7 @@
 import { Card } from "@/components/card";
 import { DbErrorPanel } from "@/components/db-error-panel";
 import { PageHeader } from "@/components/page-header";
+import { Section } from "@/components/section";
 import { StartWorkoutButton } from "@/components/start-workout-button";
 import { WorkoutSession } from "@/components/workout-session";
 import {
@@ -124,37 +125,44 @@ export default async function AllenamentoPage() {
           </p>
         </Card>
       ) : (
-        days.map((day) => (
-          <Card
-            key={day.id}
-            title={`${day.label} — ${day.focus}${day.id === suggestedId ? " · consigliata" : ""}`}
-          >
-            <ul className="mb-4 divide-y divide-hairline">
-              {day.exercises.map((exercise) => (
-                <li
-                  key={exercise.id}
-                  className="flex items-baseline gap-3 py-2.5 first:pt-0"
-                >
-                  <span className="flex-1 text-[15px] leading-snug">{exercise.name}</span>
-                  <span className="shrink-0 text-[15px] font-semibold tabular-nums text-muted">
-                    {exercise.sets}×{exercise.reps}
+        <Section title="Il programma">
+          {days.map((day) => (
+            <Card key={day.id}>
+              <header className="mb-3 flex items-baseline justify-between gap-2">
+                <h3 className="text-[15px] font-semibold">
+                  {day.label} — {day.focus}
+                </h3>
+                {day.id === suggestedId ? (
+                  <span className="shrink-0 rounded-full bg-raised px-2 py-0.5 text-[11px] font-medium text-muted">
+                    consigliata
                   </span>
-                </li>
-              ))}
-            </ul>
-            <StartWorkoutButton
-              dayId={day.id}
-              label={`${day.label} — ${day.focus}`}
-              variante="secondaria"
-            />
-          </Card>
-        ))
+                ) : null}
+              </header>
+              <ul className="mb-4 divide-y divide-hairline">
+                {day.exercises.map((exercise) => (
+                  <li key={exercise.id} className="flex items-baseline gap-3 py-2.5 first:pt-0">
+                    <span className="flex-1 text-[15px] leading-snug">{exercise.name}</span>
+                    <span className="shrink-0 text-[15px] font-semibold tabular-nums text-muted">
+                      {exercise.sets}×{exercise.reps}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <StartWorkoutButton
+                dayId={day.id}
+                label={`${day.label} — ${day.focus}`}
+                variante="secondaria"
+              />
+            </Card>
+          ))}
+        </Section>
       )}
 
       {recent.length > 0 ? (
-        <Card title="Ultimi allenamenti">
-          <ul className="divide-y divide-hairline">
-            {recent.map((session) => (
+        <Section title="Ultimi allenamenti">
+          <Card>
+            <ul className="divide-y divide-hairline">
+              {recent.map((session) => (
               <li
                 key={session.id}
                 className="flex items-baseline justify-between gap-3 py-3 first:pt-0 last:pb-0"
@@ -172,8 +180,9 @@ export default async function AllenamentoPage() {
                 </span>
               </li>
             ))}
-          </ul>
-        </Card>
+            </ul>
+          </Card>
+        </Section>
       ) : null}
     </main>
   );

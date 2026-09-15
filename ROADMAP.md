@@ -150,6 +150,37 @@ Nessuna è bloccante, tutte sono state pesate col metro dei gesti.
       la giornata successiva a quella dell'ultima seduta. Resta un
       suggerimento — le altre giornate sono tutte avviabili.
 
+## 6-bis. Interfaccia: cosa resta dopo il confronto con Bevel
+
+Ordinato per quanto cambia davvero l'uso. Il metro resta quello di
+`PRODOTTO.md`: si aggiunge solo ciò che abbassa un costo in tocchi o rende
+leggibile qualcosa che oggi non lo è.
+
+- [x] **Titoli di sezione fuori dalle schede.** Fatto su tutte e quattro le
+      schermate.
+- [x] **Freccia su quello che si apre.** Fatto sulle tessere dei macro.
+- [x] **Stati vuoti con un'indicazione di cosa fare.** Fatto su diario e
+      storico.
+- [ ] **Card d'insight in linguaggio naturale sul diario.** Una riga che
+      legge i numeri al posto tuo: "ti restano 1.390 kcal e 86 g di proteine —
+      un petto di pollo e una colazione ci stanno". Oggi i numeri ci sono ma
+      la sintesi la fai a mente. È la cosa che manca di più.
+- [ ] **Etichetta qualitativa accanto ai numeri dello storico.** "−217 kcal"
+      diventa "−217 kcal · sotto il target". Descrive, non giudica.
+- [ ] **Schede a mezza larghezza affiancate** dove il contenuto è corto
+      (giorni entro il target, media giornaliera).
+- [ ] **Heatmap del mese** nello storico, tipo calendario, con quanti giorni
+      sei stato in target: oggi si vedono sette o trenta colonne, ma non si
+      coglie il mese a colpo d'occhio.
+- [ ] **Data toccabile nell'intestazione** che apre un selettore, invece delle
+      sole frecce. La striscia della settimana copre già i sette giorni
+      vicini; serve per andare più indietro.
+- [ ] **Intestazione che si compatta scorrendo.** Costa poco, guadagna una
+      riga su schermate lunghe.
+- [ ] **Un "+" che apre i modi di registrare.** Oggi i tasti rapidi sono in
+      fondo al diario: da valutare solo se il conteggio dei tocchi migliora,
+      altrimenti è decorazione.
+
 ## 7. Cose che restano fuori, di proposito
 
 Scritte per non riaprirle ogni volta.

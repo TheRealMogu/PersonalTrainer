@@ -47,8 +47,30 @@ export function MacroTile({
         rubava i pixel che servono per scrivere "Carboidrati" per intero, e
         un'etichetta troncata vale meno di un pallino.
       */}
-      <span className="text-[11px] font-medium leading-tight tracking-tight text-muted">
-        {MACRO_LABELS[key]}
+      {/*
+        La freccia dice che il riquadro si apre. Senza, l'unico modo di
+        scoprirlo e' toccarlo per caso: una cosa toccabile deve dichiararsi.
+      */}
+      <span className="flex items-center justify-between gap-1">
+        <span className="truncate text-[11px] font-medium leading-tight tracking-tight text-muted">
+          {MACRO_LABELS[key]}
+        </span>
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 10 10"
+          fill="none"
+          aria-hidden="true"
+          className="shrink-0 text-reference"
+        >
+          <path
+            d="M3.5 1.5 7 5l-3.5 3.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </span>
 
       <span className="mt-1.5 flex items-baseline gap-1">
