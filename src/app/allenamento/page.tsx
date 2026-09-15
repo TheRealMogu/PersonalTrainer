@@ -1,6 +1,8 @@
 import { Card } from "@/components/card";
 import { DbErrorPanel } from "@/components/db-error-panel";
 import { PageHeader } from "@/components/page-header";
+import { RecentSessions } from "@/components/recent-sessions";
+import { UndoSeduta } from "@/components/undo-seduta";
 import { Section } from "@/components/section";
 import { StartWorkoutButton } from "@/components/start-workout-button";
 import { WorkoutSession } from "@/components/workout-session";
@@ -12,7 +14,7 @@ import {
   getWorkout,
 } from "@/lib/queries";
 import { formatDayLabel } from "@/lib/date";
-import { formatVolume, suggestNextDayId } from "@/lib/workout";
+import { suggestNextDayId } from "@/lib/workout";
 import type { LoggedSet } from "@/lib/workout";
 
 export const dynamic = "force-dynamic";
@@ -71,14 +73,17 @@ export default async function AllenamentoPage() {
 
   if (dati.stato === "in-corso") {
     return (
-      <WorkoutSession
-        session={dati.session}
-        label={dati.day.label}
-        focus={dati.day.focus}
-        exercises={dati.day.exercises}
-        sets={dati.sets}
-        lastTime={dati.lastTime}
-      />
+      <>
+        <UndoSeduta />
+        <WorkoutSession
+          session={dati.session}
+          label={dati.day.label}
+          focus={dati.day.focus}
+          exercises={dati.day.exercises}
+          sets={dati.sets}
+          lastTime={dati.lastTime}
+        />
+      </>
     );
   }
 
@@ -161,29 +166,11 @@ export default async function AllenamentoPage() {
       {recent.length > 0 ? (
         <Section title="Ultimi allenamenti">
           <Card>
-            <ul className="divide-y divide-hairline">
-              {recent.map((session) => (
-              <li
-                key={session.id}
-                className="flex items-baseline justify-between gap-3 py-3 first:pt-0 last:pb-0"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-[15px]">
-                    {session.label} — {session.focus}
-                  </p>
-                  <p className="mt-0.5 text-[13px] tabular-nums text-muted">
-                    {session.day.slice(8, 10)}/{session.day.slice(5, 7)} · {session.setCount} serie
-                  </p>
-                </div>
-                <span className="shrink-0 text-[15px] font-semibold tabular-nums">
-                  {formatVolume(session.volume)} kg
-                </span>
-              </li>
-            ))}
-            </ul>
+            <RecentSessions sessions={recent} />
           </Card>
         </Section>
       ) : null}
+      <UndoSeduta />
     </main>
   );
 }

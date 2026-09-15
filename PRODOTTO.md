@@ -62,6 +62,11 @@ prodotto, non una mancanza di funzionalità.
 | Sapere cosa mi entra ancora | 0 tocchi | 0 (conteggio sempre visibile) | ok |
 | Capire dove sono finite le calorie | 0 tocchi | 0 (totale per pasto) | ok |
 | Sapere quale allenamento tocca | 0 tocchi | 0 (scheda "Tocca a te") | ok |
+| Correggere una serie sbagliata | 2 tocchi | 2 (tocca la riga → salva) | ok |
+| Rimediare a una serie eliminata | 1 tocco | 1 (Annulla) | ok |
+| Rimediare a "Fine" toccato per sbaglio | 1 tocco | 1 (Annulla) | ok |
+| Uscire da una giornata avviata sbagliata | 1 tocco | 1 (Scarta) | ok |
+| Spostare un pasto di momento | 2 tocchi | 2 (tocca la riga → momento) | ok |
 | Portarsi via i propri dati | 2 tocchi | 2 (Piano → scarica) | ok |
 | Segnare una serie senza segnale | 1 tocco | 1 (resta sul telefono) | ok |
 | Sapere com'è andata la settimana | 0 tocchi | 0 (striscia in cima al diario) | ok |
@@ -151,7 +156,10 @@ Valgono per ogni aggiunta futura.
 1. **Bersagli da 44×44 px minimo.** Sotto, il pollice sbaglia.
 2. **Riscontro visibile sotto i 100 ms**, anche se il salvataggio dura un
    secondo.
-3. **Le azioni distruttive si annullano**, non si confermano.
+3. **Le azioni distruttive si annullano**, non si confermano. E non
+   esistono vicoli ciechi: tutto quello che si registra si corregge e si
+   toglie, e ogni cosa che sparisce lascia un modo di rimetterla. Un tocco
+   storto in palestra, con le mani sudate, non deve costare un allenamento.
 4. **Contrasto del testo almeno 4.5:1.** Il grigio troppo chiaro non è
    eleganza, è testo che non si legge al sole.
 5. **Niente numeri inventati.** Un giorno non compilato è "non registrato", mai

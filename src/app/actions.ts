@@ -102,19 +102,28 @@ export async function restoreMeal(
 }
 
 /**
- * Cambia la quantita' di un pasto gia' inserito, riscalando i macro dalla
- * porzione base. Sbagliare a digitare capita: se correggere costa quanto
- * rifare tutto, il dato sbagliato resta li'.
+ * Corregge un pasto gia' inserito: quantita' e momento della giornata.
+ *
+ * La quantita' riscala i macro dalla porzione base. Il momento serve perche'
+ * i tasti rapidi lo scelgono dall'ora dell'orologio: aggiungere uno spuntino
+ * alle 12:30 lo fa finire a pranzo, e senza questa correzione ci resta.
+ *
+ * Sbagliare capita: se correggere costa quanto rifare tutto, il dato
+ * sbagliato resta li'.
  */
-export async function updateMealQuantity(
+export async function updateMeal(
   id: number,
   day: string,
   quantity: number,
+  slot?: MealSlot,
 ): Promise<ActionResult> {
   if (!Number.isInteger(id) || id <= 0) return { ok: false, error: "Pasto non valido." };
   if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };
   if (!Number.isFinite(quantity) || quantity <= 0 || quantity > 20) {
     return { ok: false, error: "La quantità deve stare fra 0 e 20 porzioni." };
+  }
+  if (slot !== undefined && !isMealSlot(slot)) {
+    return { ok: false, error: "Momento della giornata non valido." };
   }
 
   try {
@@ -137,10 +146,11 @@ export async function updateMealQuantity(
         carbs: current.carbs * factor,
         protein: current.protein * factor,
         fat: current.fat * factor,
+        ...(slot === undefined ? {} : { slot }),
       })
       .where(eq(meals.id, id));
   } catch (cause) {
-    console.error("updateMealQuantity fallita", cause);
+    console.error("updateMeal fallita", cause);
     return { ok: false, error: "Modifica non riuscita. Riprova." };
   }
 
