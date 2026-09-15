@@ -117,7 +117,7 @@ export default async function StoricoPage({
           <Card title="Andamento">
             <div className="flex flex-col gap-8">
               {MACRO_ORDER.map((macro) => (
-                <MacroHistoryChart key={macro} macro={macro} days={days} />
+                <MacroHistoryChart key={macro} macro={macro} days={days} today={today} />
               ))}
             </div>
             <p className="mt-4 text-[13px] text-muted">

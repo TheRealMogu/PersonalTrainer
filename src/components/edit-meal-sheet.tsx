@@ -92,7 +92,7 @@ export function EditMealSheet({
             value={custom}
             onChange={(event) => setCustom(event.target.value)}
             placeholder="es. 0,75"
-            className="h-12 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent"
+            className="h-12 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
           />
         </label>
 
@@ -111,7 +111,7 @@ export function EditMealSheet({
           <button
             type="button"
             onClick={onDelete}
-            className="min-h-12 rounded-xl border border-hairline px-5 text-[15px] font-medium text-over"
+            className="min-h-12 rounded-xl border border-hairline px-5 text-[15px] font-medium text-muted"
           >
             Elimina
           </button>

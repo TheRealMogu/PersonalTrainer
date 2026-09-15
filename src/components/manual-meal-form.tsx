@@ -86,7 +86,7 @@ export function ManualMealForm({
           required
           maxLength={120}
           autoFocus
-          className="min-h-11 w-full rounded-xl border border-hairline bg-raised px-3 py-2.5 outline-none focus:border-accent"
+          className="min-h-11 w-full rounded-xl border border-hairline bg-raised px-3 py-2.5 outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
         />
       </label>
 
@@ -119,7 +119,7 @@ export function ManualMealForm({
               value={values[field]}
               onChange={(event) => update(field, event.target.value)}
               placeholder="0"
-              className="min-h-11 w-full rounded-xl border border-hairline bg-raised px-3 py-2.5 tabular-nums outline-none focus:border-accent"
+              className="min-h-11 w-full rounded-xl border border-hairline bg-raised px-3 py-2.5 tabular-nums outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
             />
           </label>
         ))}

@@ -16,7 +16,8 @@
   --color-surface: #ffffff;
   --color-raised: #f7f7fa;
   --color-hairline: #e3e3e8;
-  --color-reference: #b8b8bd;
+  /* 3.26:1 sul bianco: e' la linea del target, se non si vede il grafico non si legge. */
+  --color-reference: #8e8e93;
   --color-ink: #1c1c1e;
   --color-muted: #6e6e73;
 
@@ -51,7 +52,8 @@
     --color-surface: #1c1c1e;
     --color-raised: #2c2c2e;
     --color-hairline: #38383a;
-    --color-reference: #5a5a5e;
+    /* 3.36:1 sul fondo scuro. */
+    --color-reference: #6e6e73;
     --color-ink: #f2f2f7;
     --color-muted: #9b9ba1;
 

@@ -93,7 +93,7 @@ export function QuantitySheet({
             value={custom}
             onChange={(event) => setCustom(event.target.value)}
             placeholder="es. 0,75"
-            className="h-12 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent"
+            className="h-12 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
           />
         </label>
 

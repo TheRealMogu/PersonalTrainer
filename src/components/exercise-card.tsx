@@ -116,7 +116,7 @@ export function ExerciseCard({
             onChange={(event) => setWeight(event.target.value)}
             placeholder="0"
             aria-label={`Carico per ${exercise.name}`}
-            className="h-11 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent"
+            className="h-11 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
           />
         </label>
 
@@ -129,7 +129,7 @@ export function ExerciseCard({
             onChange={(event) => setReps(event.target.value)}
             placeholder={exercise.reps}
             aria-label={`Ripetizioni per ${exercise.name}`}
-            className="h-11 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent"
+            className="h-11 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
           />
         </label>
 

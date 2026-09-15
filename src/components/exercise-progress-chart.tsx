@@ -3,8 +3,12 @@ import { formatWeight } from "@/lib/workout";
 
 const WIDTH = 320;
 const PLOT = 64;
-const AXIS = 14;
-const HEIGHT = PLOT + AXIS;
+/*
+ * Niente banda per gli assi dentro l'SVG: le date stanno sotto, in HTML.
+ * Dentro il viewBox venivano scalate con il grafico e su schermo stretto
+ * finivano rese a meno di sette pixel.
+ */
+const HEIGHT = PLOT;
 const DOT = 4;
 
 /**
@@ -79,26 +83,20 @@ export function ExerciseProgressChart({ progress }: { progress: ExerciseProgress
           />
         ))}
 
-        <text
-          x="0"
-          y={HEIGHT - 2}
-          fontSize="9"
-          fill="var(--color-muted)"
-          style={{ fontVariantNumeric: "tabular-nums" }}
-        >
-          {first.day.slice(8, 10)}/{first.day.slice(5, 7)}
-        </text>
-        <text
-          x={WIDTH}
-          y={HEIGHT - 2}
-          textAnchor="end"
-          fontSize="9"
-          fill="var(--color-muted)"
-          style={{ fontVariantNumeric: "tabular-nums" }}
-        >
-          {last.day.slice(8, 10)}/{last.day.slice(5, 7)}
-        </text>
       </svg>
+
+      {/* Date in HTML: dentro l'SVG venivano rimpicciolite con il disegno. */}
+      <div
+        className="mt-1 flex justify-between text-[11px] tabular-nums text-muted"
+        aria-hidden="true"
+      >
+        <span>
+          {first.day.slice(8, 10)}/{first.day.slice(5, 7)}
+        </span>
+        <span>
+          {last.day.slice(8, 10)}/{last.day.slice(5, 7)}
+        </span>
+      </div>
 
       <p className="mt-1 text-[13px] text-muted">
         Massimale stimato{" "}
