@@ -190,6 +190,19 @@ describe("il prompt da dare a Claude", () => {
     }
   });
 
+  /*
+   * Le foto sono il caso vero: si fotografa l'etichetta e si manda. Senza
+   * dirglielo, un modello stima lo stesso invece di leggere i numeri che ha
+   * gia' davanti -- e una stima al posto di un dato e' esattamente quello
+   * che la regola 5 vieta.
+   */
+  it("dice cosa fare con le foto, che sono il caso vero", () => {
+    const prompt = promptPerClaude([]);
+    assert.match(prompt, /foto di un'etichetta/);
+    assert.match(prompt, /tabella nutrizionale/);
+    assert.match(prompt, /foto di un piatto/);
+  });
+
   it("porta con sé i valori già in archivio, così non vengono ristimati", () => {
     assert.match(promptPerClaude(foods), /Fette biscottate \(2 pezzi\): 70 kcal/);
     assert.doesNotMatch(promptPerClaude([]), /già in archivio/);

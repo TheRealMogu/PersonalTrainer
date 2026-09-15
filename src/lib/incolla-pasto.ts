@@ -38,6 +38,8 @@ export function promptPerClaude(foods: QuickFood[]): string {
     SCHELETRO,
     "",
     "Regole: i valori sono totali per la porzione indicata, non per 100 g. Se non scrivo la quantità, usa la porzione tipica italiana e scrivila in \"porzione\". Le kcal devono tornare con i macro (4 per grammo di carboidrati e proteine, 9 per i grassi). Usa le tabelle CREA.",
+    "",
+    "Se allego la foto di un'etichetta, i numeri della tabella nutrizionale valgono più di qualsiasi stima: prendili da lì e riscalali sulla quantità che ho mangiato. Se allego la foto di un piatto, stima le quantità e scrivile in \"porzione\", così le controllo.",
     riferimenti ? "" : null,
     riferimenti || null,
     "",
