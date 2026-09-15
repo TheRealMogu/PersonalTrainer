@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Meal } from "@/db/schema";
 import { formatMacro } from "@/lib/nutrition";
+import { MEAL_SLOTS, SLOT_LABELS, type MealSlot } from "@/lib/meal-slots";
 
 const PRESETS = [0.5, 1, 1.5, 2];
 
@@ -18,12 +19,13 @@ export function EditMealSheet({
   onClose,
 }: {
   meal: Meal;
-  onConfirm: (quantity: number) => void;
+  onConfirm: (quantity: number, slot: MealSlot) => void;
   onDelete: () => void;
   onClose: () => void;
 }) {
   const [quantity, setQuantity] = useState(meal.quantity);
   const [custom, setCustom] = useState("");
+  const [slot, setSlot] = useState<MealSlot>(meal.slot as MealSlot);
 
   const effective = custom.trim() === "" ? quantity : Number(custom.replace(",", "."));
   const valid = Number.isFinite(effective) && effective > 0 && effective <= 20;
@@ -96,6 +98,30 @@ export function EditMealSheet({
           />
         </label>
 
+        {/*
+          Il momento si sceglie dall'ora dell'orologio quando si usa un tasto
+          rapido: uno spuntino alle 12:30 finisce a pranzo. Senza poterlo
+          spostare, resta li' per sempre.
+        */}
+        <p className="mt-4 mb-2 text-[13px] text-muted">Quando</p>
+        <div className="flex gap-2">
+          {MEAL_SLOTS.map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setSlot(value)}
+              aria-pressed={slot === value}
+              className={`min-h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors ${
+                slot === value
+                  ? "bg-accent text-on-accent"
+                  : "border border-hairline bg-raised text-muted"
+              }`}
+            >
+              {SLOT_LABELS[value]}
+            </button>
+          ))}
+        </div>
+
         <div className="mt-4 rounded-xl bg-raised px-4 py-3">
           <p className="text-[15px] font-semibold tabular-nums">
             {valid ? formatMacro(scaled.kcal, "kcal") : "—"} kcal
@@ -118,7 +144,7 @@ export function EditMealSheet({
           <button
             type="button"
             disabled={!valid}
-            onClick={() => onConfirm(effective)}
+            onClick={() => onConfirm(effective, slot)}
             className="min-h-12 flex-1 rounded-xl bg-accent text-[15px] font-semibold text-on-accent active:opacity-80 disabled:opacity-40"
           >
             Salva

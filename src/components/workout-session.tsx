@@ -2,7 +2,14 @@
 
 import { useCallback, useEffect, useOptimistic, useRef, useState, useSyncExternalStore, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { deleteSet, endSession, logSet } from "@/app/allenamento/actions";
+import {
+  deleteSession,
+  deleteSet,
+  endSession,
+  logSet,
+  restoreSet,
+  updateSet,
+} from "@/app/allenamento/actions";
 import type { WorkoutExercise, WorkoutSession as Session } from "@/db/schema";
 import { newClientId, pendingForSession, type PendingSet } from "@/lib/pending-sets";
 import {
@@ -13,11 +20,14 @@ import {
   getSnapshot,
   subscribe,
 } from "@/lib/pending-store";
+import { proponiAnnullamento } from "@/lib/undo-seduta-store";
 import { formatVolume, groupByExercise, totalVolume, type LoggedSet } from "@/lib/workout";
 import { AnimatedNumber } from "./animated-number";
+import { EditSetSheet } from "./edit-set-sheet";
 import { ExerciseCard } from "./exercise-card";
 import { RestTimer } from "./rest-timer";
 import { SessionTimer } from "./session-timer";
+import { UndoToast } from "./undo-toast";
 
 type OptimisticAction = { type: "add"; set: LoggedSet } | { type: "remove"; id: number };
 
@@ -27,6 +37,9 @@ type OptimisticAction = { type: "add"; set: LoggedSet } | { type: "remove"; id: 
  * uguali e il cestino rischiava di togliere quella sbagliata.
  */
 const BASE_ID_CODA = -100_000;
+
+/** Quanto resta a schermo il messaggio con "Annulla", come nel diario. */
+const UNDO_SECONDS = 6;
 
 export function WorkoutSession({
   session,
@@ -49,6 +62,13 @@ export function WorkoutSession({
   // Un contatore invece di un orario: serve solo a rimontare il timer da capo
   // a ogni serie, e non richiede di leggere l'orologio durante il render.
   const [restId, setRestId] = useState(0);
+  const [inModifica, setInModifica] = useState<LoggedSet | null>(null);
+  /*
+   * Ogni azione che toglie qualcosa lascia un modo di rimetterla: una serie
+   * eliminata, la seduta chiusa per sbaglio, la giornata avviata sbagliata.
+   * Senza, un tocco storto in palestra e' definitivo.
+   */
+  const [serieDaRipristinare, setSerieDaRipristinare] = useState<LoggedSet | null>(null);
   const tempId = useRef(-1);
 
   const [optimisticSets, applyOptimistic] = useOptimistic(
@@ -175,9 +195,25 @@ export function WorkoutSession({
       return;
     }
 
+    const eliminata = tutteLeSerie.find((set) => set.id === setId);
+
     startTransition(async () => {
       applyOptimistic({ type: "remove", id: setId });
       const result = await deleteSet(setId);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      if (eliminata) setSerieDaRipristinare(eliminata);
+      router.refresh();
+    });
+  }
+
+  function handleEditSet(set: LoggedSet, weight: number, reps: number) {
+    setInModifica(null);
+    setError(null);
+    startTransition(async () => {
+      const result = await updateSet({ id: set.id, weight, reps });
       if (!result.ok) {
         setError(result.error);
         return;
@@ -190,6 +226,55 @@ export function WorkoutSession({
     setError(null);
     startTransition(async () => {
       const result = await endSession(session.id);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      /*
+        "Fine" sta dove il pollice passa, e chiuderla per sbaglio spezzerebbe
+        l'allenamento in due sedute. Il messaggio va nel negozio condiviso e
+        non qui: fra un istante questa schermata non esiste piu'.
+      */
+      proponiAnnullamento({
+        tipo: "riapri",
+        sessionId: session.id,
+        messaggio: "Allenamento chiuso",
+      });
+      router.refresh();
+    });
+  }
+
+  /** Scarta la seduta intera: e' la via d'uscita dalla giornata sbagliata. */
+  function handleDiscard() {
+    setError(null);
+    startTransition(async () => {
+      const result = await deleteSession(session.id);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      proponiAnnullamento({
+        tipo: "ripristina",
+        backup: result.backup,
+        messaggio: "Allenamento scartato",
+      });
+      router.refresh();
+    });
+  }
+
+  function handleUndoSerie() {
+    const serie = serieDaRipristinare;
+    setSerieDaRipristinare(null);
+    if (!serie) return;
+
+    startTransition(async () => {
+      const result = await restoreSet({
+        sessionId: session.id,
+        exerciseId: serie.exerciseId,
+        setNumber: serie.setNumber,
+        weight: serie.weight,
+        reps: serie.reps,
+      });
       if (!result.ok) {
         setError(result.error);
         return;
@@ -250,6 +335,7 @@ export function WorkoutSession({
           sets={byExercise.get(exercise.id) ?? []}
           lastTime={lastTime[exercise.id] ?? []}
           onLog={(weight, reps) => handleLog(exercise.id, weight, reps)}
+          onEdit={setInModifica}
           onDelete={handleDelete}
           disabled={false}
         />
@@ -259,6 +345,56 @@ export function WorkoutSession({
         <p role="alert" className="mb-4 px-1 text-[13px] text-over">
           {error}
         </p>
+      ) : null}
+
+      {/*
+        Via d'uscita dalla giornata avviata per sbaglio: chiuderla lascerebbe
+        una riga nello storico, scartarla la toglie del tutto. Resta
+        annullabile come tutto il resto.
+      */}
+      <div className="mb-4 mt-2 text-center">
+        <button
+          type="button"
+          onClick={handleDiscard}
+          className="min-h-11 rounded-xl px-4 text-[13px] font-medium text-muted active:bg-raised"
+        >
+          Scarta questo allenamento
+        </button>
+      </div>
+
+      {/*
+        Con il recupero a schermo serve spazio sotto: il timer e' fisso in
+        fondo e coprirebbe l'ultimo pulsante, che diventa visibile ma non
+        toccabile.
+      */}
+      {restId > 0 ? <div aria-hidden="true" className="h-24" /> : null}
+
+      {inModifica ? (
+        <EditSetSheet
+          set={inModifica}
+          exerciseName={
+            exercises.find((e) => e.id === inModifica.exerciseId)?.name ?? "Esercizio"
+          }
+          onConfirm={(weight, reps) => handleEditSet(inModifica, weight, reps)}
+          onDelete={() => {
+            const set = inModifica;
+            setInModifica(null);
+            handleDelete(set.id);
+          }}
+          onClose={() => setInModifica(null)}
+        />
+      ) : null}
+
+      {serieDaRipristinare ? (
+        <UndoToast
+          key={serieDaRipristinare.id}
+          message={`Serie ${serieDaRipristinare.setNumber} eliminata`}
+          seconds={UNDO_SECONDS}
+          onUndo={handleUndoSerie}
+          onDismiss={() => setSerieDaRipristinare(null)}
+          // Col recupero a schermo il messaggio sale, o resta sotto al timer.
+          distanzaRem={restId > 0 ? 9.75 : 4.25}
+        />
       ) : null}
 
       {restId > 0 ? <RestTimer key={restId} onClose={() => setRestId(0)} /> : null}

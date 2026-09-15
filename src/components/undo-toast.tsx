@@ -12,11 +12,14 @@ export function UndoToast({
   seconds,
   onUndo,
   onDismiss,
+  distanzaRem = 4.25,
 }: {
   message: string;
   seconds: number;
   onUndo: () => void;
   onDismiss: () => void;
+  /** Distanza dal fondo, in rem. Si alza se sotto c'e' gia' qualcosa. */
+  distanzaRem?: number;
 }) {
   const [left, setLeft] = useState(seconds);
 
@@ -33,7 +36,13 @@ export function UndoToast({
     <div
       role="status"
       className="fixed inset-x-0 z-20 px-5"
-      style={{ bottom: "calc(4.25rem + env(safe-area-inset-bottom))" }}
+      /*
+        `distanzaRem` serve quando in fondo c'e' gia' qualcos'altro: in
+        palestra il timer di recupero sta nello stesso punto, e senza spostare
+        il messaggio il pulsante "Annulla" finiva sotto il timer, visibile ma
+        non toccabile.
+      */
+      style={{ bottom: `calc(${distanzaRem}rem + env(safe-area-inset-bottom))` }}
     >
       <div className="mx-auto flex w-full max-w-md items-center gap-3 rounded-xl bg-overlay/95 px-4 py-3 text-on-overlay shadow-lg backdrop-blur">
         <span className="min-w-0 flex-1 truncate text-[13px]">{message}</span>

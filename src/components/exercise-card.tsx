@@ -19,6 +19,7 @@ export function ExerciseCard({
   sets,
   lastTime,
   onLog,
+  onEdit,
   onDelete,
   disabled,
 }: {
@@ -26,6 +27,7 @@ export function ExerciseCard({
   sets: LoggedSet[];
   lastTime: LoggedSet[];
   onLog: (weight: number, reps: number) => void;
+  onEdit: (set: LoggedSet) => void;
   onDelete: (setId: number) => void;
   disabled: boolean;
 }) {
@@ -72,18 +74,31 @@ export function ExerciseCard({
       {sets.length > 0 ? (
         <ul className="mt-3 divide-y divide-hairline">
           {sets.map((set) => (
-            <li key={set.id} className="flex items-center gap-3 py-2">
-              <span className="w-5 shrink-0 text-[13px] tabular-nums text-muted">
-                {set.setNumber}
-              </span>
-              <span className="flex-1 text-[15px] tabular-nums">
-                <strong className="font-semibold">{formatWeight(set.weight)}</strong> kg ×{" "}
-                <strong className="font-semibold">{set.reps}</strong>
-                {/* Non e' un errore: la serie c'e', deve solo ancora partire. */}
-                {set.inAttesa ? (
-                  <span className="ml-2 text-[13px] font-normal text-muted">da mandare</span>
-                ) : null}
-              </span>
+            <li key={set.id} className="flex items-center gap-1 py-1">
+              {/*
+                La riga si tocca e si corregge. Prima l'unico modo di
+                rimediare a un carico digitato male era eliminare e
+                riscrivere, e l'eliminazione non si annullava.
+              */}
+              <button
+                type="button"
+                onClick={() => onEdit(set)}
+                disabled={disabled || set.inAttesa}
+                aria-label={`Modifica serie ${set.setNumber} di ${exercise.name}`}
+                className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg px-1 text-left active:bg-raised disabled:opacity-100"
+              >
+                <span className="w-5 shrink-0 text-[13px] tabular-nums text-muted">
+                  {set.setNumber}
+                </span>
+                <span className="flex-1 text-[15px] tabular-nums">
+                  <strong className="font-semibold">{formatWeight(set.weight)}</strong> kg ×{" "}
+                  <strong className="font-semibold">{set.reps}</strong>
+                  {/* Non e' un errore: la serie c'e', deve solo ancora partire. */}
+                  {set.inAttesa ? (
+                    <span className="ml-2 text-[13px] font-normal text-muted">da mandare</span>
+                  ) : null}
+                </span>
+              </button>
               <button
                 type="button"
                 onClick={() => onDelete(set.id)}

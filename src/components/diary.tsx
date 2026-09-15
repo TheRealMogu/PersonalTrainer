@@ -6,7 +6,7 @@ import {
   addMeal,
   deleteMeal,
   restoreMeal,
-  updateMealQuantity,
+  updateMeal,
   type MealInput,
 } from "@/app/actions";
 import type { Meal, QuickFood } from "@/db/schema";
@@ -111,7 +111,7 @@ export function Diary({
     });
   }
 
-  function handleEdit(meal: Meal, quantity: number) {
+  function handleEdit(meal: Meal, quantity: number, slot: MealSlot) {
     setEditing(null);
     setError(null);
     startTransition(async () => {
@@ -121,6 +121,7 @@ export function Diary({
         meal: {
           ...meal,
           quantity,
+          slot,
           kcal: Math.round(meal.kcal * factor),
           carbs: meal.carbs * factor,
           protein: meal.protein * factor,
@@ -128,7 +129,7 @@ export function Diary({
         },
       });
 
-      const result = await updateMealQuantity(meal.id, day, quantity);
+      const result = await updateMeal(meal.id, day, quantity, slot);
       if (!result.ok) {
         setError(result.error);
         return;
@@ -217,7 +218,7 @@ export function Diary({
       {editing ? (
         <EditMealSheet
           meal={editing}
-          onConfirm={(quantity) => handleEdit(editing, quantity)}
+          onConfirm={(quantity, slot) => handleEdit(editing, quantity, slot)}
           onDelete={() => {
             const meal = editing;
             setEditing(null);

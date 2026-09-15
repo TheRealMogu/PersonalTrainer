@@ -142,6 +142,11 @@ Nessuna è bloccante, tutte sono state pesate col metro dei gesti.
       apre il dettaglio con da dove arriva e cosa ci sta ancora, i tasti
       rapidi mostrano anche i macro e non solo le calorie, e i numeri
       scorrono invece di saltare.
+- [x] **Correggere e disfare tutto.** Fatto: una serie si modifica toccandola,
+      la sua eliminazione si annulla, "Fine" toccato per sbaglio si riapre, una
+      giornata avviata sbagliata si scarta, una seduta si toglie dallo storico
+      e torna com'era, e un pasto si sposta di momento. Nessuna azione resta
+      senza via d'uscita.
 - [ ] **Note sulla seduta.** "Spalla che tira" vale più di tre decimali sul
       carico.
 - [ ] **Riordinare gli esercizi** della giornata, se in palestra la macchina
