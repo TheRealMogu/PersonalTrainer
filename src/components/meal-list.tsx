@@ -28,7 +28,13 @@ export function MealList({
 }) {
   if (meals.length === 0) {
     return (
-      <p className="text-[15px] text-muted">Nessun pasto registrato per questa giornata.</p>
+      <div className="py-2 text-center">
+        <p className="text-[15px] font-medium">Giornata ancora vuota</p>
+        <p className="mt-1 text-[13px] leading-snug text-muted">
+          Hai l&apos;intero budget a disposizione. I tasti rapidi qui sotto
+          aggiungono un alimento con un tocco.
+        </p>
+      </div>
     );
   }
 

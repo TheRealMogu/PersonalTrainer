@@ -18,6 +18,7 @@ import { CalorieRing } from "./calorie-ring";
 import { EditMealSheet } from "./edit-meal-sheet";
 import { MacroSheet } from "./macro-sheet";
 import { MacroTile } from "./macro-tile";
+import { Section } from "./section";
 import { ManualMealForm } from "./manual-meal-form";
 import { MealList } from "./meal-list";
 import { QuickFoods } from "./quick-foods";
@@ -177,35 +178,35 @@ export function Diary({
         </div>
       </Card>
 
-      <Card title={`Pasti (${optimisticMeals.length})`}>
-        <MealList
-          meals={optimisticMeals}
-          onEdit={setEditing}
-          onDelete={handleDelete}
-        />
-      </Card>
+      <Section title={optimisticMeals.length === 1 ? "1 pasto" : `${optimisticMeals.length} pasti`}>
+        <Card>
+          <MealList meals={optimisticMeals} onEdit={setEditing} onDelete={handleDelete} />
+        </Card>
+      </Section>
 
-      <Card title="Aggiungi">
-        <QuickFoods
-          foods={quickFoods}
-          defaultSlot={defaultSlot}
-          totals={totals}
-          onAdd={(food, quantity, slot) =>
-            handleAdd({
-              slot,
-              name: food.name,
-              quantity,
-              kcal: food.kcal * quantity,
-              carbs: food.carbs * quantity,
-              protein: food.protein * quantity,
-              fat: food.fat * quantity,
-            })
-          }
-        />
-        <div className="mt-4 border-t border-hairline pt-4">
-          <ManualMealForm defaultSlot={defaultSlot} onAdd={handleAdd} />
-        </div>
-      </Card>
+      <Section title="Aggiungi">
+        <Card>
+          <QuickFoods
+            foods={quickFoods}
+            defaultSlot={defaultSlot}
+            totals={totals}
+            onAdd={(food, quantity, slot) =>
+              handleAdd({
+                slot,
+                name: food.name,
+                quantity,
+                kcal: food.kcal * quantity,
+                carbs: food.carbs * quantity,
+                protein: food.protein * quantity,
+                fat: food.fat * quantity,
+              })
+            }
+          />
+          <div className="mt-4 border-t border-hairline pt-4">
+            <ManualMealForm defaultSlot={defaultSlot} onAdd={handleAdd} />
+          </div>
+        </Card>
+      </Section>
 
       {error ? (
         <p role="alert" className="mb-4 px-1 text-[13px] text-over">

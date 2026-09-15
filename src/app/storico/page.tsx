@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card } from "@/components/card";
 import { DbErrorPanel } from "@/components/db-error-panel";
 import { ExerciseProgressChart } from "@/components/exercise-progress-chart";
@@ -5,6 +6,7 @@ import { MacroHistoryChart, MacroHistoryTable } from "@/components/macro-history
 import { MacroStatTile } from "@/components/macro-stat-tile";
 import { PageHeader } from "@/components/page-header";
 import { RangeFilter } from "@/components/range-filter";
+import { Section } from "@/components/section";
 import { todayIso } from "@/lib/date";
 import { buildDateRange, buildHistoryStats, fillMissingDays } from "@/lib/history";
 import { getDailyTotals, getExerciseProgress } from "@/lib/queries";
@@ -58,10 +60,19 @@ export default async function StoricoPage({
 
       {stats.loggedDays === 0 && !stats.todayLogged ? (
         <Card>
-          <p className="text-[15px] text-muted">
-            Nessun pasto registrato in questo periodo. Aggiungine dal diario e
-            qui vedrai l&apos;andamento.
-          </p>
+          <div className="py-2 text-center">
+            <p className="text-[15px] font-medium">Ancora niente da mostrare</p>
+            <p className="mt-1 text-[13px] leading-snug text-muted">
+              Lo storico si riempie da solo man mano che registri i pasti. Bastano
+              due giorni perché le medie comincino a dire qualcosa.
+            </p>
+            <Link
+              href="/"
+              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl border border-hairline px-5 text-[15px] font-medium text-accent active:bg-raised"
+            >
+              Vai al diario
+            </Link>
+          </div>
         </Card>
       ) : null}
 
@@ -76,45 +87,49 @@ export default async function StoricoPage({
 
       {stats.loggedDays > 0 ? (
         <>
-          <Card title="Media giornaliera">
-            <div className="grid grid-cols-2 gap-2">
-              {MACRO_ORDER.map((macro) => (
-                <MacroStatTile key={macro} macro={macro} average={stats.averages[macro]} />
-              ))}
-            </div>
-            <p className="mt-3 text-[13px] text-muted">
-              {stats.loggedDays === 1
-                ? `Un solo giorno registrato sui ${stats.totalDays} conclusi`
-                : `Media su ${stats.loggedDays} giorni registrati sui ${stats.totalDays} conclusi`}
-              ; lo scarto è rispetto al target giornaliero. I giorni non
-              compilati non abbassano la media, e oggi non entra nel conto finché
-              non è finito.
-            </p>
-          </Card>
+          <Section title="Media giornaliera">
+            <Card>
+              <div className="grid grid-cols-2 gap-2">
+                {MACRO_ORDER.map((macro) => (
+                  <MacroStatTile key={macro} macro={macro} average={stats.averages[macro]} />
+                ))}
+              </div>
+              <p className="mt-3 text-[13px] text-muted">
+                {stats.loggedDays === 1
+                  ? `Un solo giorno registrato sui ${stats.totalDays} conclusi`
+                  : `Media su ${stats.loggedDays} giorni registrati sui ${stats.totalDays} conclusi`}
+                ; lo scarto è rispetto al target giornaliero. I giorni non
+                compilati non abbassano la media, e oggi non entra nel conto
+                finché non è finito.
+              </p>
+            </Card>
+          </Section>
 
-          <Card title="Giorni entro il target">
-            <dl className="divide-y divide-hairline">
-              {MACRO_ORDER.map((macro) => (
-                <div
-                  key={macro}
-                  className="flex items-baseline justify-between py-3 first:pt-0 last:pb-0"
-                >
-                  <dt className="text-[15px]">{MACRO_LABELS[macro]}</dt>
-                  <dd className="text-[15px] font-semibold tabular-nums">
-                    {stats.daysWithinTarget[macro]}
-                    <span className="font-normal text-muted"> / {stats.loggedDays}</span>
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </Card>
+          <Section title="Giorni entro il target">
+            <Card>
+              <dl className="divide-y divide-hairline">
+                {MACRO_ORDER.map((macro) => (
+                  <div
+                    key={macro}
+                    className="flex items-baseline justify-between py-3 first:pt-0 last:pb-0"
+                  >
+                    <dt className="text-[15px]">{MACRO_LABELS[macro]}</dt>
+                    <dd className="text-[15px] font-semibold tabular-nums">
+                      {stats.daysWithinTarget[macro]}
+                      <span className="font-normal text-muted"> / {stats.loggedDays}</span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </Card>
+          </Section>
         </>
       ) : null}
 
       {/* Con niente registrato il grafico sarebbe una griglia vuota: non si mostra. */}
       {stats.loggedDays > 0 || stats.todayLogged ? (
-        <>
-          <Card title="Andamento">
+        <Section title="Andamento">
+          <Card>
             <div className="flex flex-col gap-8">
               {MACRO_ORDER.map((macro) => (
                 <MacroHistoryChart key={macro} macro={macro} days={days} today={today} />
@@ -126,24 +141,27 @@ export default async function StoricoPage({
             </p>
           </Card>
 
-          <Card title="I numeri">
+          {/* Stessa sezione: la tabella è lo stesso dato del grafico, letto come numeri. */}
+          <Card>
             <MacroHistoryTable days={days} />
           </Card>
-        </>
+        </Section>
       ) : null}
 
       {exerciseProgress.length > 0 ? (
-        <Card title="Progressione in palestra">
-          <div className="flex flex-col gap-8">
-            {exerciseProgress.map((progress) => (
-              <ExerciseProgressChart key={progress.exerciseId} progress={progress} />
-            ))}
-          </div>
-          <p className="mt-4 text-[13px] text-muted">
-            Il massimale stimato mette sulla stessa scala serie diverse: 80 kg × 5
-            e 70 kg × 10 valgono quasi uguale. È una stima, non una misura.
-          </p>
-        </Card>
+        <Section title="Progressione in palestra">
+          <Card>
+            <div className="flex flex-col gap-8">
+              {exerciseProgress.map((progress) => (
+                <ExerciseProgressChart key={progress.exerciseId} progress={progress} />
+              ))}
+            </div>
+            <p className="mt-4 text-[13px] text-muted">
+              Il massimale stimato mette sulla stessa scala serie diverse: 80 kg × 5
+              e 70 kg × 10 valgono quasi uguale. È una stima, non una misura.
+            </p>
+          </Card>
+        </Section>
       ) : null}
     </main>
   );
