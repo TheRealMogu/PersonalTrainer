@@ -3,11 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { meals, type QuickFood } from "@/db/schema";
+import { meals } from "@/db/schema";
 import { isIsoDate } from "@/lib/date";
 import { isMealSlot, type MealSlot } from "@/lib/meal-slots";
-import { stimaDaTesto, type EsitoStima } from "@/lib/ai-pasti";
-import { getQuickFoods } from "@/lib/queries";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -173,32 +171,4 @@ export async function deleteMeal(id: number, day: string): Promise<ActionResult>
 
   revalidatePath("/");
   return { ok: true };
-}
-
-/**
- * Legge una frase ("due uova, 80 g di pane e un caffè") e propone gli
- * alimenti che contiene, senza salvare niente.
- *
- * I tasti rapidi coprono quello che si mangia sempre; questa copre i giorni
- * in cui si mangia altro. Restituisce una proposta, non una scrittura: il
- * salvataggio resta un gesto separato, fatto guardando i numeri.
- */
-export async function stimaPasto(
-  testo: string,
-  slot: MealSlot,
-): Promise<EsitoStima> {
-  if (!isMealSlot(slot)) return { ok: false, error: "Momento della giornata non valido." };
-
-  // I cibi rapidi servono da riferimento: se in archivio c'e' gia' un
-  // alimento con i valori della confezione, quelli sono veri e vanno riusati
-  // invece di stimarli da capo. Se la lettura fallisce si stima lo stesso:
-  // un riferimento in meno non giustifica un errore in faccia.
-  let riferimenti: QuickFood[] = [];
-  try {
-    riferimenti = await getQuickFoods();
-  } catch (cause) {
-    console.error("stimaPasto: cibi rapidi non letti", cause);
-  }
-
-  return stimaDaTesto(testo, slot, riferimenti);
 }

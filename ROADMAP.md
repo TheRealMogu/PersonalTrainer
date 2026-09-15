@@ -28,13 +28,11 @@ fermava se mancava una variabile d'ambiente, e quando il database era
 indietro con le migration l'app rispondeva con un codice numerico e basta.
 Adesso dice cosa fare.
 
-**Il testo libero non è mai stato provato contro il modello vero**: il foglio
-"Scrivi cosa hai mangiato" è stato verificato in Chromium con una risposta
-finta al posto della chiamata all'API, perché in questo ambiente non c'è una
-`ANTHROPIC_API_KEY`. Quello che è stato provato davvero: l'elenco proposto, i
-totali, la correzione dei numeri, il salvataggio nel database e il messaggio
-che compare quando la chiave manca. Quello che non è stato provato: quanto
-sono buone le stime che torna il modello.
+**Quanto siano buone le stime che torna Claude non lo sappiamo**: dipende da
+come è scritta la frase, e si scopre usandolo. Quello che l'app fa per non
+farsi fregare è dichiararle come stime, mostrarle riga per riga prima di
+salvare, e segnalare quando le calorie non tornano con i macro. La lettura dei
+formati è coperta da test.
 
 **Una revisione guardando le schermate una per una** ne ha trovate altre due,
 anche queste sistemate: lo Storico faceva la media contando anche oggi, che è
@@ -174,11 +172,13 @@ leggibile qualcosa che oggi non lo è.
 - [x] **Freccia su quello che si apre.** Fatto sulle tessere dei macro.
 - [x] **Stati vuoti con un'indicazione di cosa fare.** Fatto su diario e
       storico.
-- [x] **Pasto scritto a parole.** Fatto: Aggiungi → *Scrivi cosa hai
-      mangiato*. Una frase diventa righe del diario con i macro compilati, da
-      controllare e correggere prima di salvare. Copre i giorni in cui si
-      mangia qualcosa che non ha un tasto rapido -- che sono quelli in cui il
-      diario, prima, restava vuoto. Richiede `ANTHROPIC_API_KEY`.
+- [x] **Pasto che arriva da una chat.** Fatto: Aggiungi → *Incolla da
+      Claude*. Si copia il prompt (che porta con sé i cibi rapidi già in
+      archivio, così quei valori non vengono ristimati), lo si manda a Claude
+      con cosa si è mangiato, e si incolla indietro la risposta. L'app legge
+      JSON, tabelle markdown e righe scritte a mano, e propone gli alimenti
+      da controllare prima di salvare. Nessuna chiave, nessun costo, nessuna
+      rete: la lettura è tutta nel telefono.
 - [x] **Una curva sola per tutto quello che si muove.** Fatto: fogli, barre
       in fondo, entrate di schermata e risposta al tocco condividono
       `--ease-ios` in `globals.css`, invece di avere ognuno la propria
@@ -197,10 +197,10 @@ leggibile qualcosa che oggi non lo è.
 - [ ] **Data toccabile nell'intestazione** che apre un selettore, invece delle
       sole frecce. La striscia della settimana copre già i sette giorni
       vicini; serve per andare più indietro.
-- [ ] **Foto dell'etichetta invece della frase.** Il passo naturale dopo il
-      testo libero: da una tabella nutrizionale fotografata i numeri sono
-      letti, non stimati, e l'avviso "sono stime" sparirebbe. Stesso foglio,
-      stessa conferma prima di salvare.
+- [ ] **Un modo per tornare indietro dalla chat senza copiare a mano.** Oggi
+      il giro è: copia il prompt, apri Claude, incolla, copia la risposta,
+      torna, incolla. Sei gesti, di cui quattro sono trasporto. Da valutare
+      un collegamento che apra l'app con la risposta già dentro.
 - [ ] **Intestazione che si compatta scorrendo.** Costa poco, guadagna una
       riga su schermate lunghe.
 - [ ] **Un "+" che apre i modi di registrare.** Oggi i tasti rapidi sono in

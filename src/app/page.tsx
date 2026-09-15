@@ -10,16 +10,6 @@ import type { Meal, QuickFood } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
-/*
- * La lettura di una frase ("due uova e 80 g di pane") passa da un modello:
- * qualche secondo, non qualche decina di millisecondi. Il tetto predefinito
- * di Vercel e' dieci secondi, e sotto quello la richiesta verrebbe tagliata a
- * meta' proprio quando la rete e' lenta -- cioe' quando serve di piu'.
- *
- * Vale per le Server Action chiamate da questa pagina, `stimaPasto` compresa.
- */
-export const maxDuration = 60;
-
 export default async function DiarioPage({
   searchParams,
 }: {

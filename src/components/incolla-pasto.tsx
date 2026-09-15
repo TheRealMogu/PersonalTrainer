@@ -1,10 +1,16 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
-import { stimaPasto, type MealInput } from "@/app/actions";
+import { useRef, useState } from "react";
+import type { MealInput } from "@/app/actions";
+import type { QuickFood } from "@/db/schema";
+import {
+  leggiIncollato,
+  MAX_INCOLLATO,
+  promptPerClaude,
+} from "@/lib/incolla-pasto";
 import { MEAL_SLOTS, SLOT_LABELS, type MealSlot } from "@/lib/meal-slots";
 import { formatMacro } from "@/lib/nutrition";
-import { MAX_TESTO, stimaIncoerente, type AlimentoStimato } from "@/lib/stima-pasto";
+import { stimaIncoerente, type AlimentoStimato } from "@/lib/stima-pasto";
 
 type Riga = AlimentoStimato & { chiave: number; incluso: boolean };
 
@@ -32,24 +38,31 @@ function parseNumero(value: string): number {
 }
 
 /**
- * Scrivi cosa hai mangiato, il resto lo compila lui.
+ * Il ponte fra la chat di Claude e il diario.
  *
  * I tasti rapidi coprono i giorni uguali agli altri. Questo copre gli altri:
- * quando il prodotto cambia, quando mangi fuori, quando non c'e' un tasto per
- * quello che hai davanti -- cioe' proprio i giorni in cui, senza, il diario
- * resta vuoto.
+ * quando il prodotto cambia, quando si mangia fuori, quando non c'e' un
+ * tasto per quello che si ha davanti -- cioe' proprio i giorni in cui,
+ * senza, il diario resta vuoto.
  *
- * Quello che torna e' una proposta, mai una scrittura. Si vede riga per riga,
- * si toglie quello che non torna, si correggono i numeri se serve, e solo
- * allora si salva. Le stime sono etichettate come tali: un numero che entra
- * nel diario senza essere guardato sarebbe un numero inventato, e la regola 6
- * di PRODOTTO.md non lo permette.
+ * Il calcolo lo fa Claude, in chat, dove si sta gia' scrivendo e dove si puo'
+ * anche fotografare l'etichetta. Qui si incolla la risposta. Nessuna chiave
+ * API, niente da pagare, e funziona anche senza rete: la lettura e' tutta
+ * qui dentro.
+ *
+ * Quello che si incolla e' una proposta, mai una scrittura. Si vede riga per
+ * riga, si toglie quello che non torna, si correggono i numeri se serve, e
+ * solo allora si salva. Le stime sono etichettate come tali: un numero che
+ * entra nel diario senza essere guardato sarebbe un numero inventato, e la
+ * regola 5 di PRODOTTO.md non lo permette.
  */
-export function ChatPasto({
+export function IncollaPasto({
   defaultSlot,
+  foods,
   onAdd,
 }: {
   defaultSlot: MealSlot;
+  foods: QuickFood[];
   onAdd: (meals: Omit<MealInput, "day">[]) => void;
 }) {
   const [aperto, setAperto] = useState(false);
@@ -58,9 +71,12 @@ export function ChatPasto({
   const [righe, setRighe] = useState<Riga[] | null>(null);
   const [nota, setNota] = useState("");
   const [errore, setErrore] = useState<string | null>(null);
-  const [inCorso, startTransition] = useTransition();
   const [aperta, setAperta] = useState<number | null>(null);
+  const [copiato, setCopiato] = useState(false);
+  const [mostraPrompt, setMostraPrompt] = useState(false);
+  const [riapri, setRiapri] = useState(false);
   const chiave = useRef(0);
+  const prompt = promptPerClaude(foods);
 
   function chiudi() {
     setAperto(false);
@@ -69,30 +85,67 @@ export function ChatPasto({
     setNota("");
     setErrore(null);
     setAperta(null);
+    setCopiato(false);
+    setMostraPrompt(false);
+    setRiapri(false);
     setSlot(defaultSlot);
   }
 
+  /*
+   * La lettura e' tutta qui: nessuna chiamata, nessuna attesa. Sotto i
+   * millisecondi, quindi non serve uno stato "sto leggendo" -- ci sarebbe
+   * solo un lampo, che e' peggio di niente.
+   */
   function leggi() {
-    if (!testo.trim() || inCorso) return;
-    setErrore(null);
-    setRighe(null);
+    if (!testo.trim()) return;
     setAperta(null);
 
-    startTransition(async () => {
-      const esito = await stimaPasto(testo, slot);
-      if (!esito.ok) {
-        setErrore(esito.error);
+    const esito = leggiIncollato(testo, slot);
+    if (!esito.ok) {
+      setRighe(null);
+      setErrore(esito.error);
+      return;
+    }
+    setErrore(null);
+    setRighe(
+      esito.stima.alimenti.map((alimento) => ({
+        ...alimento,
+        chiave: chiave.current++,
+        incluso: true,
+      })),
+    );
+    setNota(esito.stima.nota);
+    setRiapri(false);
+  }
+
+  /*
+   * Copiare e incollare sono i due gesti che questa schermata deve rendere
+   * a un tocco: sono l'unica ragione per cui esiste. Se il browser non
+   * lascia toccare gli appunti (succede fuori da https, o se l'utente
+   * rifiuta), non si rompe niente: resta il testo selezionabile a mano.
+   */
+  async function copiaPrompt() {
+    try {
+      await navigator.clipboard.writeText(prompt);
+      setCopiato(true);
+      setTimeout(() => setCopiato(false), 2000);
+    } catch {
+      setErrore("Non riesco a copiare da solo: tieni premuto sul riquadro qui sopra e copia.");
+    }
+  }
+
+  async function incollaRisposta() {
+    try {
+      const appunti = await navigator.clipboard.readText();
+      if (!appunti.trim()) {
+        setErrore("Gli appunti sono vuoti.");
         return;
       }
-      setRighe(
-        esito.alimenti.map((alimento) => ({
-          ...alimento,
-          chiave: chiave.current++,
-          incluso: true,
-        })),
-      );
-      setNota(esito.nota);
-    });
+      setTesto(appunti.slice(0, MAX_INCOLLATO));
+      setErrore(null);
+    } catch {
+      setErrore("Non riesco a leggere gli appunti: incolla a mano nel riquadro.");
+    }
   }
 
   function aggiorna(k: number, patch: Partial<Riga>) {
@@ -128,11 +181,12 @@ export function ChatPasto({
         onClick={() => setAperto(true)}
         className="min-h-11 w-full rounded-xl border border-dashed border-hairline py-3 text-[15px] font-medium text-accent tocco active:bg-raised"
       >
-        Scrivi cosa hai mangiato
+        Incolla da Claude
       </button>
     );
   }
 
+  const ingressoAperto = righe === null || riapri;
   const scelte = (righe ?? []).filter((riga) => riga.incluso);
   const totale = scelte.reduce(
     (acc, riga) => ({
@@ -156,69 +210,129 @@ export function ChatPasto({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Scrivi cosa hai mangiato"
+        aria-label="Incolla da Claude"
         className="relative animate-foglio mx-auto flex max-h-[88vh] w-full max-w-md flex-col overflow-y-auto rounded-t-3xl bg-surface px-5 pt-5"
         style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
       >
         <header className="mb-4">
           <h2 className="text-[20px] font-bold leading-tight tracking-tight">
-            Scrivi cosa hai mangiato
+            Incolla da Claude
           </h2>
           <p className="mt-0.5 text-[13px] text-muted">
-            A parole tue. I numeri te li propongo io, poi li controlli.
+            Chiedi a lui i numeri, poi portali qui. Li controlli prima che
+            entrino nel diario.
           </p>
         </header>
 
-        <label className="block">
-          <span className="sr-only">Descrizione del pasto</span>
-          <textarea
-            value={testo}
-            onChange={(event) => setTesto(event.target.value.slice(0, MAX_TESTO))}
-            rows={3}
-            autoFocus
-            placeholder="Es. due uova strapazzate, 80 g di pane integrale e un caffè macchiato"
-            className="w-full resize-none rounded-xl border border-hairline bg-raised px-3 py-2.5 text-[15px] leading-snug outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
-          />
-        </label>
-
         {/*
-          Il momento si propone dall'ora, ma vale solo per gli alimenti di cui
-          il testo non lo dice: "stamattina due uova" resta colazione anche a
-          mezzogiorno. Senza scriverlo sembrerebbe che decida per tutti.
-        */}
-        <p className="mt-4 mb-2 text-[13px] text-muted">
-          Quando, se non lo scrivi nel testo
-        </p>
-        <div className="flex gap-2">
-          {MEAL_SLOTS.map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setSlot(value)}
-              aria-pressed={slot === value}
-              className={`min-h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors duration-200 ease-ios ${
-                slot === value
-                  ? "bg-accent text-on-accent"
-                  : "border border-hairline bg-raised text-muted"
-              }`}
-            >
-              {SLOT_LABELS[value]}
-            </button>
-          ))}
-        </div>
+          Finche' non c'e' un elenco, la schermata e' tutta ingresso: due
+          passaggi numerati, perche' il giro passa da un'altra app e torna
+          indietro, e senza dire a che punto si e' si finisce per incollare
+          il prompt nella casella della risposta.
 
-        <button
-          type="button"
-          onClick={leggi}
-          disabled={!testo.trim() || inCorso}
-          className={`mt-3 min-h-12 w-full rounded-xl text-[15px] font-semibold tocco disabled:opacity-40 ${
-            righe
-              ? "border border-hairline text-accent active:bg-raised"
-              : "bg-accent text-on-accent active:opacity-80"
-          }`}
-        >
-          {inCorso ? "Sto leggendo…" : righe ? "Rileggi" : "Leggi"}
-        </button>
+          Quando l'elenco arriva, l'ingresso si chiude. Lasciarlo aperto
+          spingerebbe sotto la piega proprio le righe che bisogna guardare
+          prima di salvare -- cioe' la sola ragione per cui questa schermata
+          non salva da sola.
+        */}
+        {ingressoAperto ? (
+          <>
+            <p className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-muted">
+              1 · Copia questo e mandalo a Claude
+            </p>
+            <p className="mb-2 text-[13px] leading-snug text-muted">
+              Gli chiede i numeri nel formato che so leggere
+              {foods.length > 0
+                ? `, e si porta dietro i tuoi ${foods.length} cibi rapidi così non li ristima`
+                : ""}
+              .{" "}
+              <button
+                type="button"
+                onClick={() => setMostraPrompt((aperto) => !aperto)}
+                className="text-accent underline underline-offset-2"
+              >
+                {mostraPrompt ? "Nascondi" : "Guarda cosa dice"}
+              </button>
+            </p>
+            {mostraPrompt ? (
+              <pre className="mb-2 max-h-48 overflow-y-auto whitespace-pre-wrap break-words rounded-xl bg-raised px-3 py-2.5 font-sans text-[13px] leading-snug text-muted">
+                {prompt}
+              </pre>
+            ) : null}
+            <button
+              type="button"
+              onClick={copiaPrompt}
+              className="min-h-12 w-full rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
+            >
+              {copiato ? "Copiato ✓" : "Copia il prompt"}
+            </button>
+
+            <p className="mt-5 mb-2 text-[13px] font-semibold uppercase tracking-wide text-muted">
+              2 · Incolla qui la sua risposta
+            </p>
+            <label className="block">
+              <span className="sr-only">Risposta di Claude</span>
+              <textarea
+                value={testo}
+                onChange={(event) => setTesto(event.target.value.slice(0, MAX_INCOLLATO))}
+                rows={4}
+                placeholder={'{"alimenti":[{"nome":"Pane integrale", …'}
+                className="w-full resize-none rounded-xl border border-hairline bg-raised px-3 py-2.5 text-[15px] leading-snug outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={incollaRisposta}
+              className="mt-2 min-h-12 w-full rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
+            >
+              Incolla dagli appunti
+            </button>
+
+            {/*
+              Il momento si propone dall'ora, ma vale solo per gli alimenti
+              che non lo portano gia' scritto: se Claude ha messo
+              "colazione", quello resta. Senza dirlo sembrerebbe che decida
+              per tutti.
+            */}
+            <p className="mt-5 mb-2 text-[13px] text-muted">
+              Quando, per le righe che non lo dicono
+            </p>
+            <div className="flex gap-2">
+              {MEAL_SLOTS.map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setSlot(value)}
+                  aria-pressed={slot === value}
+                  className={`min-h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors duration-200 ease-ios ${
+                    slot === value
+                      ? "bg-accent text-on-accent"
+                      : "border border-hairline bg-raised text-muted"
+                  }`}
+                >
+                  {SLOT_LABELS[value]}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={leggi}
+              disabled={!testo.trim()}
+              className="mt-3 min-h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
+            >
+              Leggi
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setRiapri(true)}
+            className="min-h-12 w-full rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
+          >
+            Cambia il testo incollato
+          </button>
+        )}
 
         {/*
           Regola 9: il rosso e' per il fuori target e per un guasto che ha
@@ -231,14 +345,8 @@ export function ChatPasto({
           </p>
         ) : null}
 
-        {inCorso ? (
-          <p aria-live="polite" className="mt-3 text-[13px] text-muted">
-            Sto leggendo il testo…
-          </p>
-        ) : null}
-
         {righe && righe.length > 0 ? (
-          <div className="mt-5 border-t border-hairline pt-4">
+          <div className={ingressoAperto ? "mt-5 border-t border-hairline pt-4" : "mt-5"}>
             <div className="mb-3 flex items-baseline justify-between gap-3">
               <h3 className="text-[13px] font-semibold uppercase tracking-wide text-muted">
                 Stime, non pesate
@@ -249,9 +357,9 @@ export function ChatPasto({
             </div>
 
             <p className="mb-3 text-[13px] leading-snug text-muted">
-              Questi numeri sono stimati da una descrizione, non letti su
-              un&apos;etichetta. Controllali: quello che non torna si corregge
-              qui, o si toglie.
+              Questi numeri li ha stimati Claude da una descrizione: non sono
+              letti su un&apos;etichetta. Controllali: quello che non torna si
+              corregge qui, o si toglie.
             </p>
 
             {nota ? (
@@ -317,11 +425,11 @@ export function ChatPasto({
                       </button>
                     </div>
 
-                    {riga.supposta || sospetta ? (
+                    {riga.supposta || !riga.porzione || sospetta ? (
                       <p className="pl-13 text-[13px] leading-snug text-muted">
                         {sospetta
                           ? "Le calorie non tornano con i macro: guarda questa riga."
-                          : "Quantità non indicata: ho usato la porzione tipica."}
+                          : "Porzione non indicata: controlla che sia quella che hai mangiato."}
                       </p>
                     ) : null}
 

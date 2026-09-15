@@ -133,14 +133,15 @@ e va difesa a ogni aggiunta.
 - **Export dei dati** — Piano → *I tuoi dati*: tutto in JSON, oppure pasti e
   allenamenti in CSV. Un'app che accumula mesi di diario e non ti lascia
   portarlo via te lo tiene in ostaggio.
-- **Pasto scritto a parole** — Aggiungi → *Scrivi cosa hai mangiato*: una
-  frase qualsiasi ("due uova strapazzate, 80 g di pane e un caffè") diventa
-  righe del diario con i macro già compilati. I tasti rapidi coprono i
-  giorni uguali agli altri; questa copre gli altri, che sono quelli in cui
-  il diario resterebbe vuoto. Quello che torna è una proposta: si tolgono le
-  righe che non tornano, si correggono i numeri, e solo allora si salva.
-  Richiede una `ANTHROPIC_API_KEY`; senza, il tasto spiega cosa manca e
-  resta la via manuale.
+- **Incolla da Claude** — Aggiungi → *Incolla da Claude*: si copia un prompt,
+  lo si manda a Claude insieme a cosa si è mangiato (anche con la foto
+  dell'etichetta), e si riporta indietro la risposta. L'app la legge e
+  propone le righe con i macro già compilati. I tasti rapidi coprono i giorni
+  uguali agli altri; questa copre gli altri, che sono quelli in cui il diario
+  resterebbe vuoto. Il calcolo avviene dove si sta già scrivendo; qui non c'è
+  nessuna chiamata a pagamento e niente da configurare, e la lettura funziona
+  anche senza rete. Quello che si incolla è una proposta: si tolgono le righe
+  che non tornano, si correggono i numeri, e solo allora si salva.
 
 ## Cosa resta fuori, di proposito
 
@@ -214,12 +215,16 @@ Valgono per ogni aggiunta futura.
     risale in 260: è la differenza fra le due durate a far sembrare solido
     un pulsante.
 18. **Quello che non è stato misurato si dice, prima di salvarlo.** I macro
-    che arrivano da una frase scritta a parole sono stime: si mostrano
-    etichettati come tali, riga per riga, e si salvano solo dopo che li hai
-    guardati. Un numero stimato che entra nel diario da solo è un numero
-    inventato, e la regola 5 non lo permette. Quando le calorie non tornano
-    con i macro dichiarati, lo si segnala su quella riga invece di
+    che arrivano da fuori — da una chat, da un incollaggio — sono stime: si
+    mostrano etichettati come tali, riga per riga, e si salvano solo dopo che
+    li hai guardati. Un numero stimato che entra nel diario da solo è un
+    numero inventato, e la regola 5 non lo permette. Quando le calorie non
+    tornano con i macro dichiarati, lo si segnala su quella riga invece di
     correggerla di nascosto: non sappiamo quale dei due sia sbagliato.
+19. **Quello che arriva da fuori è testo, non istruzioni.** Si fa passare da
+    una sola porta, che valida campo per campo e scarta il resto. Un numero
+    fuori scala si butta, non si arrotonda; una riga senza nome non è una
+    riga.
 
 ## Come si struttura una schermata
 

@@ -2,13 +2,14 @@ import type { QuickFood } from "@/db/schema";
 import { isMealSlot, type MealSlot } from "./meal-slots";
 
 /**
- * Un alimento riconosciuto dentro una frase, con i macro stimati.
+ * Un alimento arrivato da fuori, con i macro stimati.
  *
  * "Stimati" e' la parola importante: questi numeri non escono dal database,
- * escono da un modello che ha letto "due uova e una fetta di pane". Restano
- * una proposta finche' non li confermi, e l'interfaccia lo dice a chiare
- * lettere. La regola 6 di PRODOTTO.md vieta i numeri inventati: un numero
- * dichiarato come stima, che puoi correggere prima di salvarlo, non lo e'.
+ * escono da una conversazione in cui qualcuno ha letto "due uova e una fetta
+ * di pane". Restano una proposta finche' non li confermi, e l'interfaccia lo
+ * dice a chiare lettere. La regola 5 di PRODOTTO.md vieta i numeri
+ * inventati: un numero dichiarato come stima, che puoi correggere prima di
+ * salvarlo, non lo e'.
  */
 export type AlimentoStimato = {
   nome: string;
@@ -28,16 +29,6 @@ export type Stima = {
   /** Una riga sola, vuota se non c'e' niente da segnalare. */
   nota: string;
 };
-
-/**
- * Una frase lunga un pasto, non un tema. Oltre, e' quasi sempre un
- * incollaggio finito li' per sbaglio.
- *
- * Sta qui e non accanto alla chiamata al modello perche' la casella di testo
- * deve conoscerlo: un limite che si scopre solo dopo aver premuto "Leggi"
- * fa riscrivere tutto da capo.
- */
-export const MAX_TESTO = 600;
 
 /** Tetti larghi: servono a fermare un numero impazzito, non a giudicare un pasto. */
 const MAX_KCAL = 5000;
@@ -127,7 +118,7 @@ export function stimaIncoerente(item: AlimentoStimato): boolean {
 }
 
 /**
- * I cibi rapidi passati al modello come riferimento.
+ * I cibi rapidi da allegare al prompt, come riferimento.
  *
  * Non e' un dettaglio: se in archivio c'e' gia' "Fette biscottate" con i
  * valori letti sulla confezione, quei numeri sono veri e vanno riusati.

@@ -16,7 +16,6 @@
     "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.125.0",
     "@capacitor/core": "^8.5.2",
     "@capacitor/ios": "^8.5.2",
     "@neondatabase/serverless": "^1.1.0",

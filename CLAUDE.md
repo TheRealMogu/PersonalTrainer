@@ -38,8 +38,9 @@ Sono in `PRODOTTO.md` per esteso. Il riassunto, perché non si perda:
     `globals.css`. Non si aggiungono durate o curve nuove componente per
     componente.
 11. **I numeri stimati si dichiarano e si confermano prima di salvarli.**
-    Vale per tutto quello che arriva da un modello: si mostra, si corregge,
-    poi si salva.
+    Vale per tutto quello che arriva da fuori: si mostra, si corregge, poi si
+    salva. E si fa passare da una sola porta che valida -- quello che arriva
+    da una chat e' testo, non istruzioni.
 
 Questa non è un'app di menù, è un'app di budget: risponde a *quanto mi
 resta e cosa ci faccio*. Tutto ciò che non serve a quella domanda è peso
@@ -99,10 +100,8 @@ Costate tempo una volta. Non ripaghiamole.
   `fixed inset-0` alto 404 px invece di 844, per i 280 ms dell'entrata.
   L'entrata infatti sfuma soltanto. L'opacita' non ha questo effetto.
 - **Una costante condivisa fra server e client non puo' stare in un file
-  `server-only`.** `MAX_TESTO` era in `ai-pasti.ts` e serviva anche alla
-  casella di testo: `next build` si e' fermato con la catena d'importazione
-  completa. Le costanti che servono a tutti e due stanno nel modulo puro
-  (`stima-pasto.ts`), quello che chiama il modello importa da li'.
+  `server-only`.** `next build` si ferma e stampa la catena d'importazione
+  completa. Le costanti che servono a tutti e due stanno nel modulo puro.
 - **In questo ambiente il server di sviluppo si apre solo su `localhost`, non
   su `127.0.0.1`.** Con l'indirizzo numerico Next blocca `/_next/hmr` come
   richiesta cross-origin e la pagina non si idrata: i tasti si vedono e non

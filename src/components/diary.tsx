@@ -15,7 +15,7 @@ import { buildProgress, sumMacros } from "@/lib/nutrition";
 import type { MacroKey } from "@/lib/targets";
 import { Card } from "./card";
 import { CalorieRing } from "./calorie-ring";
-import { ChatPasto } from "./chat-pasto";
+import { IncollaPasto } from "./incolla-pasto";
 import { EditMealSheet } from "./edit-meal-sheet";
 import { MacroSheet } from "./macro-sheet";
 import { MacroTile } from "./macro-tile";
@@ -232,11 +232,12 @@ export function Diary({
           />
           <div className="mt-4 space-y-2 border-t border-hairline pt-4">
             {/*
-              Prima la via a parole, poi quella a mano: quando il prodotto
-              cambia o si mangia fuori, scrivere una frase costa un gesto,
-              compilare cinque campi ne costa dodici.
+              Prima la via che passa da Claude, poi quella a mano: quando il
+              prodotto cambia o si mangia fuori, incollare una risposta costa
+              due tocchi, compilare cinque campi per ogni alimento ne costa
+              dodici.
             */}
-            <ChatPasto defaultSlot={defaultSlot} onAdd={handleAddMany} />
+            <IncollaPasto defaultSlot={defaultSlot} foods={quickFoods} onAdd={handleAddMany} />
             <ManualMealForm defaultSlot={defaultSlot} onAdd={handleAdd} />
           </div>
         </Card>
