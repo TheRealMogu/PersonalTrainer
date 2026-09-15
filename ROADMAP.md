@@ -28,6 +28,14 @@ fermava se mancava una variabile d'ambiente, e quando il database era
 indietro con le migration l'app rispondeva con un codice numerico e basta.
 Adesso dice cosa fare.
 
+**Il testo libero non è mai stato provato contro il modello vero**: il foglio
+"Scrivi cosa hai mangiato" è stato verificato in Chromium con una risposta
+finta al posto della chiamata all'API, perché in questo ambiente non c'è una
+`ANTHROPIC_API_KEY`. Quello che è stato provato davvero: l'elenco proposto, i
+totali, la correzione dei numeri, il salvataggio nel database e il messaggio
+che compare quando la chiave manca. Quello che non è stato provato: quanto
+sono buone le stime che torna il modello.
+
 **Una revisione guardando le schermate una per una** ne ha trovate altre due,
 anche queste sistemate: lo Storico faceva la media contando anche oggi, che è
 un giorno a metà, e quindi mentiva tutti i giorni fino a mezzanotte; e i
@@ -166,6 +174,15 @@ leggibile qualcosa che oggi non lo è.
 - [x] **Freccia su quello che si apre.** Fatto sulle tessere dei macro.
 - [x] **Stati vuoti con un'indicazione di cosa fare.** Fatto su diario e
       storico.
+- [x] **Pasto scritto a parole.** Fatto: Aggiungi → *Scrivi cosa hai
+      mangiato*. Una frase diventa righe del diario con i macro compilati, da
+      controllare e correggere prima di salvare. Copre i giorni in cui si
+      mangia qualcosa che non ha un tasto rapido -- che sono quelli in cui il
+      diario, prima, restava vuoto. Richiede `ANTHROPIC_API_KEY`.
+- [x] **Una curva sola per tutto quello che si muove.** Fatto: fogli, barre
+      in fondo, entrate di schermata e risposta al tocco condividono
+      `--ease-ios` in `globals.css`, invece di avere ognuno la propria
+      andatura. Misurato in Chromium a 320, 390 e 430 px, chiaro e scuro.
 - [ ] **Card d'insight in linguaggio naturale sul diario.** Una riga che
       legge i numeri al posto tuo: "ti restano 1.390 kcal e 86 g di proteine —
       un petto di pollo e una colazione ci stanno". Oggi i numeri ci sono ma
@@ -180,6 +197,10 @@ leggibile qualcosa che oggi non lo è.
 - [ ] **Data toccabile nell'intestazione** che apre un selettore, invece delle
       sole frecce. La striscia della settimana copre già i sette giorni
       vicini; serve per andare più indietro.
+- [ ] **Foto dell'etichetta invece della frase.** Il passo naturale dopo il
+      testo libero: da una tabella nutrizionale fotografata i numeri sono
+      letti, non stimati, e l'avviso "sono stime" sparirebbe. Stesso foglio,
+      stessa conferma prima di salvare.
 - [ ] **Intestazione che si compatta scorrendo.** Costa poco, guadagna una
       riga su schermate lunghe.
 - [ ] **Un "+" che apre i modi di registrare.** Oggi i tasti rapidi sono in

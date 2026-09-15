@@ -15,6 +15,7 @@ import { buildProgress, sumMacros } from "@/lib/nutrition";
 import type { MacroKey } from "@/lib/targets";
 import { Card } from "./card";
 import { CalorieRing } from "./calorie-ring";
+import { ChatPasto } from "./chat-pasto";
 import { EditMealSheet } from "./edit-meal-sheet";
 import { MacroSheet } from "./macro-sheet";
 import { MacroTile } from "./macro-tile";
@@ -92,6 +93,32 @@ export function Diary({
         setError(result.error);
         return;
       }
+      router.refresh();
+    });
+  }
+
+  /**
+   * Piu' alimenti in una transizione sola.
+   *
+   * Chiamare `handleAdd` in ciclo funzionerebbe, ma aprirebbe una transizione
+   * e un `router.refresh()` per ogni riga: su rete lenta il riepilogo
+   * rimbalzerebbe avanti e indietro mentre le risposte tornano in ordine
+   * sparso. Qui il riepilogo si muove una volta e si assesta una volta.
+   */
+  function handleAddMany(inputs: Omit<MealInput, "day">[]) {
+    if (inputs.length === 0) return;
+    setError(null);
+    startTransition(async () => {
+      for (const input of inputs) {
+        applyOptimistic({
+          type: "add",
+          meal: { id: tempId.current--, day, createdAt: new Date(), ...input },
+        });
+      }
+
+      const esiti = await Promise.all(inputs.map((input) => addMeal({ day, ...input })));
+      const fallito = esiti.find((esito) => !esito.ok);
+      if (fallito && !fallito.ok) setError(fallito.error);
       router.refresh();
     });
   }
@@ -203,7 +230,13 @@ export function Diary({
               })
             }
           />
-          <div className="mt-4 border-t border-hairline pt-4">
+          <div className="mt-4 space-y-2 border-t border-hairline pt-4">
+            {/*
+              Prima la via a parole, poi quella a mano: quando il prodotto
+              cambia o si mangia fuori, scrivere una frase costa un gesto,
+              compilare cinque campi ne costa dodici.
+            */}
+            <ChatPasto defaultSlot={defaultSlot} onAdd={handleAddMany} />
             <ManualMealForm defaultSlot={defaultSlot} onAdd={handleAdd} />
           </div>
         </Card>

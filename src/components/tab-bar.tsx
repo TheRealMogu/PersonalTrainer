@@ -28,7 +28,7 @@ export function TabBar() {
             <li key={tab.href} className="flex-1">
               <Link
                 href={tab.href}
-                className={`flex h-14 items-center justify-center px-1 text-center text-[12px] font-medium leading-tight transition-colors ${
+                className={`flex h-14 items-center justify-center px-1 text-center text-[12px] font-medium leading-tight transition-colors duration-200 ease-ios ${
                   active ? "text-accent" : "text-muted"
                 }`}
               >

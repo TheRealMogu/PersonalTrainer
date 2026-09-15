@@ -164,9 +164,21 @@ Le linee guida del Piano stanno in `src/lib/plan.ts` e i target in
    | `APP_PASSWORD` | la password con cui entri nell'app |
    | `AUTH_SECRET` | **l'output** di `openssl rand -base64 32`, non il comando |
 
-4. **Deploy**.
+4. Se vuoi scrivere i pasti a parole, aggiungi anche la quarta:
 
-Non è un passaggio facoltativo. Senza `DATABASE_URL` il deploy **fallisce in
+   | Nome | Valore |
+   |---|---|
+   | `ANTHROPIC_API_KEY` | una chiave presa su [console.anthropic.com](https://console.anthropic.com) → *API keys* |
+
+   È **facoltativa**, e a differenza delle altre tre **si paga a consumo**:
+   è fatturata sulla console, non dall'abbonamento a Claude. Una frase
+   costa qualche centesimo. Senza, l'app funziona identica: il tasto
+   *Scrivi cosa hai mangiato* spiega cosa manca e resta l'inserimento
+   manuale.
+
+5. **Deploy**.
+
+Le prime tre non sono un passaggio facoltativo. Senza `DATABASE_URL` il deploy **fallisce in
 compilazione**, non al primo accesso, e il messaggio parla di una pagina a caso:
 
 ```

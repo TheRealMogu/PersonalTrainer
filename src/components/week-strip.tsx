@@ -63,7 +63,7 @@ export function WeekStrip({
                 : `${giorno.day}: non registrato`
             }
             aria-current={eAperto ? "page" : undefined}
-            className={`flex min-h-11 flex-1 flex-col items-center justify-end gap-1.5 rounded-lg py-1.5 transition active:bg-raised ${
+            className={`flex min-h-11 flex-1 flex-col items-center justify-end gap-1.5 rounded-lg py-1.5 tocco-riquadro active:bg-raised ${
               eAperto ? "bg-raised" : ""
             }`}
           >

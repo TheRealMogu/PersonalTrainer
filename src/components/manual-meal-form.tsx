@@ -67,7 +67,7 @@ export function ManualMealForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="min-h-11 w-full rounded-xl border border-dashed border-hairline py-3 text-[15px] font-medium text-accent active:bg-raised"
+        className="min-h-11 w-full rounded-xl border border-dashed border-hairline py-3 text-[15px] font-medium text-accent tocco active:bg-raised"
       >
         Aggiungi manualmente
       </button>
@@ -96,7 +96,7 @@ export function ManualMealForm({
             key={value}
             type="button"
             onClick={() => setSlot(value)}
-            className={`h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors ${
+            className={`h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors duration-200 ease-ios ${
               slot === value
                 ? "bg-accent text-on-accent"
                 : "border border-hairline bg-raised text-muted"
@@ -130,7 +130,7 @@ export function ManualMealForm({
       <div className="flex gap-2 pt-1">
         <button
           type="submit"
-          className="min-h-11 flex-1 rounded-xl bg-accent py-3 text-[15px] font-semibold text-on-accent active:opacity-80"
+          className="min-h-11 flex-1 rounded-xl bg-accent py-3 text-[15px] font-semibold text-on-accent tocco active:opacity-80"
         >
           Salva
         </button>
@@ -141,7 +141,7 @@ export function ManualMealForm({
             setValues(EMPTY);
             setError(null);
           }}
-          className="min-h-11 rounded-xl border border-hairline px-5 text-[15px] font-medium text-muted active:bg-raised"
+          className="min-h-11 rounded-xl border border-hairline px-5 text-[15px] font-medium text-muted tocco active:bg-raised"
         >
           Annulla
         </button>

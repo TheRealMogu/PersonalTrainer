@@ -133,6 +133,14 @@ e va difesa a ogni aggiunta.
 - **Export dei dati** — Piano → *I tuoi dati*: tutto in JSON, oppure pasti e
   allenamenti in CSV. Un'app che accumula mesi di diario e non ti lascia
   portarlo via te lo tiene in ostaggio.
+- **Pasto scritto a parole** — Aggiungi → *Scrivi cosa hai mangiato*: una
+  frase qualsiasi ("due uova strapazzate, 80 g di pane e un caffè") diventa
+  righe del diario con i macro già compilati. I tasti rapidi coprono i
+  giorni uguali agli altri; questa copre gli altri, che sono quelli in cui
+  il diario resterebbe vuoto. Quello che torna è una proposta: si tolgono le
+  righe che non tornano, si correggono i numeri, e solo allora si salva.
+  Richiede una `ANTHROPIC_API_KEY`; senza, il tasto spiega cosa manca e
+  resta la via manuale.
 
 ## Cosa resta fuori, di proposito
 
@@ -196,6 +204,22 @@ Valgono per ogni aggiunta futura.
     palestra il segnale manca: una serie segnata deve restare segnata, e
     partire da sola dopo. Ogni scrittura che si può ritentare porta un
     identificativo, altrimenti riprovare significa duplicare.
+17. **Una curva sola per tutto quello che si muove.** Fogli, barre in fondo,
+    entrate di schermata e risposta al tocco usano la stessa
+    `cubic-bezier(0.32, 0.72, 0, 1)`, definita una volta in `globals.css`.
+    Parte veloce e si posa piano: un movimento ad andatura costante si legge
+    come meccanico, perché nessun oggetto vero parte e si ferma di colpo.
+    Niente oltre il mezzo secondo — più in là il movimento smette di essere
+    un riscontro e diventa un'attesa. Al tocco si scende in 80 ms e si
+    risale in 260: è la differenza fra le due durate a far sembrare solido
+    un pulsante.
+18. **Quello che non è stato misurato si dice, prima di salvarlo.** I macro
+    che arrivano da una frase scritta a parole sono stime: si mostrano
+    etichettati come tali, riga per riga, e si salvano solo dopo che li hai
+    guardati. Un numero stimato che entra nel diario da solo è un numero
+    inventato, e la regola 5 non lo permette. Quando le calorie non tornano
+    con i macro dichiarati, lo si segnala su quella riga invece di
+    correggerla di nascosto: non sappiamo quale dei due sia sbagliato.
 
 ## Come si struttura una schermata
 

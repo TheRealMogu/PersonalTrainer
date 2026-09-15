@@ -55,14 +55,14 @@ export function MacroSheet({
         type="button"
         aria-label="Chiudi"
         onClick={onClose}
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0 animate-velo bg-black/40"
       />
 
       <div
         role="dialog"
         aria-modal="true"
         aria-label={`Dettaglio ${MACRO_LABELS[key]}`}
-        className="relative mx-auto max-h-[85vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-surface px-5 pt-5"
+        className="relative animate-foglio mx-auto max-h-[85vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-surface px-5 pt-5"
         style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
       >
         <header className="mb-4">
@@ -140,7 +140,7 @@ export function MacroSheet({
         <button
           type="button"
           onClick={onClose}
-          className="mt-5 min-h-11 w-full rounded-xl border border-hairline text-[15px] font-medium text-muted active:bg-raised"
+          className="mt-5 min-h-11 w-full rounded-xl border border-hairline text-[15px] font-medium text-muted tocco active:bg-raised"
         >
           Chiudi
         </button>

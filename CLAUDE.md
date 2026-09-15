@@ -34,6 +34,12 @@ Sono in `PRODOTTO.md` per esteso. Il riassunto, perché non si perda:
 9. **Il rosso è per il fuori target e per un guasto che ha perso qualcosa.**
    Mai per un'azione — nemmeno "Elimina" — né per un pannello d'errore che
    occupa già tutta la schermata.
+10. **Una curva sola per tutto quello che si muove**, `--ease-ios` in
+    `globals.css`. Non si aggiungono durate o curve nuove componente per
+    componente.
+11. **I numeri stimati si dichiarano e si confermano prima di salvarli.**
+    Vale per tutto quello che arriva da un modello: si mostra, si corregge,
+    poi si salva.
 
 Questa non è un'app di menù, è un'app di budget: risponde a *quanto mi
 resta e cosa ci faccio*. Tutto ciò che non serve a quella domanda è peso
@@ -86,6 +92,21 @@ Costate tempo una volta. Non ripaghiamole.
 - **La data si calcola su `Europe/Rome`** (`src/lib/date.ts`). Il server
   gira in UTC: senza, fra mezzanotte e le due il diario apre il giorno
   prima.
+- **Un `transform` sul guscio della pagina sposta tutti i `position: fixed`
+  che contiene.** `src/app/template.tsx` avvolge ogni schermata: se
+  l'animazione d'entrata muovesse, i fogli e le barre di annullamento che
+  stanno dentro misurerebbero il guscio invece della finestra. Misurato: un
+  `fixed inset-0` alto 404 px invece di 844, per i 280 ms dell'entrata.
+  L'entrata infatti sfuma soltanto. L'opacita' non ha questo effetto.
+- **Una costante condivisa fra server e client non puo' stare in un file
+  `server-only`.** `MAX_TESTO` era in `ai-pasti.ts` e serviva anche alla
+  casella di testo: `next build` si e' fermato con la catena d'importazione
+  completa. Le costanti che servono a tutti e due stanno nel modulo puro
+  (`stima-pasto.ts`), quello che chiama il modello importa da li'.
+- **In questo ambiente il server di sviluppo si apre solo su `localhost`, non
+  su `127.0.0.1`.** Con l'indirizzo numerico Next blocca `/_next/hmr` come
+  richiesta cross-origin e la pagina non si idrata: i tasti si vedono e non
+  fanno niente. Sembra un bug del codice, non lo e'.
 - **La rete di questo ambiente non raggiunge Neon.** `db:migrate` e
   `db:seed` contro il database vero li lancia l'utente dalla sua macchina.
   Per provare in locale: Postgres normale e driver `pg`.

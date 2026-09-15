@@ -44,7 +44,7 @@ export function UndoToast({
       */
       style={{ bottom: `calc(${distanzaRem}rem + env(safe-area-inset-bottom))` }}
     >
-      <div className="mx-auto flex w-full max-w-md items-center gap-3 rounded-xl bg-overlay/95 px-4 py-3 text-on-overlay shadow-lg backdrop-blur">
+      <div className="mx-auto flex w-full max-w-md animate-barra items-center gap-3 rounded-xl bg-overlay/95 px-4 py-3 text-on-overlay shadow-lg backdrop-blur">
         <span className="min-w-0 flex-1 truncate text-[13px]">{message}</span>
         <button
           type="button"

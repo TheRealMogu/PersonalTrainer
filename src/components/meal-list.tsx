@@ -66,7 +66,7 @@ export function MealList({
                       type="button"
                       onClick={() => onEdit(meal)}
                       aria-label={`Modifica ${meal.name}`}
-                      className="min-w-0 flex-1 py-1.5 text-left active:opacity-60"
+                      className="min-w-0 flex-1 py-1.5 text-left tocco active:opacity-60"
                     >
                       <p className="truncate text-[15px] font-medium">
                         {meal.name}
@@ -101,7 +101,7 @@ export function MealList({
                       type="button"
                       onClick={() => onDelete(meal)}
                       aria-label={`Elimina ${meal.name}`}
-                      className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted active:bg-raised"
+                      className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full tocco active:bg-raised"
                     >
                       <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                         <path

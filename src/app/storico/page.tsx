@@ -68,7 +68,7 @@ export default async function StoricoPage({
             </p>
             <Link
               href="/"
-              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl border border-hairline px-5 text-[15px] font-medium text-accent active:bg-raised"
+              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl border border-hairline px-5 text-[15px] font-medium text-accent tocco active:bg-raised"
             >
               Vai al diario
             </Link>

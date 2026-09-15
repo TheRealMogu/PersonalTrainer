@@ -66,7 +66,7 @@ export function RecentSessions({ sessions }: { sessions: RecentSession[] }) {
               type="button"
               onClick={() => handleDelete(session)}
               aria-label={`Elimina ${session.label} del ${session.day}`}
-              className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted active:bg-raised"
+              className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full tocco active:bg-raised"
             >
               <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                 <path

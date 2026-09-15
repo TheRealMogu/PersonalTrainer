@@ -41,7 +41,7 @@ export function RestTimer({ onClose }: { onClose: () => void }) {
       className="fixed inset-x-0 z-20 px-5"
       style={{ bottom: "calc(4.25rem + env(safe-area-inset-bottom))" }}
     >
-      <div className="mx-auto w-full max-w-md overflow-hidden rounded-2xl bg-overlay/95 text-on-overlay shadow-lg backdrop-blur">
+      <div className="mx-auto w-full max-w-md animate-barra overflow-hidden rounded-2xl bg-overlay/95 text-on-overlay shadow-lg backdrop-blur">
         <div className="h-1 w-full bg-overlay-track">
           <div
             className={`h-full transition-[width] duration-500 ${done ? "bg-over" : "bg-accent"}`}

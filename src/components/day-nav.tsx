@@ -8,7 +8,7 @@ function hrefForDay(day: string, today: string) {
 }
 
 const ARROW_CLASS =
-  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface text-accent shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-opacity active:opacity-60";
+  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface text-accent shadow-[0_1px_2px_rgba(0,0,0,0.04)] tocco-riquadro active:opacity-60";
 
 /**
  * Il cambio giorno e' una navigazione lato server: su rete lenta passa circa

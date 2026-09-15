@@ -66,7 +66,7 @@ export default function PianoPage() {
                 <a
                   href={voce.href}
                   download
-                  className="flex min-h-11 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent active:bg-raised"
+                  className="flex min-h-11 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
                 >
                   {voce.testo}
                 </a>

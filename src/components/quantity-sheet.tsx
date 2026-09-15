@@ -44,14 +44,14 @@ export function QuantitySheet({
         type="button"
         aria-label="Chiudi"
         onClick={onClose}
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0 animate-velo bg-black/40"
       />
 
       <div
         role="dialog"
         aria-modal="true"
         aria-label={`Quantità per ${food.name}`}
-        className="relative mx-auto w-full max-w-md rounded-t-3xl bg-surface px-5 pt-5"
+        className="relative animate-foglio mx-auto w-full max-w-md rounded-t-3xl bg-surface px-5 pt-5"
         style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
       >
         <header className="mb-4">
@@ -73,7 +73,7 @@ export function QuantitySheet({
                   setQuantity(value);
                   setCustom("");
                 }}
-                className={`h-12 flex-1 rounded-xl text-[15px] font-semibold tabular-nums transition-colors ${
+                className={`h-12 flex-1 rounded-xl text-[15px] font-semibold tabular-nums transition-colors duration-200 ease-ios ${
                   active
                     ? "bg-accent text-on-accent"
                     : "border border-hairline bg-raised text-ink"
@@ -104,7 +104,7 @@ export function QuantitySheet({
               key={value}
               type="button"
               onClick={() => setSlot(value)}
-              className={`h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors ${
+              className={`h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors duration-200 ease-ios ${
                 slot === value
                   ? "bg-accent text-on-accent"
                   : "border border-hairline bg-raised text-muted"
@@ -138,7 +138,7 @@ export function QuantitySheet({
             type="button"
             disabled={!valid}
             onClick={() => onConfirm(effective, slot)}
-            className="min-h-12 flex-1 rounded-xl bg-accent text-[15px] font-semibold text-on-accent active:opacity-80 disabled:opacity-40"
+            className="min-h-12 flex-1 rounded-xl bg-accent text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
           >
             Aggiungi
           </button>

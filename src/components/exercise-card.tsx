@@ -85,7 +85,7 @@ export function ExerciseCard({
                 onClick={() => onEdit(set)}
                 disabled={disabled || set.inAttesa}
                 aria-label={`Modifica serie ${set.setNumber} di ${exercise.name}`}
-                className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg px-1 text-left active:bg-raised disabled:opacity-100"
+                className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg px-1 text-left tocco active:bg-raised disabled:opacity-100"
               >
                 <span className="w-5 shrink-0 text-[13px] tabular-nums text-muted">
                   {set.setNumber}
@@ -104,7 +104,7 @@ export function ExerciseCard({
                 onClick={() => onDelete(set.id)}
                 aria-label={`Elimina serie ${set.setNumber} di ${exercise.name}`}
                 disabled={disabled}
-                className="-mr-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted active:bg-raised disabled:opacity-40"
+                className="-mr-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full tocco active:bg-raised disabled:opacity-40"
               >
                 <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                   <path
@@ -153,7 +153,7 @@ export function ExerciseCard({
           onClick={handleLog}
           disabled={disabled}
           aria-label={`Segna la serie di ${exercise.name}`}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent active:opacity-80 disabled:opacity-50"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent tocco active:opacity-80 disabled:opacity-50"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path

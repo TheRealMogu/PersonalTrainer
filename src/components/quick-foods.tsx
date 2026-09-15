@@ -68,7 +68,7 @@ export function QuickFoods({
         type="button"
         onClick={() => setSoloCheCiSta((value) => !value)}
         aria-pressed={soloCheCiSta}
-        className={`mb-3 min-h-11 w-full rounded-xl px-4 text-[13px] font-medium transition-colors ${
+        className={`mb-3 min-h-11 w-full rounded-xl px-4 text-[13px] font-medium transition-colors duration-200 ease-ios ${
           soloCheCiSta
             ? "bg-accent text-on-accent"
             : "border border-hairline bg-raised text-muted"
@@ -110,7 +110,7 @@ export function QuickFoods({
                 if (longPressed.current) return;
                 onAdd(food, 1, defaultSlot);
               }}
-              className="flex min-h-16 w-full flex-col justify-between rounded-xl border border-hairline bg-surface px-3 py-2.5 pr-10 text-left transition active:scale-[0.98] active:bg-raised"
+              className="flex min-h-16 w-full flex-col justify-between rounded-xl border border-hairline bg-surface px-3 py-2.5 pr-10 text-left tocco-riquadro active:bg-raised"
             >
               <span className="text-[15px] font-medium leading-tight">{food.name}</span>
               <span className="mt-1.5 block text-[13px] tabular-nums text-muted">
@@ -150,7 +150,7 @@ export function QuickFoods({
               type="button"
               onClick={() => setSheetFor(food)}
               aria-label={`Scegli quantità per ${food.name}`}
-              className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center rounded-xl text-muted active:text-accent"
+              className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center rounded-xl tocco active:text-accent"
             >
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                 <path
