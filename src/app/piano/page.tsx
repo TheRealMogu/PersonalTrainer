@@ -4,14 +4,27 @@ import { LogoutButton } from "@/components/logout-button";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 import { PLAN_SECTIONS } from "@/lib/plan";
+import { todayIso } from "@/lib/date";
+import { meseDi, settimanaDi } from "@/lib/intervallo-export";
 import { formatMacro } from "@/lib/nutrition";
-import { MACRO_LABELS, MACRO_ORDER, MACRO_UNITS, type Obiettivi } from "@/lib/targets";
+import {
+  MACRO_LABELS,
+  MACRO_ORDER,
+  MACRO_UNITS,
+  type Obiettivi,
+} from "@/lib/targets";
 import { getObiettivi } from "@/lib/queries";
 import { OBIETTIVI_PREDEFINITI } from "@/lib/targets";
 
 export const dynamic = "force-dynamic";
 
 export default async function PianoPage() {
+  // Su ora italiana, come tutto il resto: il server gira in UTC e fra
+  // mezzanotte e le due "questa settimana" sarebbe quella prima.
+  const oggi = todayIso();
+  const settimana = settimanaDi(oggi);
+  const mese = meseDi(oggi);
+
   // Se la lettura fallisce si mostrano i valori di partenza invece di una
   // schermata d'errore: il Piano contiene anche le regole del PT e
   // l'accesso, che non c'entrano niente con i target.
@@ -93,9 +106,9 @@ export default async function PianoPage() {
       <Section title="I tuoi alimenti">
         <Card>
           <p className="mb-4 text-[15px] leading-snug text-muted">
-            I tasti rapidi del diario. Si aggiungono, si correggono e si
-            tolgono da qui — e crescono da soli ogni volta che salvi un pasto
-            fra i rapidi.
+            I tasti rapidi del diario. Si aggiungono, si correggono e si tolgono
+            da qui — e crescono da soli ogni volta che salvi un pasto fra i
+            rapidi.
           </p>
           <Link
             href="/alimenti"
@@ -113,14 +126,17 @@ export default async function PianoPage() {
       <Section title="I tuoi dati">
         <Card>
           <p className="mb-4 text-[15px] leading-snug text-muted">
-            Scarica tutto quello che hai registrato. Il JSON è la copia completa;
-            i CSV si aprono in Excel o Numbers.
+            Scarica tutto quello che hai registrato. Il JSON è la copia
+            completa; i CSV si aprono in Excel o Numbers.
           </p>
           <ul className="space-y-2">
             {[
               { href: "/api/esporta", testo: "Copia completa (JSON)" },
               { href: "/api/esporta?formato=pasti", testo: "Pasti (CSV)" },
-              { href: "/api/esporta?formato=serie", testo: "Allenamenti (CSV)" },
+              {
+                href: "/api/esporta?formato=serie",
+                testo: "Allenamenti (CSV)",
+              },
             ].map((voce) => (
               <li key={voce.href}>
                 <a
@@ -133,6 +149,45 @@ export default async function PianoPage() {
               </li>
             ))}
           </ul>
+
+          {/*
+            Un periodo solo, per mandarne uno al personal trainer senza aprire
+            il CSV e tagliarlo a mano. Il file si porta il periodo nel nome --
+            "pasti-2026-09-14_2026-09-20.csv" -- perche' un export parziale
+            che sembra completo fa concludere a chi lo legge che hai mangiato
+            solo quello.
+          */}
+          <div className="mt-4 border-t border-hairline pt-4">
+            <p className="mb-3 text-[15px] leading-snug text-muted">
+              Oppure un periodo solo, da mandare al personal trainer:
+            </p>
+            <ul className="space-y-2">
+              {[
+                {
+                  href: `/api/esporta?formato=pasti&da=${settimana.da}&a=${settimana.a}`,
+                  testo: "Pasti di questa settimana (CSV)",
+                },
+                {
+                  href: `/api/esporta?formato=serie&da=${settimana.da}&a=${settimana.a}`,
+                  testo: "Allenamenti di questa settimana (CSV)",
+                },
+                {
+                  href: `/api/esporta?da=${mese.da}&a=${mese.a}`,
+                  testo: "Questo mese, tutto (JSON)",
+                },
+              ].map((voce) => (
+                <li key={voce.href}>
+                  <a
+                    href={voce.href}
+                    download
+                    className="flex min-h-11 w-full items-center justify-center rounded-xl border border-hairline px-3 text-center text-[15px] font-medium text-accent tocco active:bg-raised"
+                  >
+                    {voce.testo}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </Card>
       </Section>
 

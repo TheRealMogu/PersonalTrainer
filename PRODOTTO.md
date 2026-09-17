@@ -98,6 +98,7 @@ proprio le schermate che vanno riviste.
 | Aggiungere un integratore | 3 gesti | 3 (Piano → elenco → *Aggiungi*) | ok |
 | Togliere un integratore dal diario | 3 gesti | 3 (elenco → riga → *Non lo prendo più*) | ok |
 | Registrare un pasto di cui sai solo le calorie | 2 gesti | 2 (*Solo calorie* → scrivi → *Aggiungi*) | ok |
+| Mandare una settimana sola al personal trainer | 2 gesti | 2 (Piano → *Pasti di questa settimana*) | ok |
 
 Le righe **sopra il tetto** sono misurate su una giornata vera (10 pasti
 registrati, schermo da 390 px). Le prime due righe dell'aggiunta sono
@@ -170,7 +171,11 @@ e va difesa a ogni aggiunta.
   arriva e quante porzioni dei tuoi alimenti ci stanno ancora nel margine.
 - **Export dei dati** — Piano → *I tuoi dati*: tutto in JSON, oppure pasti e
   allenamenti in CSV. Un'app che accumula mesi di diario e non ti lascia
-  portarlo via te lo tiene in ostaggio.
+  portarlo via te lo tiene in ostaggio. Si può scaricare anche **un periodo
+  solo** — questa settimana, questo mese — da mandare al personal trainer
+  senza aprire il CSV e tagliarlo a mano. Il file si porta il periodo nel
+  nome, e il JSON lo scrive dentro: un export parziale che sembra completo
+  fa concludere a chi lo legge che hai mangiato solo quello.
 - **I tuoi alimenti** — Piano → *I tuoi alimenti*: i tasti rapidi si
   aggiungono, si correggono e si tolgono, con annullamento. Crescono da soli:
   ogni pasto si salva fra i rapidi con un tocco, quindi un prodotto incollato
