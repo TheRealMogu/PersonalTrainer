@@ -406,6 +406,53 @@ Vale anche il contrario: se dopo la Fase 1 il numero sale già, le fasi 4 e 5
 possono restare dove sono. **Meno funzioni che si usano batte più funzioni che
 non si aprono.**
 
+## 6-quater. Niente entra senza poter essere corretto: l'inventario
+
+La regola 3 dice che tutto quello che si registra si corregge e si toglie.
+Vale per i pasti e per le serie, ma la regola non parla di *pasti*: parla di
+**tutto quello che inserisci**. Contato riga per riga sul codice, tre tabelle
+su sei non si toccano affatto dall'app.
+
+| Cosa | Inserire | Correggere | Togliere |
+|---|---|---|---|
+| Pasto | ✅ | ✅ nome, quantità, momento e tutti i macro | ✅ con annulla |
+| Serie di allenamento | ✅ | ✅ carico e ripetizioni | ✅ con annulla |
+| Seduta | ✅ | ❌ non si cambia data né giornata | ✅ con annulla |
+| **Cibo rapido** | ❌ solo dal seed | ❌ | ❌ |
+| **Esercizio del programma** | ❌ solo dal seed | ❌ | ❌ |
+| **Target giornalieri** | ❌ stanno nel codice | ❌ | ❌ |
+
+Le tre righe in fondo hanno tutte lo stesso effetto pratico: per cambiare una
+cosa che cambia davvero nella vita serve un deploy, o peggio un `db:seed` —
+che **cancella a cascata lo storico di allenamento**.
+
+### In ordine di quanto si sente
+
+- [x] **Correggere un pasto per intero.** Fatto. Prima si potevano cambiare
+      solo quantità e momento, e andava bene finché i numeri venivano dai
+      tasti rapidi, letti sulla confezione. Da quando arrivano anche da una
+      stima incollata da una chat non basta più: se la stima sbaglia di
+      trenta calorie, riscalare la quantità sposta l'errore invece di
+      toglierlo. Nome e macro stanno dietro a un tocco, così il caso
+      frequente — mezza porzione — resta a portata di pollice.
+- [ ] **Cibi rapidi: aggiungere, correggere, togliere.** Il buco più grosso,
+      e quello già incontrato: *«molte volte non mangio le stesse cose e
+      magari i prodotti variano»*. Se lo yogurt cambia ricetta, oggi i suoi
+      valori restano sbagliati per sempre. Serve anche il verso opposto:
+      **«salva come tasto rapido»** su un pasto appena inserito, che
+      trasforma un incollaggio in un tasto riusabile e riduce il lavoro
+      futuro invece di aggiungerne.
+- [ ] **Esercizi del programma: rinominare, cambiare serie e ripetizioni,
+      aggiungere, togliere, riordinare.** Quando il personal trainer cambia
+      la scheda, oggi l'unica strada è `db:seed`, che rifiuta di partire se
+      esistono serie registrate — e con `--forza-allenamento` le cancella. In
+      pratica: o perdi lo storico o tieni la scheda vecchia.
+- [ ] **Target giornalieri modificabili.** Stanno in `src/lib/targets.ts`:
+      cambiarli richiede un deploy. Il PT li cambia a ogni fase.
+- [ ] **Seduta: cambiare data e giornata.** Se apri "Day 1" invece di "Day 2"
+      puoi solo scartare e rifare; se ti dimentichi di registrare l'altroieri,
+      non puoi registrarlo a posteriori.
+
 ## 7. Cose che restano fuori, di proposito
 
 Scritte per non riaprirle ogni volta.

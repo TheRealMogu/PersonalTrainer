@@ -8,6 +8,7 @@ import {
   restoreMeal,
   updateMeal,
   type MealInput,
+  type MealPatch,
 } from "@/app/actions";
 import type { Meal, QuickFood } from "@/db/schema";
 import type { MealSlot } from "@/lib/meal-slots";
@@ -138,25 +139,22 @@ export function Diary({
     });
   }
 
-  function handleEdit(meal: Meal, quantity: number, slot: MealSlot) {
+  /*
+   * Il foglio manda i valori gia' calcolati, quelli che hai letto prima di
+   * premere Salva. Qui non si rifa' il conto: due calcoli della stessa cosa
+   * sono due occasioni di non essere d'accordo, e quello che vince
+   * sarebbe quello che non hai visto.
+   */
+  function handleEdit(meal: Meal, patch: MealPatch) {
     setEditing(null);
     setError(null);
     startTransition(async () => {
-      const factor = quantity / meal.quantity;
       applyOptimistic({
         type: "replace",
-        meal: {
-          ...meal,
-          quantity,
-          slot,
-          kcal: Math.round(meal.kcal * factor),
-          carbs: meal.carbs * factor,
-          protein: meal.protein * factor,
-          fat: meal.fat * factor,
-        },
+        meal: { ...meal, ...patch, kcal: Math.round(patch.kcal) },
       });
 
-      const result = await updateMeal(meal.id, day, quantity, slot);
+      const result = await updateMeal(meal.id, day, patch);
       if (!result.ok) {
         setError(result.error);
         return;
@@ -267,7 +265,7 @@ export function Diary({
       {editing ? (
         <EditMealSheet
           meal={editing}
-          onConfirm={(quantity, slot) => handleEdit(editing, quantity, slot)}
+          onConfirm={(patch) => handleEdit(editing, patch)}
           onDelete={() => {
             const meal = editing;
             setEditing(null);

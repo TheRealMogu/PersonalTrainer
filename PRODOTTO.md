@@ -65,6 +65,7 @@ proprio le schermate che vanno riviste.
 | Ripetere un pasto che fai sempre uguale | 1 gesto | — (non esiste) | **manca** |
 | Segnare un bicchiere d'acqua | 1 gesto | — (non esiste) | **manca** |
 | Correggere un pasto già inserito | 2 gesti | 2 (tocca la riga → quantità) | ok |
+| Correggere nome o macro di un pasto | 3 gesti | 3 (riga → *Correggi nome e valori* → campo) | ok |
 | Annullare un errore | 1 gesto | 1 | ok |
 | Entrare nell'app | 0 gesti dopo il primo accesso | 0 | ok |
 | Segnare il carico di una serie | 2 gesti | 1 (campi già pronti) | ok |
@@ -207,6 +208,11 @@ Valgono per ogni aggiunta futura.
    esistono vicoli ciechi: tutto quello che si registra si corregge e si
    toglie, e ogni cosa che sparisce lascia un modo di rimetterla. Un tocco
    storto in palestra, con le mani sudate, non deve costare un allenamento.
+   **Vale per ogni cosa che si inserisce, non solo per i pasti e le serie**:
+   un cibo rapido, un esercizio del programma e un target sono roba inserita
+   anche se oggi entra dal seed, e una cosa che si cambia solo con un deploy
+   è un vicolo cieco lungo. L'inventario di cosa manca è la sezione 6-quater
+   di [ROADMAP.md](ROADMAP.md).
 4. **Contrasto del testo almeno 4.5:1.** Il grigio troppo chiaro non è
    eleganza, è testo che non si legge al sole.
 5. **Niente numeri inventati.** Un giorno non compilato è "non registrato", mai

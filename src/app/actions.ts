@@ -102,53 +102,56 @@ export async function restoreMeal(
 }
 
 /**
- * Corregge un pasto gia' inserito: quantita' e momento della giornata.
+ * Cosa si puo' correggere di un pasto gia' inserito: tutto.
  *
- * La quantita' riscala i macro dalla porzione base. Il momento serve perche'
- * i tasti rapidi lo scelgono dall'ora dell'orologio: aggiungere uno spuntino
- * alle 12:30 lo fa finire a pranzo, e senza questa correzione ci resta.
+ * Prima si potevano cambiare solo quantita' e momento, e i macro venivano
+ * riscalati dal server. Bastava finche' i numeri arrivavano dai tasti
+ * rapidi, dove sono letti sulla confezione. Da quando arrivano anche da una
+ * stima incollata da una chat non basta piu': se la stima e' sbagliata di
+ * trenta calorie, riscalare la quantita' non la aggiusta -- sposta
+ * l'errore.
  *
- * Sbagliare capita: se correggere costa quanto rifare tutto, il dato
- * sbagliato resta li'.
+ * I valori arrivano assoluti, gia' come vanno scritti. Il riscalamento per
+ * quantita' lo fa il foglio, dove si vede mentre lo fai: qui si scrive
+ * quello che hai davanti agli occhi, e non c'e' un secondo calcolo che
+ * potrebbe non essere d'accordo col primo.
  */
+export type MealPatch = {
+  name: string;
+  quantity: number;
+  slot: MealSlot;
+  kcal: number;
+  carbs: number;
+  protein: number;
+  fat: number;
+};
+
 export async function updateMeal(
   id: number,
   day: string,
-  quantity: number,
-  slot?: MealSlot,
+  patch: MealPatch,
 ): Promise<ActionResult> {
   if (!Number.isInteger(id) || id <= 0) return { ok: false, error: "Pasto non valido." };
-  if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };
-  if (!Number.isFinite(quantity) || quantity <= 0 || quantity > 20) {
-    return { ok: false, error: "La quantità deve stare fra 0 e 20 porzioni." };
-  }
-  if (slot !== undefined && !isMealSlot(slot)) {
-    return { ok: false, error: "Momento della giornata non valido." };
-  }
+
+  const error = validate({ day, ...patch });
+  if (error) return { ok: false, error };
 
   try {
-    const [current] = await db
-      .select()
-      .from(meals)
-      .where(and(eq(meals.id, id), eq(meals.day, day)));
-
-    if (!current) return { ok: false, error: "Pasto non trovato." };
-
-    // I macro salvati sono gia' moltiplicati: si torna alla porzione base
-    // prima di riscalare, altrimenti l'errore si accumula a ogni modifica.
-    const factor = quantity / current.quantity;
-
-    await db
+    const aggiornate = await db
       .update(meals)
       .set({
-        quantity,
-        kcal: Math.round(current.kcal * factor),
-        carbs: current.carbs * factor,
-        protein: current.protein * factor,
-        fat: current.fat * factor,
-        ...(slot === undefined ? {} : { slot }),
+        name: patch.name.trim(),
+        quantity: patch.quantity,
+        slot: patch.slot,
+        kcal: Math.round(patch.kcal),
+        carbs: patch.carbs,
+        protein: patch.protein,
+        fat: patch.fat,
       })
-      .where(eq(meals.id, id));
+      .where(and(eq(meals.id, id), eq(meals.day, day)))
+      .returning({ id: meals.id });
+
+    if (aggiornate.length === 0) return { ok: false, error: "Pasto non trovato." };
   } catch (cause) {
     console.error("updateMeal fallita", cause);
     return { ok: false, error: "Modifica non riuscita. Riprova." };
