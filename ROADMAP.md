@@ -377,15 +377,20 @@ Ogni fase ha un bersaglio misurabile. Se una fase non abbassa il numero, non
   non registrato, perché la media resta vera.
 - Bersaglio: **2 gesti**.
 
-**Fase 5 — Codice a barre.** *(2–3 giorni, ed è quella che può fallire)*
-- Fotocamera → EAN → valori dalla confezione. La scorciatoia più usata in
-  assoluto nelle app vere.
-- Due incognite serie: serve un archivio prodotti (Open Food Facts è aperto e
-  gratuito, ma sui prodotti italiani è incompleto), e dentro Capacitor serve
-  un plugin per la fotocamera con i permessi iOS.
-- Ripiego se l'archivio non basta: la foto dell'etichetta va già in chat, e
-  *Incolla da Claude* legge i numeri della tabella nutrizionale.
-- Bersaglio: **3 gesti**, e almeno 7 prodotti su 10 del tuo carrello trovati.
+**Fase 5 — Trovare un prodotto che non hai in archivio.**
+- Ricerca per nome su Open Food Facts: gratis, senza chiave, 263.566 prodotti
+  italiani, ed è lo stesso archivio su cui è costruita Yuka.
+- **Prima la ricerca per nome, non lo scanner.** La ricerca non ha bisogno di
+  niente di nativo e gira oggi; lo scanner su iOS vuole un plugin Capacitor,
+  Xcode e i permessi — cioè la parte cara, per una comodità.
+- Ripiego quando la scheda del prodotto è incompleta (capita, è
+  collaborativo): la foto dell'etichetta va già in chat, e *Incolla da
+  Claude* legge la tabella nutrizionale.
+- Bersaglio: **3 gesti**, e almeno 7 prodotti su 10 del tuo carrello trovati
+  **con i valori nutrizionali compilati** — da misurare per prima cosa, non
+  da dare per buono.
+- Il confronto con le alternative a pagamento e i dettagli stanno nella
+  sezione 6-sexies.
 
 **Fase 6 — Ricordarsi che l'app esiste.** *(da valutare)*
 - Il problema smette di essere l'attrito e diventa la memoria: se non apri
@@ -552,6 +557,90 @@ cambia scheda togliendo l'esercizio che le ha, e **dopo il cambio quelle
 serie si leggono ancora** — nel dettaglio della seduta e nella progressione.
 Poi si fa undo e il programma torna identico a prima, campo per campo.
 Finché questa prova non esiste, la funzione non esiste.
+
+## 6-sexies. Trovare un prodotto da solo: quali API esistono, davvero
+
+Cercate a settembre 2026. La conclusione è corta: **una sola vale la pena, e
+le altre non sono un ripiego, sono fuori scala.**
+
+### Open Food Facts — questa
+
+- **Gratis, senza chiave.** Nessuna variabile d'ambiente da configurare,
+  nessun conto a consumo. A differenza dell'idea dell'API di Claude che
+  avevamo scartato, qui non c'è niente da pagare e niente da ricordarsi.
+- **263.566 prodotti italiani** in archivio (il totale mondiale ha superato i
+  4 milioni).
+- **È il database su cui è costruita Yuka**, e un'altra centinaia di app. La
+  domanda «come fa Yuka» ha come risposta «usa questo».
+- Chiamata: `GET world.openfoodfacts.org/api/v2/product/{ean}.json`.
+  Torna `product_name`, `brands`, `quantity`, e `nutriments` con i valori per
+  100 g **e** per porzione, più Nutri-Score, ingredienti e immagini.
+- C'è anche la **ricerca per nome**, che è la parte che ci interessa di più
+  (sotto il perché).
+- Licenza ODbL: i dati si possono usare e ridistribuire citando la fonte.
+- Chiedono un `User-Agent` che dica chi sei. Va messo, è buona educazione e
+  costa una riga.
+
+**Il difetto, ed è vero:** è collaborativo, quindi la completezza varia da
+prodotto a prodotto. Alcune schede hanno la foto ma non i valori. Non è un
+motivo per scartarlo — è il motivo per cui il ripiego serve sempre, e il
+ripiego ce l'abbiamo già: la foto dell'etichetta va in chat e *Incolla da
+Claude* legge la tabella nutrizionale.
+
+### Le altre, e perché no
+
+| | Perché no |
+|---|---|
+| **Nutritionix** | Ottimo su prodotti confezionati e catene di ristoranti, ma **da 1.850 $/mese** e centrato sugli Stati Uniti. |
+| **Edamam** | Ha anche il testo libero, ma il piano gratuito è molto limitato e si arriva a **999 $/mese**. Il testo libero ce l'abbiamo già gratis. |
+| **FatSecret** | Copertura internazionale buona e ha il codice a barre, ma serve un contratto commerciale. |
+| **USDA FoodData Central** | Gratis e serio, ma **niente codice a barre** e cibi americani: inutile per lo scaffale di un supermercato italiano. |
+| **API di MyFitnessPal** | Non è pubblica. Non è un'opzione. |
+
+Per un'app che usa una persona sola, pagare da 999 a 1.850 dollari al mese
+per sapere quante calorie ha uno yogurt è fuori discussione.
+
+### La parte che nessuno si aspetta: la ricerca viene prima della fotocamera
+
+L'istinto dice «serve lo scanner del codice a barre». Contando il lavoro,
+conviene il contrario:
+
+- **La ricerca per nome non ha bisogno di niente di nativo.** Un campo, una
+  chiamata, una lista, si tocca il prodotto e diventa un tasto rapido. Gira
+  nel browser, gira dentro Capacitor, gira oggi.
+- **Lo scanner sì.** Su iOS `BarcodeDetector` non esiste nel WebView: serve
+  un plugin Capacitor per la fotocamera, quindi Xcode, un Mac e i permessi
+  iOS nel progetto. È la parte cara, ed è cara per una comodità — digitare
+  tredici cifre è brutto ma funziona.
+
+Quindi l'ordine giusto è: **prima la ricerca, poi il codice digitato a mano,
+e lo scanner solo se i primi due si rivelano scomodi all'uso.** Così
+l'«aggiunta dinamica dei prodotti» arriva senza toccare il guscio iOS.
+
+### I passi
+
+- [ ] **Cerca un prodotto per nome** dentro *Aggiungi*: campo, risultati con
+      marca e kcal per 100 g, si tocca e finisce nel diario. Un solo giro di
+      rete, nessuna configurazione.
+- [ ] **Salvalo come tasto rapido**, con la porzione che usi tu. È il punto
+      in cui l'archivio smette di essere quello del seed e diventa il tuo —
+      e si incastra con il punto «cibi rapidi modificabili» di 6-quater.
+- [ ] **Codice a barre digitato a mano**, per quando il nome non basta a
+      distinguere due varianti dello stesso prodotto.
+- [ ] **Scanner con la fotocamera**, solo dopo, e solo se serve davvero.
+
+### Due cose da sapere prima di scriverne una riga
+
+1. **Da questo ambiente non si può provare.** Il proxy di rete blocca
+   `world.openfoodfacts.org`, `api.nal.usda.gov` e `platform.fatsecret.com`:
+   verificato, tutti e tre rispondono con connessione rifiutata. Quindi
+   nessuna delle affermazioni qui sopra sulla *forma* della risposta è stata
+   provata sul campo — vengono dalla documentazione. La prima cosa da fare,
+   quando si comincia, è una chiamata vera con tre prodotti che compri
+   davvero, e guardare quanti hanno i valori nutrizionali compilati.
+2. **La chiamata va fatta dal server**, non dal telefono: così passa dal
+   nostro dominio, non espone niente, e in futuro si può mettere in cache un
+   prodotto già cercato invece di richiederlo ogni volta.
 
 ## 7. Cose che restano fuori, di proposito
 
