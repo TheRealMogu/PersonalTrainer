@@ -113,16 +113,22 @@ export function QuickFoods({
               className="flex min-h-16 w-full flex-col justify-between rounded-xl border border-hairline bg-surface px-3 py-2.5 pr-10 text-left tocco-riquadro active:bg-raised"
             >
               <span className="text-[15px] font-medium leading-tight">{food.name}</span>
+              {/*
+                Qui c'era, accanto alle calorie, una scritta rossa "sfora
+                carboidrati" su ogni alimento che non ci stava piu'. A fine
+                giornata ne comparivano sette su dodici: aprivi l'app per
+                segnare la cena e trovavi un muro di rosso che diceva che
+                qualunque cosa mangi e' sbagliata.
+
+                La regola 8 dice di non incolpare per quello che e' gia'
+                successo, e la 9 tiene il rosso per il fuori target e per i
+                guasti. Quel numero e' gia' detto una volta sola, e in
+                positivo, dal tasto "Cosa mi entra ancora (6 su 12)", che
+                filtra anche. Ripeterlo dodici volte in rosso non aggiungeva
+                informazione: aggiungeva rimprovero.
+              */}
               <span className="mt-1.5 block text-[13px] tabular-nums text-muted">
                 {food.kcal} kcal
-                {verdicts.get(food.id)?.fits === false ? (
-                  <span className="ml-1.5 text-over">
-                    sfora {verdicts
-                      .get(food.id)!
-                      .exceeds.map((key) => MACRO_LABELS[key].toLowerCase())
-                      .join(", ")}
-                  </span>
-                ) : null}
               </span>
 
               {/*

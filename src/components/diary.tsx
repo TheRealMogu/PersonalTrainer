@@ -8,6 +8,7 @@ import {
   restoreMeal,
   updateMeal,
   type MealInput,
+  type MealPatch,
 } from "@/app/actions";
 import type { Meal, QuickFood } from "@/db/schema";
 import type { MealSlot } from "@/lib/meal-slots";
@@ -138,25 +139,22 @@ export function Diary({
     });
   }
 
-  function handleEdit(meal: Meal, quantity: number, slot: MealSlot) {
+  /*
+   * Il foglio manda i valori gia' calcolati, quelli che hai letto prima di
+   * premere Salva. Qui non si rifa' il conto: due calcoli della stessa cosa
+   * sono due occasioni di non essere d'accordo, e quello che vince
+   * sarebbe quello che non hai visto.
+   */
+  function handleEdit(meal: Meal, patch: MealPatch) {
     setEditing(null);
     setError(null);
     startTransition(async () => {
-      const factor = quantity / meal.quantity;
       applyOptimistic({
         type: "replace",
-        meal: {
-          ...meal,
-          quantity,
-          slot,
-          kcal: Math.round(meal.kcal * factor),
-          carbs: meal.carbs * factor,
-          protein: meal.protein * factor,
-          fat: meal.fat * factor,
-        },
+        meal: { ...meal, ...patch, kcal: Math.round(patch.kcal) },
       });
 
-      const result = await updateMeal(meal.id, day, quantity, slot);
+      const result = await updateMeal(meal.id, day, patch);
       if (!result.ok) {
         setError(result.error);
         return;
@@ -206,12 +204,6 @@ export function Diary({
         </div>
       </Card>
 
-      <Section title={optimisticMeals.length === 1 ? "1 pasto" : `${optimisticMeals.length} pasti`}>
-        <Card>
-          <MealList meals={optimisticMeals} onEdit={setEditing} onDelete={handleDelete} />
-        </Card>
-      </Section>
-
       <Section title="Aggiungi">
         <Card>
           <QuickFoods
@@ -243,6 +235,27 @@ export function Diary({
         </Card>
       </Section>
 
+      {/*
+        La lista di quello che hai gia' mangiato sta SOTTO i modi per
+        aggiungere, e non sopra come prima.
+
+        Misurato su una giornata vera da dieci pasti: il primo tasto rapido
+        stava a 1626 px, cioe' 882 px di scorrimento -- quasi due schermate
+        di pollice. E peggiorava da solo: piu' registravi durante la
+        giornata, piu' la lista cresceva e piu' lontano finiva il tasto per
+        registrare. La cena, che segni quando sei piu' stanco, era quella che
+        costava di piu'.
+
+        Il prezzo e' che "vedere cosa ho mangiato" passa da 0 gesti a 1. Si
+        paga volentieri: quello che hai gia' mangiato te lo ricordi, quello
+        che ti resta no -- e quello resta in cima, nell'anello.
+      */}
+      <Section title={optimisticMeals.length === 1 ? "1 pasto" : `${optimisticMeals.length} pasti`}>
+        <Card>
+          <MealList meals={optimisticMeals} onEdit={setEditing} onDelete={handleDelete} />
+        </Card>
+      </Section>
+
       {error ? (
         <p role="alert" className="mb-4 px-1 text-[13px] text-over">
           {error}
@@ -252,7 +265,7 @@ export function Diary({
       {editing ? (
         <EditMealSheet
           meal={editing}
-          onConfirm={(quantity, slot) => handleEdit(editing, quantity, slot)}
+          onConfirm={(patch) => handleEdit(editing, patch)}
           onDelete={() => {
             const meal = editing;
             setEditing(null);

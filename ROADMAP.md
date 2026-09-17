@@ -326,25 +326,34 @@ le altre quattro, e quella che c'è è sepolta a 2,8 schermate.
 Ogni fase ha un bersaglio misurabile. Se una fase non abbassa il numero, non
 è servita e si torna indietro.
 
-**Fase 0 — Togliere quello che respinge.** *(mezza giornata)*
+**Fase 0 — Togliere quello che respinge.** ✅ *fatta*
 - Via la scritta rossa "sfora" dai tasti rapidi. Resta la riga «cosa mi entra
-  ancora», detta una volta.
-- Bersaglio: zero segnali di colpa sulla schermata di aggiunta.
-- È la prima perché non aggiunge niente da imparare e cambia come ci si sente
-  ad aprire l'app.
+  ancora», detta una volta e in positivo, che filtra anche.
+- Bersaglio: zero segnali di colpa sulla schermata di aggiunta. **Centrato**:
+  misurato il colore calcolato di ogni testo dentro la sezione *Aggiungi*, a
+  quattro larghezze e in entrambi i temi — nessun rosso.
 
-**Fase 1 — Mettere l'aggiunta dove si guarda.** *(mezza giornata)*
+**Fase 1 — Mettere l'aggiunta dove si guarda.** ✅ *fatta, con un conto da saldare*
 - *Aggiungi* subito sotto l'anello; la lista dei pasti sotto.
-- Costa il gesto «vedere cosa ho mangiato», che passa da 0 a 1: accettato,
-  perché quello che hai già mangiato lo ricordi, quello che ti resta no.
 - Bersaglio: **da 882 px di scorrimento a 0** per il primo tasto rapido.
+  **Centrato** a 320, 390 e 430 px.
+- **Il prezzo è più alto del previsto.** Avevo scritto che «vedere cosa ho
+  mangiato» sarebbe passato da 0 a 1 gesto: misurato, costa **3**. La lista
+  dei pasti comincia a 1590 px perché la griglia dei dodici tasti rapidi è
+  alta 720 px da sola. Stessa ragione per cui *Incolla da Claude* resta a 3
+  gesti invece di 2.
+- Non si aggiusta con un altro spostamento di sezioni: si aggiusta
+  accorciando la griglia, che è la Fase 2. Fino ad allora le due righe
+  restano segnate sopra il tetto in `PRODOTTO.md` invece di essere assolte.
 
 **Fase 2 — Ripetere invece di ricomporre.** *(1–2 giorni)*
 - «Come ieri» su un pasto: ricopia colazione/pranzo/cena di un giorno
   precedente in un tocco.
 - I tasti rapidi si riordinano da soli per momento della giornata: alle 8 in
   cima ci sono quelli della colazione, non i primi dodici in ordine di
-  inserimento.
+  inserimento. E se ne mostrano pochi, con il resto dietro a un tocco: è
+  anche l'unico modo di riportare sotto il tetto le due righe che la Fase 1
+  ha lasciato fuori, perché quei 720 px di griglia spingono giù tutto.
 - Bersaglio: **una colazione ricorrente in 1 gesto, una giornata tipo in 4**.
 - È la fase che sposta di più: chi mangia quasi sempre le stesse cose non
   dovrebbe ricomporle da capo ogni mattina.
@@ -396,6 +405,53 @@ Il dato ce l'abbiamo già, e non richiede niente di nuovo: lo Storico calcola
 Vale anche il contrario: se dopo la Fase 1 il numero sale già, le fasi 4 e 5
 possono restare dove sono. **Meno funzioni che si usano batte più funzioni che
 non si aprono.**
+
+## 6-quater. Niente entra senza poter essere corretto: l'inventario
+
+La regola 3 dice che tutto quello che si registra si corregge e si toglie.
+Vale per i pasti e per le serie, ma la regola non parla di *pasti*: parla di
+**tutto quello che inserisci**. Contato riga per riga sul codice, tre tabelle
+su sei non si toccano affatto dall'app.
+
+| Cosa | Inserire | Correggere | Togliere |
+|---|---|---|---|
+| Pasto | ✅ | ✅ nome, quantità, momento e tutti i macro | ✅ con annulla |
+| Serie di allenamento | ✅ | ✅ carico e ripetizioni | ✅ con annulla |
+| Seduta | ✅ | ❌ non si cambia data né giornata | ✅ con annulla |
+| **Cibo rapido** | ❌ solo dal seed | ❌ | ❌ |
+| **Esercizio del programma** | ❌ solo dal seed | ❌ | ❌ |
+| **Target giornalieri** | ❌ stanno nel codice | ❌ | ❌ |
+
+Le tre righe in fondo hanno tutte lo stesso effetto pratico: per cambiare una
+cosa che cambia davvero nella vita serve un deploy, o peggio un `db:seed` —
+che **cancella a cascata lo storico di allenamento**.
+
+### In ordine di quanto si sente
+
+- [x] **Correggere un pasto per intero.** Fatto. Prima si potevano cambiare
+      solo quantità e momento, e andava bene finché i numeri venivano dai
+      tasti rapidi, letti sulla confezione. Da quando arrivano anche da una
+      stima incollata da una chat non basta più: se la stima sbaglia di
+      trenta calorie, riscalare la quantità sposta l'errore invece di
+      toglierlo. Nome e macro stanno dietro a un tocco, così il caso
+      frequente — mezza porzione — resta a portata di pollice.
+- [ ] **Cibi rapidi: aggiungere, correggere, togliere.** Il buco più grosso,
+      e quello già incontrato: *«molte volte non mangio le stesse cose e
+      magari i prodotti variano»*. Se lo yogurt cambia ricetta, oggi i suoi
+      valori restano sbagliati per sempre. Serve anche il verso opposto:
+      **«salva come tasto rapido»** su un pasto appena inserito, che
+      trasforma un incollaggio in un tasto riusabile e riduce il lavoro
+      futuro invece di aggiungerne.
+- [ ] **Esercizi del programma: rinominare, cambiare serie e ripetizioni,
+      aggiungere, togliere, riordinare.** Quando il personal trainer cambia
+      la scheda, oggi l'unica strada è `db:seed`, che rifiuta di partire se
+      esistono serie registrate — e con `--forza-allenamento` le cancella. In
+      pratica: o perdi lo storico o tieni la scheda vecchia.
+- [ ] **Target giornalieri modificabili.** Stanno in `src/lib/targets.ts`:
+      cambiarli richiede un deploy. Il PT li cambia a ogni fase.
+- [ ] **Seduta: cambiare data e giornata.** Se apri "Day 1" invece di "Day 2"
+      puoi solo scartare e rifare; se ti dimentichi di registrare l'altroieri,
+      non puoi registrarlo a posteriori.
 
 ## 7. Cose che restano fuori, di proposito
 
