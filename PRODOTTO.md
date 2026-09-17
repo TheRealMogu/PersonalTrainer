@@ -58,10 +58,10 @@ proprio le schermate che vanno riviste.
 | Gesto quotidiano | Tetto | Oggi | Stato |
 |---|---|---|---|
 | Vedere quanto mi resta | 0 gesti (apro l'app) | 0 | ok |
-| Vedere cosa ho mangiato | 1 gesto | **3** (la lista sta sotto l'aggiunta) | **sopra il tetto** |
+| Vedere cosa ho mangiato | 1 gesto | 1 (*N pasti ↓* nella barra del giorno) | ok |
 | Aggiungere un cibo ricorrente | 1 gesto | 1 (i tasti rapidi aprono a vista) | ok |
 | Aggiungere lo stesso cibo in quantità diversa | 2 gesti | 2 | ok |
-| Registrare qualcosa che non è fra i tasti rapidi | 2 gesti | **3** (*Incolla da Claude* a 1,7 schermate) | **sopra il tetto** |
+| Registrare qualcosa che non è fra i tasti rapidi | 2 gesti | 2 (*Solo calorie*) oppure 3 (*Incolla da Claude*) | ok per il caso veloce |
 | Ripetere un pasto che fai sempre uguale | 1 gesto | — (non esiste) | **manca** |
 | Segnare un bicchiere d'acqua | 1 gesto | 1 (tasto + nella scheda in cima) | ok |
 | Salvare un pasto fra i tasti rapidi | 2 gesti | 2 (tocca la riga → salva) | ok |
@@ -99,6 +99,8 @@ proprio le schermate che vanno riviste.
 | Togliere un integratore dal diario | 3 gesti | 3 (elenco → riga → *Non lo prendo più*) | ok |
 | Registrare un pasto di cui sai solo le calorie | 2 gesti | 2 (*Solo calorie* → scrivi → *Aggiungi*) | ok |
 | Mandare una settimana sola al personal trainer | 2 gesti | 2 (Piano → *Pasti di questa settimana*) | ok |
+| Ripetere la colazione di tutti i giorni | 1 gesto | 1 (*Come ieri*, a 772 px quindi sopra la piega) | ok |
+| Trovare nei tasti rapidi quello che mangio adesso | 1 gesto | 1 (è già in cima: l'ordine segue l'ora) | ok |
 
 Le righe **sopra il tetto** sono misurate su una giornata vera (10 pasti
 registrati, schermo da 390 px). Le prime due righe dell'aggiunta sono
@@ -184,6 +186,17 @@ e va difesa a ogni aggiunta.
 - **Acqua** — bicchieri +/− nella scheda in cima al diario, con il totale in
   litri. Nessun macro, nessuna stima, nessuna scelta da fare: è un contatore.
   Il "meno" è l'annullamento, a un tocco di distanza.
+- **Come ieri** — sopra i tasti rapidi: ricopia in un tocco il pasto che hai
+  già fatto in questo momento della giornata. Dice quale giorno ricopia, cosa
+  contiene e quante calorie sono, quindi si decide prima di toccare. Si chiama
+  *Come ieri* solo quando è davvero ieri: se l'ultima colazione registrata è
+  di lunedì, dice *Come lunedì*.
+- **Tasti rapidi in ordine di ora** — alle otto in cima c'è la colazione, a
+  sera la cena. L'ordine viene da quello che hai già registrato, non da una
+  configurazione da compilare, e cambia da solo quando cambiano le abitudini.
+  Se ne mostrano sei: gli altri stanno dietro un tocco, perché la griglia da
+  dodici era alta 720 px e spingeva tutto il resto sotto.
+
 - **Solo calorie** — Aggiungi → *Solo calorie*: un campo, un numero, fatto.
   Per quando mangi fuori e scomporre il piatto non succederà mai. Le calorie
   entrano nell'anello, che resta esatto; i macro restano fuori dal conto, e

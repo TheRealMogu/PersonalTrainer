@@ -11,6 +11,7 @@ import {
   type MealPatch,
 } from "@/app/actions";
 import type { Meal, QuickFood } from "@/db/schema";
+import type { UltimaVolta, UsoPerMomento } from "@/lib/abitudini";
 import type { IntegratoreDelGiorno } from "@/lib/integratori";
 import type { MealSlot } from "@/lib/meal-slots";
 import {
@@ -21,6 +22,7 @@ import {
 } from "@/lib/nutrition";
 import type { MacroKey, Obiettivi } from "@/lib/targets";
 import { Acqua } from "./acqua";
+import { ComeUltimaVolta } from "./come-ultima-volta";
 import { Integratori } from "./integratori";
 import { SoloCalorie } from "./solo-calorie";
 import { Card } from "./card";
@@ -57,6 +59,9 @@ export function Diary({
   defaultSlot,
   acqua,
   integratori,
+  usi,
+  ultimaVolta,
+  ieri,
   obiettivi,
 }: {
   day: string;
@@ -65,6 +70,11 @@ export function Diary({
   defaultSlot: MealSlot;
   acqua: number;
   integratori: IntegratoreDelGiorno[];
+  /** Quello che hai gia' registrato negli ultimi mesi: decide l'ordine dei tasti. */
+  usi: UsoPerMomento[];
+  /** L'ultimo pasto fatto in questo momento della giornata, da ricopiare. */
+  ultimaVolta: UltimaVolta | null;
+  ieri: string;
   obiettivi: Obiettivi;
 }) {
   const router = useRouter();
@@ -255,7 +265,7 @@ export function Diary({
           scheda a parte l'avrebbe spinta sotto la piega, dove le cose non si
           guardano -- e una cosa che non si guarda non si segna.
         */}
-        <div className="mt-4 border-t border-hairline pt-4">
+        <div className="mt-3 border-t border-hairline pt-3">
           <Acqua
             day={day}
             bicchieri={acqua}
@@ -270,16 +280,33 @@ export function Diary({
           a chi non li prende questa scheda resta com'era.
         */}
         {integratori.length > 0 ? (
-          <div className="mt-4 border-t border-hairline pt-4">
+          <div className="mt-3 border-t border-hairline pt-3">
             <Integratori day={day} integratori={integratori} />
           </div>
         ) : null}
       </Card>
 
+      {/*
+        Ricopiare viene prima di ricomporre, e sta *sopra* il titolo
+        "Aggiungi" invece che dentro la scheda.
+        
+        Misurato: dentro la scheda cadeva a 842 px, cioe' due px sopra la
+        piega di un iPhone da 844 -- visibile sulla carta, invisibile davvero.
+        Il titolo e il suo margine erano 54 px, ed erano tutto quello che
+        mancava.
+      */}
+      <ComeUltimaVolta
+        ultima={ultimaVolta}
+        oggi={day}
+        ieri={ieri}
+        onAdd={handleAddMany}
+      />
+
       <Section title="Aggiungi">
         <Card>
           <QuickFoods
             foods={quickFoods}
+            usi={usi}
             defaultSlot={defaultSlot}
             totals={totals}
             targets={obiettivi.macro}
@@ -329,6 +356,7 @@ export function Diary({
         che ti resta no -- e quello resta in cima, nell'anello.
       */}
       <Section
+        id="pasti"
         title={
           optimisticMeals.length === 1
             ? "1 pasto"

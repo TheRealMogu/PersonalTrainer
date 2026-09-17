@@ -378,17 +378,33 @@ Ogni fase ha un bersaglio misurabile. Se una fase non abbassa il numero, non
   accorciando la griglia, che è la Fase 2. Fino ad allora le due righe
   restano segnate sopra il tetto in `PRODOTTO.md` invece di essere assolte.
 
-**Fase 2 — Ripetere invece di ricomporre.** *(1–2 giorni)*
-- «Come ieri» su un pasto: ricopia colazione/pranzo/cena di un giorno
-  precedente in un tocco.
-- I tasti rapidi si riordinano da soli per momento della giornata: alle 8 in
-  cima ci sono quelli della colazione, non i primi dodici in ordine di
-  inserimento. E se ne mostrano pochi, con il resto dietro a un tocco: è
-  anche l'unico modo di riportare sotto il tetto le due righe che la Fase 1
-  ha lasciato fuori, perché quei 720 px di griglia spingono giù tutto.
-- Bersaglio: **una colazione ricorrente in 1 gesto, una giornata tipo in 4**.
-- È la fase che sposta di più: chi mangia quasi sempre le stesse cose non
-  dovrebbe ricomporle da capo ogni mattina.
+**Fase 2 — Ripetere invece di ricomporre.** ✅ *fatta, e una previsione sbagliata*
+- «Come ieri» ricopia in un tocco il pasto già fatto in questo momento della
+  giornata. **Centrato**: 1 gesto, e il tasto finisce a 772 px, cioè sopra la
+  piega di uno schermo da 844.
+- I tasti rapidi si riordinano da soli per momento della giornata, da quello
+  che hai già registrato negli ultimi 90 giorni. Misurato: a cena in cima
+  c'è il pollo, a colazione l'avena. Se ne mostrano sei: **la griglia è
+  passata da 720 a 295 px**.
+- **La previsione sbagliata**: avevo scritto che accorciare la griglia
+  avrebbe riportato sotto il tetto le due righe lasciate fuori dalla Fase 1.
+  Misurato: la lista dei pasti è a 1535 px, cioè **quattro** gesti di
+  scorrimento — peggio dei tre di prima. I 425 px guadagnati sulla griglia se
+  li sono ripresi acqua, integratori, *Solo calorie* e *Come ieri*, tutta
+  roba aggiunta sopra la lista nel frattempo.
+- **Come è stato risolto davvero**: non accorciando ancora, ma con un salto.
+  La riga sotto la data diceva «Diario», che è informazione zero; adesso dice
+  *N pasti ↓* ed è un bersaglio che porta alla lista. Un gesto, zero pixel di
+  altezza in più. Scorrendo costa ancora quattro gesti, e resta scritto qui.
+- Restano due limiti, voluti:
+  - *Come ieri* propone solo il momento della giornata corrente. Ripetere il
+    pranzo alle otto di mattina non si può: si userebbe una volta su cento e
+    costerebbe un selettore in cima alla schermata più affollata dell'app.
+  - Su un giorno passato la barra mostra *Torna a oggi* invece del salto: lì
+    l'uscita conta di più, ma il problema dello scorrimento è lo stesso.
+- Bersaglio: **una colazione ricorrente in 1 gesto** — centrato.
+- La riga integratori è passata da 124 a 72 px, due per riga invece di uno:
+  era quello che spingeva *Aggiungi* sotto la piega.
 
 **Fase 3 — L'acqua.** ✅ *fatta*
 - Bicchieri +/− dentro la scheda del riepilogo, sotto i macro: niente macro,
