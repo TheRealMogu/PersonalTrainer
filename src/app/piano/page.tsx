@@ -87,6 +87,24 @@ export default async function PianoPage() {
         </Section>
       ))}
 
+      <Section title="La tua scheda">
+        <Card>
+          <p className="mb-4 text-[15px] leading-snug text-muted">
+            Quando il personal trainer ne manda una nuova: copi un prompt, lo
+            mandi a una chat con i suoi documenti, riporti indietro la risposta
+            e <strong className="font-medium">guardi cosa cambia</strong> prima
+            di confermare. Niente viene cancellato — quello che esce dal
+            programma resta leggibile con tutti i carichi registrati sopra.
+          </p>
+          <Link
+            href="/scheda"
+            className="flex min-h-12 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
+          >
+            Cambia la scheda
+          </Link>
+        </Card>
+      </Section>
+
       <Section title="I tuoi integratori">
         <Card>
           <p className="mb-4 text-[15px] leading-snug text-muted">

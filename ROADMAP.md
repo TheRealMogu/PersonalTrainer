@@ -145,10 +145,12 @@ Nessuna è bloccante, tutte sono state pesate col metro dei gesti.
       l'app non li traccia: oggi le regole stanno nel Piano come testo.
 - [ ] **Peso corporeo** con andamento nel tempo. Un numero al giorno,
       due tocchi.
-- [ ] **Aggiungere un cibo ai tasti rapidi dall'app**, senza passare dal
-      file di seed e da un comando.
-- [ ] **Duplicare un giorno.** "Oggi ho mangiato come ieri" è comune e oggi
-      costa un pasto alla volta.
+- [x] **Aggiungere un cibo ai tasti rapidi dall'app**, senza passare dal
+      file di seed e da un comando. Fatto: *Piano → I tuoi alimenti*, e ogni
+      pasto si salva fra i rapidi con un tocco.
+- [~] **Duplicare un giorno.** Mezzo fatto: *Come ieri* ricopia un pasto
+      intero in un tocco, ma un momento della giornata alla volta e solo
+      quello in cui sei. Copiare l'intera giornata resta da fare.
 - [x] **Diario più denso e più vivo.** Fatto: le tre barre a tutta larghezza
       sono diventate tre riquadri affiancati, in cima c'è la striscia degli
       ultimi sette giorni (tocchi un giorno e ci vai), toccando un macro si
@@ -513,14 +515,15 @@ che **cancella a cascata lo storico di allenamento**.
       riusabile. L'archivio cresce mangiando, non scaricando — ed è per
       questo che un archivio esterno resta una comodità e non una
       dipendenza.
-- [ ] **Esercizi del programma: rinominare, cambiare serie e ripetizioni,
-      aggiungere, togliere, riordinare.** Quando il personal trainer cambia
-      la scheda, oggi l'unica strada è `db:seed`, che rifiuta di partire se
-      esistono serie registrate — e con `--forza-allenamento` le cancella. In
-      pratica: o perdi lo storico o tieni la scheda vecchia.
-- [ ] **Target giornalieri modificabili.** Stanno in `src/lib/targets.ts`:
-      cambiarli richiede un deploy. Il PT li cambia a ogni fase. Il disegno
-      per esteso è nella sezione 6-quinquies.
+- [x] **Esercizi del programma: cambiare serie e ripetizioni, aggiungere,
+      togliere, riordinare.** Fatto da *Piano → Cambia la scheda*, incollando
+      la scheda nuova. Resta fuori **rinominare**: un nome diverso viene letto
+      come "esercizio vecchio fuori, nuovo dentro", quindi la progressione
+      riparte da zero. È voluto finché non c'è modo di dire "questo è lo
+      stesso esercizio con un altro nome" — indovinarlo sarebbe peggio.
+- [x] **Target giornalieri modificabili.** Fatto: tabella `targets` e
+      schermata *Piano → Cambia gli obiettivi*. Resta aperto il `valido_da`,
+      descritto in 6-septies.
 - [ ] **Seduta: cambiare data e giornata.** Se apri "Day 1" invece di "Day 2"
       puoi solo scartare e rifare; se ti dimentichi di registrare l'altroieri,
       non puoi registrarlo a posteriori.
@@ -600,16 +603,32 @@ deve costare niente al gesto quotidiano.
 Il pezzo grosso è il punto 3 (il confronto) e il punto 5 (l'undo del cambio).
 Ma due cose si possono fare subito e valgono da sole:
 
-- [ ] **Target giornalieri modificabili.** Stanno in `src/lib/targets.ts`:
-      oggi cambiarli richiede un deploy, e il PT li cambia a ogni fase. Una
-      tabella `targets` con una riga, un campo per macro, e la schermata in
-      Piano. È il pezzo più piccolo di tutto questo e sblocca metà del
-      problema da solo.
-- [ ] **`archiviato_il` sugli esercizi**, con le letture aggiornate. Senza
-      questa colonna nessun cambio scheda è sicuro; con questa, anche il
-      `db:seed` può smettere di cancellare.
-- [ ] **Prompt + incolla + confronto + applica in transazione.**
-- [ ] **Undo del cambio scheda**, con la fotografia del prima.
+- [x] **Target giornalieri modificabili.** Fatto, e ha richiesto più della
+      mezza giornata stimata: la tabella è la parte breve, filare i target
+      attraverso undici punti è il resto.
+- [x] **`archiviato_il` sugli esercizi** (e sulle giornate, che avevano lo
+      stesso problema con le sedute). Fatto: la scheda e la seduta mostrano
+      solo i non archiviati, lo storico e il dettaglio di una seduta passata
+      li mostrano tutti. Il `db:seed` ha smesso di cancellare: archivia.
+- [x] **Prompt + incolla + confronto + applica in transazione.** Fatto:
+      *Piano → Cambia la scheda*. Il prompt si porta dietro la scheda di
+      adesso e dice di tenere gli stessi nomi, perché un nome riscritto
+      diverso spezzerebbe in due la progressione dei carichi. Il confronto dei
+      nomi ignora maiuscole e accenti per la stessa ragione.
+
+      Sulla transazione c'era un ostacolo vero: `neon-http` **non ha**
+      `db.transaction()` (lancia), ha `db.batch()`; `node-postgres`, quello
+      con cui si prova in locale, ha l'opposto. Senza un adattatore la prova
+      locale non avrebbe detto niente su quello che succede in produzione.
+      Sta in `src/db/transazione.ts`, e le istruzioni si costruiscono
+      sull'esecutore che arriva come argomento — costruirle fuori le farebbe
+      finire su un'altra connessione del pool, fuori dalla transazione, senza
+      dire niente.
+- [x] **Undo del cambio scheda**, con la fotografia del prima. Fatto:
+      un'azione sola che rimette tutto com'era, archiviati compresi. Gli
+      esercizi nati dal cambio si tolgono (sono di pochi secondi prima e non
+      hanno serie sopra), tutti gli altri tornano ai valori della fotografia.
+      Le serie registrate non si toccano in nessuna delle due direzioni.
 
 ### Come si misura che è andata bene
 
@@ -726,7 +745,7 @@ per aprirla.
 | **Acqua** (bicchieri al giorno) | database | ✅ | ✅ (il "meno") | ✅ (il "meno") |
 | **Obiettivo acqua** | database (`targets`) | ✅ | ✅ | — (c'è sempre) |
 | **Target kcal e macro** | database (`targets`) | ✅ | ✅ | — (c'è sempre) |
-| **Allenamento** (giornate ed esercizi) | database, ma solo dal seed | ❌ | ❌ | ❌ |
+| **Allenamento** (giornate ed esercizi) | database | ✅ incollando | ✅ | ✅ archivia, con annulla |
 | **Vitamine e integratori** | database (`supplements`) | ✅ | ✅ | ✅ dal diario, con annulla |
 
 ### Le vitamine: cosa sono, qui dentro
@@ -787,10 +806,11 @@ giornate, l'ultima è la più grossa di tutta la roadmap.
       singola scheda, è la somma: giorno, striscia, anello, tre riquadri,
       acqua, integratori. Da guardare quando si sa su che telefono gira
       davvero — se è un 844, non c'è niente da riparare.
-- [ ] **Allenamento modificabile.** La più cara, e ha un nodo vero descritto
-      in 6-quinquies: `ON DELETE CASCADE` fra serie ed esercizi, quindi
-      cambiare la scheda cancella i carichi. Prima serve `archiviato_il`, poi
-      tutto il resto diventa possibile.
+- [x] **Allenamento modificabile.** Fatto, e il nodo era davvero quello
+      previsto: `ON DELETE CASCADE` fra serie ed esercizi. Risolto con
+      `archiviato_il` invece che con una pulizia fatta bene — uno schema in
+      cui la sporcizia non può nascere, perché nessuna riga viene riscritta o
+      buttata.
 
 ### La regola che vale per tutte
 

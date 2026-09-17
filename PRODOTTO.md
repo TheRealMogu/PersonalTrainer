@@ -101,6 +101,9 @@ proprio le schermate che vanno riviste.
 | Mandare una settimana sola al personal trainer | 2 gesti | 2 (Piano → *Pasti di questa settimana*) | ok |
 | Ripetere la colazione di tutti i giorni | 1 gesto | 1 (*Come ieri*, a 772 px quindi sopra la piega) | ok |
 | Trovare nei tasti rapidi quello che mangio adesso | 1 gesto | 1 (è già in cima: l'ordine segue l'ora) | ok |
+| Caricare la scheda nuova del personal trainer | 4 gesti | 4 (Piano → *Cambia la scheda* → copia → incolla → guarda → applica) | **sopra il tetto, e va bene** |
+| Rimediare a una scheda caricata sbagliata | 1 gesto | 1 (Annulla) | ok |
+| Rileggere i carichi di un esercizio che non faccio più | 1 gesto | 1 (è ancora nello storico) | ok |
 
 Le righe **sopra il tetto** sono misurate su una giornata vera (10 pasti
 registrati, schermo da 390 px). Le prime due righe dell'aggiunta sono
@@ -186,6 +189,14 @@ e va difesa a ogni aggiunta.
 - **Acqua** — bicchieri +/− nella scheda in cima al diario, con il totale in
   litri. Nessun macro, nessuna stima, nessuna scelta da fare: è un contatore.
   Il "meno" è l'annullamento, a un tocco di distanza.
+- **Cambia la scheda** — Piano → *Cambia la scheda*: quando il personal
+  trainer ne manda una nuova, copi un prompt, lo mandi a una chat con i suoi
+  documenti, riporti indietro la risposta e **vedi cosa cambia prima di
+  confermare** — cosa esce, cosa cambia, cosa è nuovo, e quante serie hai
+  registrato su quello che esce. Niente viene cancellato: quello che esce dal
+  programma si archivia e resta leggibile nello storico e nelle sedute già
+  fatte. Si applica tutto insieme o niente, e si annulla in un tocco.
+
 - **Come ieri** — sopra i tasti rapidi: ricopia in un tocco il pasto che hai
   già fatto in questo momento della giornata. Dice quale giorno ricopia, cosa
   contiene e quante calorie sono, quindi si decide prima di toccare. Si chiama
@@ -244,6 +255,12 @@ e va difesa a ogni aggiunta.
   nessuna chiamata a pagamento e niente da configurare, e la lettura funziona
   anche senza rete. Quello che si incolla è una proposta: si tolgono le righe
   che non tornano, si correggono i numeri, e solo allora si salva.
+
+Una riga di quella tabella sfora il tetto **di proposito**: caricare una
+scheda nuova costa quattro gesti, e non si prova ad abbassarli. Capita ogni
+qualche mese, e ognuno di quei passaggi serve a non perdere mesi di carichi
+per un incolla andato storto. Il tetto dei gesti vale per quello che fai
+tutti i giorni; per quello che fai tre volte l'anno vale l'opposto.
 
 ## Cosa resta fuori, di proposito
 

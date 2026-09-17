@@ -76,8 +76,11 @@ Costate tempo una volta. Non ripaghiamole.
 - **`dotenv/config` carica `.env`, non `.env.local`.** Gli script usano
   `scripts/load-env.ts`, che prova entrambi. Next invece `.env.local` lo
   legge da solo.
-- **Il seed cancella a cascata lo storico di allenamento.** Si rifiuta di
-  partire se esistono serie registrate; `--forza-allenamento` per forzare.
+- **`ON DELETE CASCADE` fra serie ed esercizi**: cancellare un esercizio si
+  porta via tutte le serie registrate su di lui. Per questo esiste
+  `workout_exercises.archiviato_il` (e la stessa colonna sulle giornate): quel
+  che esce dal programma si archivia, non si cancella. Il seed adesso archivia;
+  il cambio scheda vero passa da *Piano → Cambia la scheda*.
 - **Capacitor 8 usa Swift Package Manager**: c'è un `.xcodeproj`, non un
   `.xcworkspace`, e lo schema non è condiviso. Il workflow ripiega sul
   target.

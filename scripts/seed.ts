@@ -1,6 +1,6 @@
 import "./load-env";
 import { neon } from "@neondatabase/serverless";
-import { sql } from "drizzle-orm";
+import { isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { quickFoods, workoutDays, workoutExercises, workoutSets } from "../src/db/schema";
 import { QUICK_FOODS_SEED, WORKOUT_SEED } from "../src/lib/seed-data";
@@ -21,35 +21,44 @@ async function main() {
   );
 
   /*
-   * Le serie registrate puntano agli esercizi con ON DELETE CASCADE: rifare
-   * il programma cancellerebbe tutto lo storico dei carichi. Meglio fermarsi
-   * e dirlo che perdere mesi di allenamenti in silenzio.
+   * Le serie registrate puntano agli esercizi con ON DELETE CASCADE, quindi
+   * una volta rifare il programma voleva dire cancellare lo storico dei
+   * carichi, e questo script poteva solo fermarsi e dirlo.
+   *
+   * Adesso c'e' `archiviato_il`: quello che esce dal programma si archivia
+   * invece di sparire, e le serie restano attaccate dove sono. Il seed non
+   * cancella piu' niente -- si limita a mettere da parte il vecchio.
+   *
+   * Per cambiare scheda sul serio c'e' *Piano -> Cambia la scheda*, che fa
+   * vedere cosa cambia prima di toccare qualcosa. Questo script resta per
+   * partire da zero.
    */
   const [{ count: loggedSets }] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(workoutSets);
 
-  const forza = process.argv.includes("--forza-allenamento");
-
-  if (loggedSets > 0 && !forza) {
-    console.log(
-      `\nTrovate ${loggedSets} serie gia' registrate: lascio il programma com'e'.`,
-    );
-    console.log(
-      "Rifarlo cancellerebbe lo storico dei carichi. Per forzare comunque:",
-    );
-    console.log("  npm run db:seed -- --forza-allenamento\n");
-    console.log("Seed completato (solo tasti rapidi).");
-    return;
-  }
-
   if (loggedSets > 0) {
-    console.log(`Forzato: cancello ${loggedSets} serie registrate.`);
+    console.log(
+      `\nTrovate ${loggedSets} serie gia' registrate: restano tutte dove sono.`,
+    );
+    console.log(
+      "Il programma di prima viene archiviato, non cancellato: lo storico si legge ancora.",
+    );
+    console.log(
+      "Per un cambio scheda vero, con il confronto prima: Piano -> Cambia la scheda.\n",
+    );
   }
 
   console.log(`Inserisco ${WORKOUT_SEED.length} giornate di allenamento…`);
-  await db.delete(workoutExercises);
-  await db.delete(workoutDays);
+  const adesso = new Date();
+  await db
+    .update(workoutExercises)
+    .set({ archiviatoIl: adesso })
+    .where(isNull(workoutExercises.archiviatoIl));
+  await db
+    .update(workoutDays)
+    .set({ archiviatoIl: adesso })
+    .where(isNull(workoutDays.archiviatoIl));
   for (const [dayIndex, day] of WORKOUT_SEED.entries()) {
     const [inserted] = await db
       .insert(workoutDays)
