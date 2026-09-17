@@ -58,10 +58,10 @@ proprio le schermate che vanno riviste.
 | Gesto quotidiano | Tetto | Oggi | Stato |
 |---|---|---|---|
 | Vedere quanto mi resta | 0 gesti (apro l'app) | 0 | ok |
-| Vedere cosa ho mangiato | 1 gesto | 0 | ok |
-| Aggiungere un cibo ricorrente | 1 gesto | **5** (4 di scorrimento + 1 tocco) | **da rivedere** |
-| Aggiungere lo stesso cibo in quantità diversa | 2 gesti | **6** | **da rivedere** |
-| Registrare qualcosa che non è fra i tasti rapidi | 2 gesti | **7** (*Incolla da Claude* sta a 2,8 schermate) | **da rivedere** |
+| Vedere cosa ho mangiato | 1 gesto | **3** (la lista sta sotto l'aggiunta) | **sopra il tetto** |
+| Aggiungere un cibo ricorrente | 1 gesto | 1 (i tasti rapidi aprono a vista) | ok |
+| Aggiungere lo stesso cibo in quantità diversa | 2 gesti | 2 | ok |
+| Registrare qualcosa che non è fra i tasti rapidi | 2 gesti | **3** (*Incolla da Claude* a 1,7 schermate) | **sopra il tetto** |
 | Ripetere un pasto che fai sempre uguale | 1 gesto | — (non esiste) | **manca** |
 | Segnare un bicchiere d'acqua | 1 gesto | — (non esiste) | **manca** |
 | Correggere un pasto già inserito | 2 gesti | 2 (tocca la riga → quantità) | ok |
@@ -87,9 +87,18 @@ proprio le schermate che vanno riviste.
 | Sapere da dove arriva un macro | 1 gesto | 1 (tocca il riquadro) | ok |
 | Sapere cosa ci sta nel margine di un macro | 1 gesto | 1 (stesso foglio) | ok |
 
-Le righe marcate **da rivedere** sono misurate su una giornata vera (10 pasti
-registrati, schermo da 390 px) il 17 settembre 2026. Il piano per riportarle
-sotto il tetto è la sezione 6-ter di [ROADMAP.md](ROADMAP.md).
+Le righe **sopra il tetto** sono misurate su una giornata vera (10 pasti
+registrati, schermo da 390 px). Le prime due righe dell'aggiunta sono
+rientrate con le fasi 0 e 1; le altre due restano fuori per la stessa
+ragione, ed è una sola: **la griglia dei dodici tasti rapidi è alta 720 px**
+e spinge in basso tutto quello che le sta sotto. La cura è la Fase 2 —
+riordinarli per momento della giornata e mostrarne meno — non un altro
+spostamento di sezioni. Il piano è la sezione 6-ter di
+[ROADMAP.md](ROADMAP.md).
+
+Il costo di «vedere cosa ho mangiato» era previsto in 1 gesto e misurato in
+3: la previsione era sbagliata, e sta scritta così invece di alzare il tetto
+per farla tornare.
 
 Due regole che valgono sempre:
 

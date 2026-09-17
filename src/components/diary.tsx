@@ -206,12 +206,6 @@ export function Diary({
         </div>
       </Card>
 
-      <Section title={optimisticMeals.length === 1 ? "1 pasto" : `${optimisticMeals.length} pasti`}>
-        <Card>
-          <MealList meals={optimisticMeals} onEdit={setEditing} onDelete={handleDelete} />
-        </Card>
-      </Section>
-
       <Section title="Aggiungi">
         <Card>
           <QuickFoods
@@ -240,6 +234,27 @@ export function Diary({
             <IncollaPasto defaultSlot={defaultSlot} foods={quickFoods} onAdd={handleAddMany} />
             <ManualMealForm defaultSlot={defaultSlot} onAdd={handleAdd} />
           </div>
+        </Card>
+      </Section>
+
+      {/*
+        La lista di quello che hai gia' mangiato sta SOTTO i modi per
+        aggiungere, e non sopra come prima.
+
+        Misurato su una giornata vera da dieci pasti: il primo tasto rapido
+        stava a 1626 px, cioe' 882 px di scorrimento -- quasi due schermate
+        di pollice. E peggiorava da solo: piu' registravi durante la
+        giornata, piu' la lista cresceva e piu' lontano finiva il tasto per
+        registrare. La cena, che segni quando sei piu' stanco, era quella che
+        costava di piu'.
+
+        Il prezzo e' che "vedere cosa ho mangiato" passa da 0 gesti a 1. Si
+        paga volentieri: quello che hai gia' mangiato te lo ricordi, quello
+        che ti resta no -- e quello resta in cima, nell'anello.
+      */}
+      <Section title={optimisticMeals.length === 1 ? "1 pasto" : `${optimisticMeals.length} pasti`}>
+        <Card>
+          <MealList meals={optimisticMeals} onEdit={setEditing} onDelete={handleDelete} />
         </Card>
       </Section>
 

@@ -326,25 +326,34 @@ le altre quattro, e quella che c'è è sepolta a 2,8 schermate.
 Ogni fase ha un bersaglio misurabile. Se una fase non abbassa il numero, non
 è servita e si torna indietro.
 
-**Fase 0 — Togliere quello che respinge.** *(mezza giornata)*
+**Fase 0 — Togliere quello che respinge.** ✅ *fatta*
 - Via la scritta rossa "sfora" dai tasti rapidi. Resta la riga «cosa mi entra
-  ancora», detta una volta.
-- Bersaglio: zero segnali di colpa sulla schermata di aggiunta.
-- È la prima perché non aggiunge niente da imparare e cambia come ci si sente
-  ad aprire l'app.
+  ancora», detta una volta e in positivo, che filtra anche.
+- Bersaglio: zero segnali di colpa sulla schermata di aggiunta. **Centrato**:
+  misurato il colore calcolato di ogni testo dentro la sezione *Aggiungi*, a
+  quattro larghezze e in entrambi i temi — nessun rosso.
 
-**Fase 1 — Mettere l'aggiunta dove si guarda.** *(mezza giornata)*
+**Fase 1 — Mettere l'aggiunta dove si guarda.** ✅ *fatta, con un conto da saldare*
 - *Aggiungi* subito sotto l'anello; la lista dei pasti sotto.
-- Costa il gesto «vedere cosa ho mangiato», che passa da 0 a 1: accettato,
-  perché quello che hai già mangiato lo ricordi, quello che ti resta no.
 - Bersaglio: **da 882 px di scorrimento a 0** per il primo tasto rapido.
+  **Centrato** a 320, 390 e 430 px.
+- **Il prezzo è più alto del previsto.** Avevo scritto che «vedere cosa ho
+  mangiato» sarebbe passato da 0 a 1 gesto: misurato, costa **3**. La lista
+  dei pasti comincia a 1590 px perché la griglia dei dodici tasti rapidi è
+  alta 720 px da sola. Stessa ragione per cui *Incolla da Claude* resta a 3
+  gesti invece di 2.
+- Non si aggiusta con un altro spostamento di sezioni: si aggiusta
+  accorciando la griglia, che è la Fase 2. Fino ad allora le due righe
+  restano segnate sopra il tetto in `PRODOTTO.md` invece di essere assolte.
 
 **Fase 2 — Ripetere invece di ricomporre.** *(1–2 giorni)*
 - «Come ieri» su un pasto: ricopia colazione/pranzo/cena di un giorno
   precedente in un tocco.
 - I tasti rapidi si riordinano da soli per momento della giornata: alle 8 in
   cima ci sono quelli della colazione, non i primi dodici in ordine di
-  inserimento.
+  inserimento. E se ne mostrano pochi, con il resto dietro a un tocco: è
+  anche l'unico modo di riportare sotto il tetto le due righe che la Fase 1
+  ha lasciato fuori, perché quei 720 px di griglia spingono giù tutto.
 - Bersaglio: **una colazione ricorrente in 1 gesto, una giornata tipo in 4**.
 - È la fase che sposta di più: chi mangia quasi sempre le stesse cose non
   dovrebbe ricomporle da capo ogni mattina.
