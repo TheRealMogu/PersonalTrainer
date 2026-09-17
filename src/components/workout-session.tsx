@@ -301,7 +301,7 @@ export function WorkoutSession({
         <button
           type="button"
           onClick={handleEnd}
-          className="min-h-11 shrink-0 rounded-full bg-accent px-5 text-[15px] font-semibold text-on-accent active:opacity-80"
+          className="min-h-11 shrink-0 rounded-full bg-accent px-5 text-[15px] font-semibold text-on-accent tocco active:opacity-80"
         >
           Fine
         </button>
@@ -321,7 +321,7 @@ export function WorkoutSession({
           <button
             type="button"
             onClick={() => void svuota()}
-            className="mt-3 min-h-11 w-full rounded-xl border border-hairline bg-surface text-[15px] font-medium text-accent active:opacity-70"
+            className="mt-3 min-h-11 w-full rounded-xl border border-hairline bg-surface text-[15px] font-medium text-accent tocco active:opacity-70"
           >
             Prova adesso
           </button>
@@ -356,7 +356,7 @@ export function WorkoutSession({
         <button
           type="button"
           onClick={handleDiscard}
-          className="min-h-11 rounded-xl px-4 text-[13px] font-medium text-muted active:bg-raised"
+          className="min-h-11 rounded-xl px-4 text-[13px] font-medium text-muted tocco active:bg-raised"
         >
           Scarta questo allenamento
         </button>

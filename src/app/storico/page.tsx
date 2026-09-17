@@ -6,10 +6,12 @@ import { MacroHistoryChart, MacroHistoryTable } from "@/components/macro-history
 import { MacroStatTile } from "@/components/macro-stat-tile";
 import { PageHeader } from "@/components/page-header";
 import { RangeFilter } from "@/components/range-filter";
+import { RiepilogoSettimana } from "@/components/riepilogo-settimana";
 import { Section } from "@/components/section";
-import { todayIso } from "@/lib/date";
+import { lunediDellaSettimana, shiftIsoDate, todayIso } from "@/lib/date";
 import { buildDateRange, buildHistoryStats, fillMissingDays } from "@/lib/history";
-import { getDailyTotals, getExerciseProgress } from "@/lib/queries";
+import { getDailyTotals, getExerciseProgress, getSessionsInRange } from "@/lib/queries";
+import { costruisciRiepilogo } from "@/lib/riepilogo";
 import { MACRO_LABELS, MACRO_ORDER } from "@/lib/targets";
 
 export const dynamic = "force-dynamic";
@@ -32,12 +34,22 @@ export default async function StoricoPage({
 
   const today = todayIso();
   const dates = buildDateRange(today, range);
+
+  // La settimana del riepilogo non e' l'intervallo del filtro: quella va da
+  // lunedi' a domenica e non si muove quando passi da 7 a 30 giorni.
+  const lunedi = lunediDellaSettimana(today);
+  const domenica = shiftIsoDate(lunedi, 6);
+
   let rows: Awaited<ReturnType<typeof getDailyTotals>>;
   let exerciseProgress: Awaited<ReturnType<typeof getExerciseProgress>>;
+  let settimana: Awaited<ReturnType<typeof getDailyTotals>>;
+  let sedute: Awaited<ReturnType<typeof getSessionsInRange>>;
   try {
-    [rows, exerciseProgress] = await Promise.all([
+    [rows, exerciseProgress, settimana, sedute] = await Promise.all([
       getDailyTotals(dates[0], today),
       getExerciseProgress(),
+      getDailyTotals(lunedi, domenica),
+      getSessionsInRange(lunedi, domenica),
     ]);
   } catch (error) {
     console.error("[storico] lettura dei dati fallita:", error);
@@ -51,10 +63,22 @@ export default async function StoricoPage({
 
   const days = fillMissingDays(rows, dates);
   const stats = buildHistoryStats(days, today);
+  const riepilogo = costruisciRiepilogo(settimana, sedute, today, today);
 
   return (
     <main>
       <PageHeader title="Storico" subtitle={`Ultimi ${range} giorni`} />
+
+      {/*
+        Il riepilogo sta in cima e fuori dal filtro: e' la domanda che ci si
+        fa la domenica sera ("com'e' andata la settimana"), e non cambia
+        risposta se sotto si guardano trenta giorni invece di sette.
+      */}
+      <Section title="Questa settimana">
+        <Card>
+          <RiepilogoSettimana riepilogo={riepilogo} />
+        </Card>
+      </Section>
 
       <RangeFilter active={range} />
 
@@ -68,7 +92,7 @@ export default async function StoricoPage({
             </p>
             <Link
               href="/"
-              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl border border-hairline px-5 text-[15px] font-medium text-accent active:bg-raised"
+              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl border border-hairline px-5 text-[15px] font-medium text-accent tocco active:bg-raised"
             >
               Vai al diario
             </Link>

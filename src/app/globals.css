@@ -39,6 +39,83 @@
   --color-overlay: #2c2c2e;
   --color-on-overlay: #ffffff;
   --color-overlay-track: #4a4a4d;
+
+  /*
+   * Il movimento, tutto deciso qui.
+   *
+   * Una curva sola per tutta l'app. Non e' una scelta di gusto: quando ogni
+   * pannello entra con la sua velocita', l'app sembra fatta di pezzi
+   * diversi, e ogni volta bisogna rifare l'abitudine a quanto ci mette una
+   * cosa ad arrivare.
+   *
+   * La curva parte veloce e si posa piano -- e' quella dei fogli di iOS. Il
+   * contrario dell'andatura costante: un movimento lineare, sullo schermo,
+   * si legge come meccanico perche' nessun oggetto vero parte e si ferma di
+   * colpo.
+   *
+   * Le durate stanno sotto il mezzo secondo: oltre, il movimento smette di
+   * essere un riscontro e diventa un'attesa.
+   */
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --animate-foglio: foglio 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-velo: velo 0.28s ease-out;
+  --animate-barra: barra 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-comparsa: comparsa 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Il foglio sale dal bordo inferiore, come una modale di sistema. */
+@keyframes foglio {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Il velo dietro al foglio: solo opacita', niente movimento. */
+@keyframes velo {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Le barre in fondo (annulla, recupero) arrivano da sotto di poco. */
+@keyframes barra {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+ * L'entrata di una schermata: solo dissolvenza, nessuno spostamento.
+ *
+ * Il movimento verticale c'era, ed e' stato tolto dopo averlo misurato: un
+ * elemento animato in `transform` diventa il riferimento dei figli in
+ * `position: fixed`. Il guscio che avvolge la pagina contiene i fogli e le
+ * barre di annullamento, e per i 280 ms dell'entrata un `fixed inset-0` li'
+ * dentro misurava 404px invece degli 844 della finestra -- cioe' una barra
+ * "in fondo allo schermo" finiva in fondo alla pagina, fuori dalla vista.
+ *
+ * L'opacita' non ha questo effetto. La dissolvenza da sola basta a far
+ * capire che la schermata e' cambiata.
+ */
+@keyframes comparsa {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /*
@@ -98,6 +175,36 @@ textarea {
   font-size: 16px;
 }
 
+/*
+ * La risposta al tocco, uguale ovunque.
+ *
+ * Si abbassa subito (80 ms) e risale piano (260 ms): e' il modo in cui si
+ * comporta un tasto vero, e la differenza fra le due durate e' quello che si
+ * sente come "solido". Con la stessa durata nei due versi sembra elastico.
+ *
+ * `.tocco` da solo smorza; `.tocco-riquadro` smorza e rimpicciolisce, e va
+ * sui riquadri -- tasti rapidi, mattonelle dei macro, giorni della striscia.
+ * Sui pulsanti a tutta larghezza il rimpicciolimento si vede troppo: li' si
+ * smorza soltanto.
+ */
+.tocco,
+.tocco-riquadro {
+  transition:
+    transform 260ms var(--ease-ios),
+    opacity 260ms var(--ease-ios),
+    background-color 260ms var(--ease-ios),
+    border-color 260ms var(--ease-ios);
+}
+
+.tocco:active,
+.tocco-riquadro:active {
+  transition-duration: 80ms;
+}
+
+.tocco-riquadro:active {
+  transform: scale(0.97);
+}
+
 /* Chi ha chiesto meno animazioni non deve vedere barre e anelli muoversi. */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -105,5 +212,14 @@ textarea {
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /*
+   * Azzerare la durata non basta per il rimpicciolimento al tocco: senza
+   * transizione lo scatto diventa istantaneo, che e' esattamente il salto
+   * che chi ha chiesto meno movimento non vuole vedere.
+   */
+  .tocco-riquadro:active {
+    transform: none;
   }
 }

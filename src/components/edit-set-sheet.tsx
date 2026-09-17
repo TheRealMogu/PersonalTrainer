@@ -45,14 +45,14 @@ export function EditSetSheet({
         type="button"
         aria-label="Chiudi"
         onClick={onClose}
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0 animate-velo bg-black/40"
       />
 
       <div
         role="dialog"
         aria-modal="true"
         aria-label={`Modifica serie ${set.setNumber} di ${exerciseName}`}
-        className="relative mx-auto w-full max-w-md rounded-t-3xl bg-surface px-5 pt-5"
+        className="relative animate-foglio mx-auto w-full max-w-md rounded-t-3xl bg-surface px-5 pt-5"
         style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
       >
         <header className="mb-4">
@@ -99,7 +99,7 @@ export function EditSetSheet({
             type="button"
             disabled={!valid}
             onClick={() => onConfirm(peso, ripetizioni)}
-            className="min-h-12 flex-1 rounded-xl bg-accent text-[15px] font-semibold text-on-accent active:opacity-80 disabled:opacity-40"
+            className="min-h-12 flex-1 rounded-xl bg-accent text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
           >
             Salva
           </button>

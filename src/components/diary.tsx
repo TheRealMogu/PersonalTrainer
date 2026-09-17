@@ -15,6 +15,7 @@ import { buildProgress, sumMacros } from "@/lib/nutrition";
 import type { MacroKey } from "@/lib/targets";
 import { Card } from "./card";
 import { CalorieRing } from "./calorie-ring";
+import { IncollaPasto } from "./incolla-pasto";
 import { EditMealSheet } from "./edit-meal-sheet";
 import { MacroSheet } from "./macro-sheet";
 import { MacroTile } from "./macro-tile";
@@ -92,6 +93,32 @@ export function Diary({
         setError(result.error);
         return;
       }
+      router.refresh();
+    });
+  }
+
+  /**
+   * Piu' alimenti in una transizione sola.
+   *
+   * Chiamare `handleAdd` in ciclo funzionerebbe, ma aprirebbe una transizione
+   * e un `router.refresh()` per ogni riga: su rete lenta il riepilogo
+   * rimbalzerebbe avanti e indietro mentre le risposte tornano in ordine
+   * sparso. Qui il riepilogo si muove una volta e si assesta una volta.
+   */
+  function handleAddMany(inputs: Omit<MealInput, "day">[]) {
+    if (inputs.length === 0) return;
+    setError(null);
+    startTransition(async () => {
+      for (const input of inputs) {
+        applyOptimistic({
+          type: "add",
+          meal: { id: tempId.current--, day, createdAt: new Date(), ...input },
+        });
+      }
+
+      const esiti = await Promise.all(inputs.map((input) => addMeal({ day, ...input })));
+      const fallito = esiti.find((esito) => !esito.ok);
+      if (fallito && !fallito.ok) setError(fallito.error);
       router.refresh();
     });
   }
@@ -203,7 +230,14 @@ export function Diary({
               })
             }
           />
-          <div className="mt-4 border-t border-hairline pt-4">
+          <div className="mt-4 space-y-2 border-t border-hairline pt-4">
+            {/*
+              Prima la via che passa da Claude, poi quella a mano: quando il
+              prodotto cambia o si mangia fuori, incollare una risposta costa
+              due tocchi, compilare cinque campi per ogni alimento ne costa
+              dodici.
+            */}
+            <IncollaPasto defaultSlot={defaultSlot} foods={quickFoods} onAdd={handleAddMany} />
             <ManualMealForm defaultSlot={defaultSlot} onAdd={handleAdd} />
           </div>
         </Card>

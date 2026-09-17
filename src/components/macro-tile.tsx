@@ -40,7 +40,7 @@ export function MacroTile({
           ? `${MACRO_LABELS[key]}: oltre il target di ${formatMacro(over, key)} ${unit}. Tocca per il dettaglio.`
           : `${MACRO_LABELS[key]}: restano ${formatMacro(remaining, key)} ${unit} su ${target}. Tocca per il dettaglio.`
       }
-      className="flex min-h-11 flex-col rounded-xl border border-hairline bg-raised px-2 py-2.5 text-left transition active:scale-[0.97] active:bg-surface"
+      className="flex min-h-11 flex-col rounded-xl border border-hairline bg-raised px-2 py-2.5 text-left tocco-riquadro active:bg-surface"
     >
       {/*
         Il pallino sta accanto al numero e non all'etichetta: a tre colonne

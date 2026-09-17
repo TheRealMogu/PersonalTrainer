@@ -28,6 +28,19 @@ fermava se mancava una variabile d'ambiente, e quando il database era
 indietro con le migration l'app rispondeva con un codice numerico e basta.
 Adesso dice cosa fare.
 
+**Il diario alimentare non viene usato.** È il problema più grave che abbia
+l'app, ed è stato detto a voce prima che i numeri lo confermassero: aggiungere
+un cibo costa 882 px di scorrimento su una giornata piena, e a fine giornata 7
+tasti rapidi su 12 sono marchiati di rosso. La parte allenamento invece viene
+usata e piace. Il piano è la sezione 6-ter, e la metrica per sapere se ha
+funzionato è già nello Storico: giorni registrati su giorni conclusi.
+
+**Quanto siano buone le stime che torna Claude non lo sappiamo**: dipende da
+come è scritta la frase, e si scopre usandolo. Quello che l'app fa per non
+farsi fregare è dichiararle come stime, mostrarle riga per riga prima di
+salvare, e segnalare quando le calorie non tornano con i macro. La lettura dei
+formati è coperta da test.
+
 **Una revisione guardando le schermate una per una** ne ha trovate altre due,
 anche queste sistemate: lo Storico faceva la media contando anche oggi, che è
 un giorno a metà, e quindi mentiva tutti i giorni fino a mezzanotte; e i
@@ -166,6 +179,23 @@ leggibile qualcosa che oggi non lo è.
 - [x] **Freccia su quello che si apre.** Fatto sulle tessere dei macro.
 - [x] **Stati vuoti con un'indicazione di cosa fare.** Fatto su diario e
       storico.
+- [x] **Pasto che arriva da una chat.** Fatto: Aggiungi → *Incolla da
+      Claude*. Si copia il prompt (che porta con sé i cibi rapidi già in
+      archivio, così quei valori non vengono ristimati), lo si manda a Claude
+      con cosa si è mangiato, e si incolla indietro la risposta. L'app legge
+      JSON, tabelle markdown e righe scritte a mano, e propone gli alimenti
+      da controllare prima di salvare. Nessuna chiave, nessun costo, nessuna
+      rete: la lettura è tutta nel telefono.
+- [x] **Una curva sola per tutto quello che si muove.** Fatto: fogli, barre
+      in fondo, entrate di schermata e risposta al tocco condividono
+      `--ease-ios` in `globals.css`, invece di avere ognuno la propria
+      andatura. Misurato in Chromium a 320, 390 e 430 px, chiaro e scuro.
+- [x] **Riepilogo della settimana.** Fatto: in cima allo Storico, lunedì–
+      domenica, alimentazione e sedute, con un tasto che lo copia come testo.
+      Serve la domenica sera e per mandarlo al personal trainer.
+- [x] **Carico per manubrio invece di "kg".** Fatto: sugli esercizi che nel
+      programma dicono "manubri" il campo si chiama *kg a manubrio*. Prima
+      diceva solo "kg" e ogni serie registrata era ambigua.
 - [ ] **Card d'insight in linguaggio naturale sul diario.** Una riga che
       legge i numeri al posto tuo: "ti restano 1.390 kcal e 86 g di proteine —
       un petto di pollo e una colazione ci stanno". Oggi i numeri ci sono ma
@@ -180,11 +210,178 @@ leggibile qualcosa che oggi non lo è.
 - [ ] **Data toccabile nell'intestazione** che apre un selettore, invece delle
       sole frecce. La striscia della settimana copre già i sette giorni
       vicini; serve per andare più indietro.
+- [ ] **Il volume dovrebbe contare due manubri?** Oggi il volume è quello che
+      scrivi per ripetizioni, quindi sugli esercizi con i manubri conta un
+      braccio solo. È coerente settimana su settimana, quindi la progressione
+      si legge lo stesso, ma il totale di seduta mescola mezzi carichi e
+      carichi interi. Raddoppiarlo cambierebbe anche i numeri già registrati:
+      da decidere, non da fare di nascosto.
+- [ ] **Export filtrato per date.** Oggi *I tuoi dati* scarica tutto lo
+      storico. Per mandare una settimana sola serve aprire il CSV e tagliarlo
+      a mano.
+- [ ] **Separatore decimale dei macro.** I chili usano la virgola
+      (`formatWeight`), i macro il punto (`formatMacro`): "12,5 kg" e
+      "C 230.6" nella stessa schermata. Da uniformare sulla virgola.
+- [ ] **Dati da Apple Watch o Fitbit.** Le calorie bruciate e i passi
+      renderebbero il budget giornaliero vero invece che fisso. Costa parecchio:
+      per Apple Health serve un plugin HealthKit dentro il guscio Capacitor,
+      Xcode e un account sviluppatore a pagamento, e i dati non escono dal
+      telefono -- quindi niente lettura dal server. Fitbit è l'opposto: API
+      web con OAuth, si legge da Vercel, ma vuole un'app registrata e i token
+      da rinnovare. Nessuna delle due è un pomeriggio di lavoro.
+- [ ] **Un modo per tornare indietro dalla chat senza copiare a mano.** Oggi
+      il giro è: copia il prompt, apri Claude, incolla, copia la risposta,
+      torna, incolla. Sei gesti, di cui quattro sono trasporto. Da valutare
+      un collegamento che apra l'app con la risposta già dentro.
 - [ ] **Intestazione che si compatta scorrendo.** Costa poco, guadagna una
       riga su schermate lunghe.
 - [ ] **Un "+" che apre i modi di registrare.** Oggi i tasti rapidi sono in
       fondo al diario: da valutare solo se il conteggio dei tocchi migliora,
       altrimenti è decorazione.
+
+## 6-ter. Il diario alimentare non si usa. Il piano per farlo usare
+
+> «L'alimentazione mi è scomoda da utilizzare e non mi viene da utilizzarla.»
+> — 17 settembre 2026
+
+È il problema più grave che abbia questa app, e batte qualunque funzione
+mancante: un diario che non si apre non registra niente, e tutto il resto —
+medie, storico, riepiloghi — è costruito sopra a quei dati.
+
+### Cosa dice la misura, non l'opinione
+
+Diario a 390 px con una giornata vera dentro (10 pasti registrati):
+
+| Cosa | Dove sta |
+|---|---|
+| Pagina intera | 2625 px = **3,1 schermate** |
+| Anello "quanto mi resta" | 206 px — in cima, ok |
+| **Primo tasto rapido** | 1626 px → **882 px di scorrimento, quasi 2 schermate** |
+| *Incolla da Claude* | 2392 px = **2,8 schermate** |
+| *Aggiungi manualmente* | 2448 px |
+
+Due conseguenze, tutte e due misurate:
+
+1. **La lista dei pasti sta sopra i tasti per aggiungere.** Più registri
+   durante la giornata, più lontano diventa il tasto per registrare. La cena
+   — il pasto che segni quando sei più stanco — è quella che costa più
+   scorrimento di tutte.
+2. **A fine giornata 7 tasti rapidi su 12 portano la scritta rossa "sfora".**
+   Apri l'app per segnare la cena e trovi un muro di rosso che dice che
+   qualunque cosa mangi è sbagliata. Formalmente la regola 9 è rispettata (è
+   fuori target, non un'azione); nei fatti è la regola 8 a saltare — *non si
+   incolpa l'utente per quello che è già successo*. C'è già una riga che dice
+   «Cosa mi entra ancora (6 su 12)»: quella basta.
+
+### Il nostro metro era rotto
+
+`PRODOTTO.md` dichiara *«aggiungere un cibo ricorrente: 1 tocco, ok»*. È vero
+e non significa niente: **la tabella dei gesti non contava lo scorrimento**.
+Si è autoassolta per due mesi su una schermata che costa due schermate di
+pollice prima del primo tocco utile.
+
+Da qui in avanti lo scorrimento è un gesto e si conta: *mezza schermata = 1
+gesto*. La tabella in `PRODOTTO.md` è stata corretta di conseguenza.
+
+### Cosa dicono le app che la gente usa davvero
+
+Non è un problema nostro, è *il* problema di questa categoria:
+
+- **50–70% di chi scarica un contacalorie smette entro 30 giorni**, e l'uso
+  crolla già nelle prime due settimane.
+- Registrare per bene costa **15–20 decisioni consapevoli al giorno** (cerca,
+  scegli quale dei 30 risultati, indovina la porzione, salva) × 4 pasti.
+- La ricerca sul cambiamento di abitudini dice che **quando la motivazione
+  cala — e cala — quello che resta è l'attrito**. Non serve più volontà,
+  serve meno attrito.
+- Confronto misurato fra due app serie: su quattro modi di registrare,
+  **MacroFactor 24 azioni contro le 36 di MyFitnessPal**. Codice a barre 5
+  contro 7; aggiunta rapida di sole calorie 3 contro 5. La differenza fra
+  un'app che si usa e una che si abbandona è di quest'ordine: dimezzare i
+  gesti, non aggiungere funzioni.
+- Le scorciatoie che tutte hanno, in ordine di quanto vengono usate:
+  **preferiti/recenti per momento della giornata**, **copia da un altro
+  giorno o da un altro pasto**, **aggiunta rapida di sole calorie**,
+  **codice a barre**, **descrizione a parole**.
+
+Noi la descrizione a parole ce l'abbiamo già (*Incolla da Claude*). Ci mancano
+le altre quattro, e quella che c'è è sepolta a 2,8 schermate.
+
+### Il piano, in ordine di quanto sposta
+
+Ogni fase ha un bersaglio misurabile. Se una fase non abbassa il numero, non
+è servita e si torna indietro.
+
+**Fase 0 — Togliere quello che respinge.** *(mezza giornata)*
+- Via la scritta rossa "sfora" dai tasti rapidi. Resta la riga «cosa mi entra
+  ancora», detta una volta.
+- Bersaglio: zero segnali di colpa sulla schermata di aggiunta.
+- È la prima perché non aggiunge niente da imparare e cambia come ci si sente
+  ad aprire l'app.
+
+**Fase 1 — Mettere l'aggiunta dove si guarda.** *(mezza giornata)*
+- *Aggiungi* subito sotto l'anello; la lista dei pasti sotto.
+- Costa il gesto «vedere cosa ho mangiato», che passa da 0 a 1: accettato,
+  perché quello che hai già mangiato lo ricordi, quello che ti resta no.
+- Bersaglio: **da 882 px di scorrimento a 0** per il primo tasto rapido.
+
+**Fase 2 — Ripetere invece di ricomporre.** *(1–2 giorni)*
+- «Come ieri» su un pasto: ricopia colazione/pranzo/cena di un giorno
+  precedente in un tocco.
+- I tasti rapidi si riordinano da soli per momento della giornata: alle 8 in
+  cima ci sono quelli della colazione, non i primi dodici in ordine di
+  inserimento.
+- Bersaglio: **una colazione ricorrente in 1 gesto, una giornata tipo in 4**.
+- È la fase che sposta di più: chi mangia quasi sempre le stesse cose non
+  dovrebbe ricomporle da capo ogni mattina.
+
+**Fase 3 — L'acqua.** *(mezza giornata)*
+- Bicchieri +/− sul diario, niente macro, niente stime. Un obiettivo
+  giornaliero in `targets.ts`.
+- Va **dopo** la Fase 1, non prima: metterla adesso vorrebbe dire aggiungere
+  roba in fondo a una schermata che non si apre.
+- Bersaglio: **1 gesto per un bicchiere, 0 per vedere a che punto sei**.
+
+**Fase 4 — Aggiunta rapida di sole calorie.** *(mezza giornata)*
+- Un campo «350 kcal» e basta, senza nome né macro, per quando mangi fuori e
+  non hai voglia di scomporre il piatto.
+- Serve a non lasciare buchi: un giorno registrato male vale più di un giorno
+  non registrato, perché la media resta vera.
+- Bersaglio: **2 gesti**.
+
+**Fase 5 — Codice a barre.** *(2–3 giorni, ed è quella che può fallire)*
+- Fotocamera → EAN → valori dalla confezione. La scorciatoia più usata in
+  assoluto nelle app vere.
+- Due incognite serie: serve un archivio prodotti (Open Food Facts è aperto e
+  gratuito, ma sui prodotti italiani è incompleto), e dentro Capacitor serve
+  un plugin per la fotocamera con i permessi iOS.
+- Ripiego se l'archivio non basta: la foto dell'etichetta va già in chat, e
+  *Incolla da Claude* legge i numeri della tabella nutrizionale.
+- Bersaglio: **3 gesti**, e almeno 7 prodotti su 10 del tuo carrello trovati.
+
+**Fase 6 — Ricordarsi che l'app esiste.** *(da valutare)*
+- Il problema smette di essere l'attrito e diventa la memoria: se non apri
+  l'app, non c'è gesto da abbassare.
+- Widget in schermata Home con quanto resta, oppure una notifica agli orari
+  dei pasti. Con Capacitor il widget è un pezzo nativo vero (Swift +
+  WidgetKit), la notifica locale è un plugin.
+- Da fare **solo se** dopo le fasi 0–4 i giorni registrati non salgono: se il
+  problema è l'attrito, una notifica in più non lo risolve, lo maschera.
+
+### Come si misura se ha funzionato
+
+Il dato ce l'abbiamo già, e non richiede niente di nuovo: lo Storico calcola
+**giorni registrati su giorni conclusi**. È la metrica onesta di questa app.
+
+- Oggi: da stabilire come punto di partenza prima della Fase 0.
+- Dopo le fasi 0–2: l'obiettivo è **5 giorni su 7 registrati per quattro
+  settimane di fila**.
+- Se dopo la Fase 2 il numero non si muove, il problema non erano i gesti e
+  il piano va rifatto invece che proseguito.
+
+Vale anche il contrario: se dopo la Fase 1 il numero sale già, le fasi 4 e 5
+possono restare dove sono. **Meno funzioni che si usano batte più funzioni che
+non si aprono.**
 
 ## 7. Cose che restano fuori, di proposito
 

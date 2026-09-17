@@ -39,7 +39,7 @@ export function StartWorkoutButton({
             router.refresh();
           })
         }
-        className={`min-h-11 w-full rounded-xl text-[15px] font-semibold active:opacity-80 disabled:opacity-50 ${
+        className={`min-h-11 w-full rounded-xl text-[15px] font-semibold tocco active:opacity-80 disabled:opacity-50 ${
           variante === "principale"
             ? "bg-accent text-on-accent"
             : "border border-hairline text-accent active:bg-raised"

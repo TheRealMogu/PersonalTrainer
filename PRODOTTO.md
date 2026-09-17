@@ -45,34 +45,48 @@ previsto, cioè quasi nulla.
 ## Il metro di misura: i gesti
 
 La comodità non è un'opinione, si conta. Ogni azione quotidiana ha un costo in
-tocchi, e ogni costo ha un tetto. Se un gesto sfora il tetto, è un bug di
+gesti, e ogni costo ha un tetto. Se un gesto sfora il tetto, è un bug di
 prodotto, non una mancanza di funzionalità.
+
+**Lo scorrimento è un gesto, e si conta: mezza schermata = 1.** Non era così,
+ed è per questo che questa tabella ha dichiarato «aggiungere un cibo
+ricorrente: 1 tocco, ok» per due mesi, mentre sul telefono quel tasto stava
+882 px più in basso — quasi due schermate di pollice prima del primo tocco
+utile. Un metro che non misura la parte cara non serve a niente, e assolve
+proprio le schermate che vanno riviste.
 
 | Gesto quotidiano | Tetto | Oggi | Stato |
 |---|---|---|---|
-| Vedere quanto mi resta | 0 tocchi (apro l'app) | 0 | ok |
-| Vedere cosa ho mangiato | 0 tocchi | 0 | ok |
-| Aggiungere un cibo ricorrente | 1 tocco | 1 | ok |
-| Aggiungere lo stesso cibo in quantità diversa | 2 tocchi | 2 (tasto "+" → quantità) | ok |
-| Correggere un pasto già inserito | 2 tocchi | 2 (tocca la riga → quantità) | ok |
-| Annullare un errore | 1 tocco | 1 | ok |
-| Entrare nell'app | 0 tocchi dopo il primo accesso | 0 | ok |
-| Segnare il carico di una serie | 2 tocchi | 1 (campi già pronti) | ok |
-| Vedere il carico dell'ultima volta | 0 tocchi | 0 | ok |
-| Sapere cosa mi entra ancora | 0 tocchi | 0 (conteggio sempre visibile) | ok |
-| Capire dove sono finite le calorie | 0 tocchi | 0 (totale per pasto) | ok |
-| Sapere quale allenamento tocca | 0 tocchi | 0 (scheda "Tocca a te") | ok |
-| Correggere una serie sbagliata | 2 tocchi | 2 (tocca la riga → salva) | ok |
-| Rimediare a una serie eliminata | 1 tocco | 1 (Annulla) | ok |
-| Rimediare a "Fine" toccato per sbaglio | 1 tocco | 1 (Annulla) | ok |
-| Uscire da una giornata avviata sbagliata | 1 tocco | 1 (Scarta) | ok |
-| Spostare un pasto di momento | 2 tocchi | 2 (tocca la riga → momento) | ok |
-| Portarsi via i propri dati | 2 tocchi | 2 (Piano → scarica) | ok |
-| Segnare una serie senza segnale | 1 tocco | 1 (resta sul telefono) | ok |
-| Sapere com'è andata la settimana | 0 tocchi | 0 (striscia in cima al diario) | ok |
-| Aprire un giorno passato | 1 tocco | 1 (dalla striscia) | ok |
-| Sapere da dove arriva un macro | 1 tocco | 1 (tocca il riquadro) | ok |
-| Sapere cosa ci sta nel margine di un macro | 1 tocco | 1 (stesso foglio) | ok |
+| Vedere quanto mi resta | 0 gesti (apro l'app) | 0 | ok |
+| Vedere cosa ho mangiato | 1 gesto | 0 | ok |
+| Aggiungere un cibo ricorrente | 1 gesto | **5** (4 di scorrimento + 1 tocco) | **da rivedere** |
+| Aggiungere lo stesso cibo in quantità diversa | 2 gesti | **6** | **da rivedere** |
+| Registrare qualcosa che non è fra i tasti rapidi | 2 gesti | **7** (*Incolla da Claude* sta a 2,8 schermate) | **da rivedere** |
+| Ripetere un pasto che fai sempre uguale | 1 gesto | — (non esiste) | **manca** |
+| Segnare un bicchiere d'acqua | 1 gesto | — (non esiste) | **manca** |
+| Correggere un pasto già inserito | 2 gesti | 2 (tocca la riga → quantità) | ok |
+| Annullare un errore | 1 gesto | 1 | ok |
+| Entrare nell'app | 0 gesti dopo il primo accesso | 0 | ok |
+| Segnare il carico di una serie | 2 gesti | 1 (campi già pronti) | ok |
+| Vedere il carico dell'ultima volta | 0 gesti | 0 | ok |
+| Sapere cosa mi entra ancora | 0 gesti | 0 (conteggio sempre visibile) | ok |
+| Capire dove sono finite le calorie | 0 gesti | 0 (totale per pasto) | ok |
+| Sapere quale allenamento tocca | 0 gesti | 0 (scheda "Tocca a te") | ok |
+| Correggere una serie sbagliata | 2 gesti | 2 (tocca la riga → salva) | ok |
+| Rimediare a una serie eliminata | 1 gesto | 1 (Annulla) | ok |
+| Rimediare a "Fine" toccato per sbaglio | 1 gesto | 1 (Annulla) | ok |
+| Uscire da una giornata avviata sbagliata | 1 gesto | 1 (Scarta) | ok |
+| Spostare un pasto di momento | 2 gesti | 2 (tocca la riga → momento) | ok |
+| Portarsi via i propri dati | 2 gesti | 2 (Piano → scarica) | ok |
+| Segnare una serie senza segnale | 1 gesto | 1 (resta sul telefono) | ok |
+| Sapere com'è andata la settimana | 0 gesti | 0 (striscia in cima al diario) | ok |
+| Aprire un giorno passato | 1 gesto | 1 (dalla striscia) | ok |
+| Sapere da dove arriva un macro | 1 gesto | 1 (tocca il riquadro) | ok |
+| Sapere cosa ci sta nel margine di un macro | 1 gesto | 1 (stesso foglio) | ok |
+
+Le righe marcate **da rivedere** sono misurate su una giornata vera (10 pasti
+registrati, schermo da 390 px) il 17 settembre 2026. Il piano per riportarle
+sotto il tetto è la sezione 6-ter di [ROADMAP.md](ROADMAP.md).
 
 Due regole che valgono sempre:
 
@@ -133,6 +147,21 @@ e va difesa a ogni aggiunta.
 - **Export dei dati** — Piano → *I tuoi dati*: tutto in JSON, oppure pasti e
   allenamenti in CSV. Un'app che accumula mesi di diario e non ti lascia
   portarlo via te lo tiene in ostaggio.
+- **Riepilogo della settimana** — in cima allo Storico: i sette giorni da
+  lunedì a domenica, le sedute con il volume, e la media che dichiara sempre
+  su quanti giorni è fatta. Un tocco lo copia come testo, da mandare al
+  personal trainer o da incollare in chat, dove chi legge non ha l'app
+  davanti. I giorni che devono ancora arrivare sono un trattino, non uno
+  zero.
+- **Incolla da Claude** — Aggiungi → *Incolla da Claude*: si copia un prompt,
+  lo si manda a Claude insieme a cosa si è mangiato (anche con la foto
+  dell'etichetta), e si riporta indietro la risposta. L'app la legge e
+  propone le righe con i macro già compilati. I tasti rapidi coprono i giorni
+  uguali agli altri; questa copre gli altri, che sono quelli in cui il diario
+  resterebbe vuoto. Il calcolo avviene dove si sta già scrivendo; qui non c'è
+  nessuna chiamata a pagamento e niente da configurare, e la lettura funziona
+  anche senza rete. Quello che si incolla è una proposta: si tolgono le righe
+  che non tornano, si correggono i numeri, e solo allora si salva.
 
 ## Cosa resta fuori, di proposito
 
@@ -196,6 +225,37 @@ Valgono per ogni aggiunta futura.
     palestra il segnale manca: una serie segnata deve restare segnata, e
     partire da sola dopo. Ogni scrittura che si può ritentare porta un
     identificativo, altrimenti riprovare significa duplicare.
+17. **Una curva sola per tutto quello che si muove.** Fogli, barre in fondo,
+    entrate di schermata e risposta al tocco usano la stessa
+    `cubic-bezier(0.32, 0.72, 0, 1)`, definita una volta in `globals.css`.
+    Parte veloce e si posa piano: un movimento ad andatura costante si legge
+    come meccanico, perché nessun oggetto vero parte e si ferma di colpo.
+    Niente oltre il mezzo secondo — più in là il movimento smette di essere
+    un riscontro e diventa un'attesa. Al tocco si scende in 80 ms e si
+    risale in 260: è la differenza fra le due durate a far sembrare solido
+    un pulsante.
+18. **Quello che non è stato misurato si dice, prima di salvarlo.** I macro
+    che arrivano da fuori — da una chat, da un incollaggio — sono stime: si
+    mostrano etichettati come tali, riga per riga, e si salvano solo dopo che
+    li hai guardati. Un numero stimato che entra nel diario da solo è un
+    numero inventato, e la regola 5 non lo permette. Quando le calorie non
+    tornano con i macro dichiarati, lo si segnala su quella riga invece di
+    correggerla di nascosto: non sappiamo quale dei due sia sbagliato.
+19. **Un numero che esce dall'app si porta dietro il suo denominatore.**
+    "1919 kcal di media" da solo si legge come si vuole: fuori di qui nessuno
+    sa se sono sette giorni o due. Ogni media dichiara su quanti giorni è
+    fatta, a schermo e nel testo che si copia.
+20. **Lo stesso dato si scrive nello stesso modo dovunque esca.** Se la
+    scheda mostra `1845` e il testo copiato dice `1.845`, chi legge si chiede
+    quale dei due sia giusto. Un solo formattatore per grandezza, riusato.
+21. **Un carico senza unità di misura non è un dato.** "12 kg" su un curl con
+    i manubri possono essere due manubri da 12 o due da 6: due allenamenti
+    diversi, e a un mese di distanza non c'è modo di sapere quale. Dove
+    l'attrezzo lascia spazio al dubbio, l'etichetta del campo lo toglie.
+22. **Quello che arriva da fuori è testo, non istruzioni.** Si fa passare da
+    una sola porta, che valida campo per campo e scarta il resto. Un numero
+    fuori scala si butta, non si arrotonda; una riga senza nome non è una
+    riga.
 
 ## Come si struttura una schermata
 

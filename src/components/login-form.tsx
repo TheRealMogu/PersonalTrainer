@@ -31,7 +31,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-4 min-h-11 w-full rounded-xl bg-accent py-3 text-[15px] font-semibold text-on-accent active:opacity-80 disabled:opacity-50"
+        className="mt-4 min-h-11 w-full rounded-xl bg-accent py-3 text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-50"
       >
         {pending ? "Verifico…" : "Entra"}
       </button>

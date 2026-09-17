@@ -11,7 +11,7 @@ export function LogoutButton() {
       type="button"
       onClick={() => startTransition(() => logout())}
       disabled={pending}
-      className="min-h-11 w-full rounded-xl border border-hairline text-[15px] font-medium text-muted active:bg-raised disabled:opacity-50"
+      className="min-h-11 w-full rounded-xl border border-hairline text-[15px] font-medium text-muted tocco active:bg-raised disabled:opacity-50"
     >
       {pending ? "Esco…" : "Esci"}
     </button>

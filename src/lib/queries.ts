@@ -186,6 +186,37 @@ export async function getRecentSessions(limit = 20) {
     .limit(limit);
 }
 
+/**
+ * Le sedute concluse in un intervallo di date, con volume e numero di serie.
+ *
+ * Simile a `getRecentSessions`, ma tagliata sulle date invece che sul
+ * numero: il riepilogo della settimana deve prendere quella settimana, non
+ * "le ultime venti" -- che in una settimana da quattro sedute ne
+ * porterebbe dentro tre di quelle prima.
+ */
+export async function getSessionsInRange(from: string, to: string) {
+  return db
+    .select({
+      day: workoutSessions.day,
+      label: workoutDays.label,
+      focus: workoutDays.focus,
+      volume: sql<number>`coalesce(sum(${workoutSets.weight} * ${workoutSets.reps}), 0)::float8`,
+      setCount: sql<number>`count(${workoutSets.id})::int`,
+    })
+    .from(workoutSessions)
+    .innerJoin(workoutDays, eq(workoutSessions.dayId, workoutDays.id))
+    .leftJoin(workoutSets, eq(workoutSets.sessionId, workoutSessions.id))
+    .where(
+      and(
+        isNotNull(workoutSessions.endedAt),
+        gte(workoutSessions.day, from),
+        lte(workoutSessions.day, to),
+      ),
+    )
+    .groupBy(workoutSessions.id, workoutDays.label, workoutDays.focus)
+    .orderBy(asc(workoutSessions.day));
+}
+
 export type ExerciseProgressPoint = {
   day: string;
   bestOneRepMax: number;

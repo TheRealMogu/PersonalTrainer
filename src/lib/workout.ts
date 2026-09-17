@@ -54,6 +54,26 @@ export function parseWeight(value: string): number {
   return Number(value.replace(",", "."));
 }
 
+/**
+ * Se il carico di questo esercizio si scrive per manubrio o in totale.
+ *
+ * "12 kg" su un curl con i manubri non vuol dire niente da solo: possono
+ * essere due manubri da 12 o due da 6. Sono due allenamenti diversi, e a
+ * distanza di un mese non c'e' modo di sapere quale dei due hai fatto.
+ *
+ * La convenzione e' quella della palestra: si scrive il peso di UN manubrio.
+ * Qui non si indovina dal tipo di attrezzo -- si legge il nome, che nel
+ * programma dice sempre "manubri" quando sono manubri.
+ */
+export function caricoPerManubrio(nomeEsercizio: string): boolean {
+  return /manubri/i.test(nomeEsercizio);
+}
+
+/** L'etichetta sopra al campo del carico. Corta: ci sta anche a 320 px. */
+export function etichettaCarico(nomeEsercizio: string): string {
+  return caricoPerManubrio(nomeEsercizio) ? "kg a manubrio" : "kg";
+}
+
 export type SetSuggestion = { weight: number; reps: number };
 
 /**

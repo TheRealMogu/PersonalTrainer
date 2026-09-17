@@ -70,3 +70,17 @@ export function weekdayInitial(iso: string): string {
   // Il 1970-01-01 era un giovedi': +3 sposta l'indice a partire dal lunedi'.
   return INIZIALI_GIORNI[(((giorni + 3) % 7) + 7) % 7];
 }
+
+/**
+ * Il lunedi' della settimana a cui appartiene questa data.
+ *
+ * La settimana va da lunedi' a domenica, come la striscia in cima al diario
+ * e come la conta chi si allena: "questa settimana ho fatto tre sedute" non
+ * cambia significato di sabato.
+ */
+export function lunediDellaSettimana(iso: string): string {
+  const giorni = Math.floor(Date.parse(`${iso}T00:00:00Z`) / 86_400_000);
+  // Il 1970-01-01 era un giovedi': +3 porta lo zero al lunedi'.
+  const indice = (((giorni + 3) % 7) + 7) % 7;
+  return shiftIsoDate(iso, -indice);
+}
