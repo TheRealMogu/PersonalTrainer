@@ -66,7 +66,7 @@ proprio le schermate che vanno riviste.
 | Segnare un bicchiere d'acqua | 1 gesto | 1 (tasto + nella scheda in cima) | ok |
 | Salvare un pasto fra i tasti rapidi | 2 gesti | 2 (tocca la riga → salva) | ok |
 | Correggere un alimento in archivio | 3 gesti | 3 (Piano → archivio → riga) | ok |
-| Vedere quanta acqua ho bevuto | 0 gesti | 0 (si vede senza scorrere) | ok |
+| Vedere quanta acqua ho bevuto | 0 gesti | 0 su schermo alto (finisce a 632 px); **1** su 320×568 | ok sopra i 700 px |
 | Correggere un pasto già inserito | 2 gesti | 2 (tocca la riga → quantità) | ok |
 | Correggere nome o macro di un pasto | 3 gesti | 3 (riga → *Correggi nome e valori* → campo) | ok |
 | Annullare un errore | 1 gesto | 1 | ok |
@@ -92,6 +92,11 @@ proprio le schermate che vanno riviste.
 | Sapere cosa ci sta nel margine di un macro | 1 gesto | 1 (stesso foglio) | ok |
 | Cambiare i target dopo che il PT li ha cambiati | 3 gesti | 3 (Piano → *Cambia gli obiettivi* → campo) | ok |
 | Cambiare l'obiettivo dell'acqua | 3 gesti | 3 (stessa schermata) | ok |
+| Segnare un integratore preso | 1 gesto | 1 (tocco sulla riga, riscontro in 50 ms) | ok |
+| Rimediare a un integratore spuntato per sbaglio | 1 gesto | 1 (stesso tocco) | ok |
+| Sapere cosa devo ancora prendere oggi | 0 gesti | 0 su schermo alto (finisce a 804 px); **1** su 320×568 | ok sopra gli 850 px |
+| Aggiungere un integratore | 3 gesti | 3 (Piano → elenco → *Aggiungi*) | ok |
+| Togliere un integratore dal diario | 3 gesti | 3 (elenco → riga → *Non lo prendo più*) | ok |
 
 Le righe **sopra il tetto** sono misurate su una giornata vera (10 pasti
 registrati, schermo da 390 px). Le prime due righe dell'aggiunta sono
@@ -173,6 +178,16 @@ e va difesa a ogni aggiunta.
 - **Acqua** — bicchieri +/− nella scheda in cima al diario, con il totale in
   litri. Nessun macro, nessuna stima, nessuna scelta da fare: è un contatore.
   Il "meno" è l'annullamento, a un tocco di distanza.
+- **Integratori** — Piano → *I tuoi integratori*: l'elenco è tuo, e nel
+  diario diventa una riga di spunte sotto l'acqua. Un tocco segna, un altro
+  toglie — il secondo tocco *è* l'annullamento del primo, quindi non c'è
+  niente da confermare. Non sono cibo: niente macro, niente quantità, niente
+  budget. La domanda è «l'ho presa oggi?», non «quanto mi resta». Se l'elenco
+  è vuoto la riga non compare, perché chi non li prende non deve vedere un
+  contatore a zero tutti i giorni. Il cestino si chiama *Non lo prendo più* e
+  fa esattamente quello: sparisce dal diario e i giorni in cui lo prendevi
+  restano.
+
 - **Obiettivi modificabili** — Piano → *Cambia gli obiettivi*: calorie,
   carboidrati, proteine, grassi e bicchieri d'acqua si scrivono a mano, e da
   lì in poi valgono ovunque — anello, barre, storico, riepilogo della

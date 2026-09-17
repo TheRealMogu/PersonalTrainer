@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { meals, waterDays } from "@/db/schema";
+import { meals, supplementChecks, waterDays } from "@/db/schema";
 import { MAX_BICCHIERI } from "@/lib/acqua";
 import { isIsoDate } from "@/lib/date";
 import { isMealSlot, type MealSlot } from "@/lib/meal-slots";
@@ -206,6 +206,51 @@ export async function setWater(day: string, bicchieri: number): Promise<ActionRe
       });
   } catch (cause) {
     console.error("setWater fallita", cause);
+    return { ok: false, error: "Non sono riuscito a segnarlo. Riprova." };
+  }
+
+  revalidatePath("/");
+  return { ok: true };
+}
+
+/**
+ * Segna o toglie la spunta di un integratore, per un giorno.
+ *
+ * Non c'e' una colonna "preso": la riga esiste se l'hai preso e non esiste se
+ * non l'hai preso. Togliere la spunta e' una DELETE, ed e' anche
+ * l'annullamento -- l'inverso esatto del tocco che l'ha messa, a un tocco di
+ * distanza. Per questo non c'e' nessun messaggio che propone di disfare.
+ *
+ * `preso` arriva dal client come stato voluto, non come "inverti": due tocchi
+ * rapidi sulla stessa riga devono finire dove dice l'ultimo, non dove li
+ * porta il conteggio.
+ */
+export async function segnaIntegratore(
+  day: string,
+  supplementId: number,
+  preso: boolean,
+): Promise<ActionResult> {
+  if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };
+  if (!Number.isInteger(supplementId) || supplementId <= 0) {
+    return { ok: false, error: "Integratore non valido." };
+  }
+
+  try {
+    if (preso) {
+      await db
+        .insert(supplementChecks)
+        .values({ day, supplementId })
+        // Gia' spuntato: e' quello che volevi, non un errore da mostrare.
+        .onConflictDoNothing();
+    } else {
+      await db
+        .delete(supplementChecks)
+        .where(
+          and(eq(supplementChecks.day, day), eq(supplementChecks.supplementId, supplementId)),
+        );
+    }
+  } catch (cause) {
+    console.error("segnaIntegratore fallita", cause);
     return { ok: false, error: "Non sono riuscito a segnarlo. Riprova." };
   }
 

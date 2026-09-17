@@ -665,7 +665,7 @@ per aprirla.
 | **Obiettivo acqua** | database (`targets`) | ✅ | ✅ | — (c'è sempre) |
 | **Target kcal e macro** | database (`targets`) | ✅ | ✅ | — (c'è sempre) |
 | **Allenamento** (giornate ed esercizi) | database, ma solo dal seed | ❌ | ❌ | ❌ |
-| **Vitamine e integratori** | non esistono | ❌ | ❌ | ❌ |
+| **Vitamine e integratori** | database (`supplements`) | ✅ | ✅ | ✅ dal diario, con annulla |
 
 ### Le vitamine: cosa sono, qui dentro
 
@@ -702,8 +702,29 @@ giornate, l'ultima è la più grossa di tutta la roadmap.
       salvataggio, ma i macro che non tornano al grammo con le calorie
       vengono solo segnalati — una dieta può avere un margine voluto, e
       un'app che rifiuta i numeri del PT si fa scavalcare.
-- [ ] **Vitamine e integratori.** Due tabelle nuove, una riga nel diario, una
-      schermata di gestione. Nessuna dipendenza dalle altre voci.
+- [x] **Vitamine e integratori.** Fatto, e come previsto qui sopra: due
+      tabelle (`supplements` e `supplement_checks`), una riga nel diario sotto
+      l'acqua, una schermata *Piano → I tuoi integratori*.
+
+      Una scelta che vale la pena sapere: il cestino **non** fa una DELETE.
+      Le spunte hanno una chiave esterna con `ON DELETE CASCADE`, quindi
+      eliminare davvero un integratore porterebbe via tutti i giorni in cui
+      l'hai preso — la stessa trappola descritta in 6-quinquies per la scheda
+      di allenamento, vista prima di pagarla. Il tasto si chiama *Non lo
+      prendo più* e fa quello: sparisce dal diario, lo storico resta, e da
+      *Riprendi* torna com'era.
+
+      Misurato: la riga sta sopra la piega a 390×844 (finisce a 804 px) ma
+      **non** su 320×568, dove serve uno scorrimento. Lì sotto la piega ci
+      finisce già l'acqua (632 px), quindi non è una cosa che introducono gli
+      integratori: è la prima schermata che è lunga. Vale un giro a parte, non
+      un rattoppo qui.
+- [ ] **La prima schermata su un telefono corto.** Misurato su 320×568:
+      l'acqua finisce a 632 px e gli integratori a 804, quindi entrambi
+      chiedono uno scorrimento che su 390×844 non serve. Non è un bug di una
+      singola scheda, è la somma: giorno, striscia, anello, tre riquadri,
+      acqua, integratori. Da guardare quando si sa su che telefono gira
+      davvero — se è un 844, non c'è niente da riparare.
 - [ ] **Allenamento modificabile.** La più cara, e ha un nodo vero descritto
       in 6-quinquies: `ON DELETE CASCADE` fra serie ed esercizi, quindi
       cambiare la scheda cancella i carichi. Prima serve `archiviato_il`, poi

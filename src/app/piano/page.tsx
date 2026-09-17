@@ -73,6 +73,22 @@ export default async function PianoPage() {
         </Section>
       ))}
 
+      <Section title="I tuoi integratori">
+        <Card>
+          <p className="mb-4 text-[15px] leading-snug text-muted">
+            Le vitamine e gli integratori che prendi. Diventano una riga di
+            spunte nel diario, sotto l&apos;acqua — e finché l&apos;elenco è
+            vuoto quella riga non c&apos;è.
+          </p>
+          <Link
+            href="/integratori"
+            className="flex min-h-12 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
+          >
+            Apri l&apos;elenco
+          </Link>
+        </Card>
+      </Section>
+
       <Section title="I tuoi alimenti">
         <Card>
           <p className="mb-4 text-[15px] leading-snug text-muted">

@@ -43,6 +43,13 @@
       "when": 1789656182345,
       "tag": "0005_omniscient_wind_dancer",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789657389562,
+      "tag": "0006_little_hammerhead",
+      "breakpoints": true
     }
   ]
 }

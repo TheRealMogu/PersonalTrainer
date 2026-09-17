@@ -11,10 +11,12 @@ import {
   type MealPatch,
 } from "@/app/actions";
 import type { Meal, QuickFood } from "@/db/schema";
+import type { IntegratoreDelGiorno } from "@/lib/integratori";
 import type { MealSlot } from "@/lib/meal-slots";
 import { buildProgress, sumMacros } from "@/lib/nutrition";
 import type { MacroKey, Obiettivi } from "@/lib/targets";
 import { Acqua } from "./acqua";
+import { Integratori } from "./integratori";
 import { Card } from "./card";
 import { CalorieRing } from "./calorie-ring";
 import { IncollaPasto } from "./incolla-pasto";
@@ -48,6 +50,7 @@ export function Diary({
   quickFoods,
   defaultSlot,
   acqua,
+  integratori,
   obiettivi,
 }: {
   day: string;
@@ -55,6 +58,7 @@ export function Diary({
   quickFoods: QuickFood[];
   defaultSlot: MealSlot;
   acqua: number;
+  integratori: IntegratoreDelGiorno[];
   obiettivi: Obiettivi;
 }) {
   const router = useRouter();
@@ -218,6 +222,18 @@ export function Diary({
         <div className="mt-4 border-t border-hairline pt-4">
           <Acqua day={day} bicchieri={acqua} obiettivo={obiettivi.bicchieriAcqua} />
         </div>
+
+        {/*
+          Gli integratori sotto l'acqua, e per lo stesso motivo: sono una cosa
+          da fare oggi, e se stessero sotto la piega non si spunterebbero. La
+          riga non c'e' finche' non hai definito almeno un integratore, quindi
+          a chi non li prende questa scheda resta com'era.
+        */}
+        {integratori.length > 0 ? (
+          <div className="mt-4 border-t border-hairline pt-4">
+            <Integratori day={day} integratori={integratori} />
+          </div>
+        ) : null}
       </Card>
 
       <Section title="Aggiungi">
