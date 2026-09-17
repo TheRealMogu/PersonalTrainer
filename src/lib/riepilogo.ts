@@ -25,6 +25,15 @@ export type Riepilogo = {
   conclusi: number;
   /** Media sui soli giorni registrati e conclusi, o null se non ce ne sono. */
   medie: MacroTotals | null;
+  /**
+   * Quante delle calorie della settimana sono state registrate senza macro.
+   *
+   * Sta nel riepilogo perche' finisce nel testo che si manda al personal
+   * trainer: chi legge non ha l'app davanti, e senza questa riga
+   * concluderebbe che quella settimana hai mangiato meno proteine di quante
+   * ne hai mangiate. Zero vuol dire che tutto e' scomposto.
+   */
+  kcalNonScomposte: number;
   sedute: SedutaRiepilogo[];
   volumeTotale: number;
   /** Vero se la settimana e' ancora in corso: cambia come si legge tutto. */
@@ -72,7 +81,7 @@ export function costruisciRiepilogo(
   totali: DailyTotals[],
   sedute: SedutaRiepilogo[],
   data: string,
-  oggi: string,
+  oggi: string
 ): Riepilogo {
   const lunedi = lunediDellaSettimana(data);
   const domenica = shiftIsoDate(lunedi, 6);
@@ -80,7 +89,7 @@ export function costruisciRiepilogo(
 
   const byDay = new Map(totali.map((riga) => [riga.day, riga]));
   const giorni = intervallo.map(
-    (day) => byDay.get(day) ?? { day, kcal: 0, carbs: 0, protein: 0, fat: 0 },
+    (day) => byDay.get(day) ?? { day, kcal: 0, carbs: 0, protein: 0, fat: 0 }
   );
 
   // Conclusi = arrivati e finiti. Oggi e' arrivato ma non e' finito; i giorni
@@ -98,6 +107,11 @@ export function costruisciRiepilogo(
     for (const macro of MACRO_ORDER) medie[macro] /= registrateRighe.length;
   }
 
+  const kcalNonScomposte = giorni.reduce(
+    (somma, riga) => somma + (riga.kcalNonScomposte ?? 0),
+    0
+  );
+
   const dellaSettimana = sedute
     .filter((seduta) => seduta.day >= lunedi && seduta.day <= domenica)
     .sort((a, b) => a.day.localeCompare(b.day));
@@ -109,8 +123,12 @@ export function costruisciRiepilogo(
     registrati: registrateRighe.length,
     conclusi: conclusiRighe.length,
     medie,
+    kcalNonScomposte,
     sedute: dellaSettimana,
-    volumeTotale: dellaSettimana.reduce((somma, seduta) => somma + seduta.volume, 0),
+    volumeTotale: dellaSettimana.reduce(
+      (somma, seduta) => somma + seduta.volume,
+      0
+    ),
     inCorso: oggi <= domenica,
     oggi,
   };
@@ -126,7 +144,7 @@ export function costruisciRiepilogo(
  */
 export function riepilogoTesto(
   r: Riepilogo,
-  targets: Record<MacroKey, number> = DAILY_TARGETS,
+  targets: Record<MacroKey, number> = DAILY_TARGETS
 ): string {
   const righe: string[] = [];
 
@@ -136,7 +154,9 @@ export function riepilogoTesto(
 
   righe.push("ALIMENTAZIONE");
   for (const giorno of r.giorni) {
-    const etichetta = `${nomeGiorno(giorno.day)} ${Number(giorno.day.slice(8))}`.padEnd(7);
+    const etichetta = `${nomeGiorno(giorno.day)} ${Number(
+      giorno.day.slice(8)
+    )}`.padEnd(7);
 
     // Un giorno che deve ancora arrivare non e' un giorno saltato.
     if (giorno.day > r.oggi) {
@@ -144,7 +164,11 @@ export function riepilogoTesto(
       continue;
     }
     if (!isLogged(giorno)) {
-      righe.push(`${etichetta} ${giorno.day === r.oggi ? "niente per ora" : "non registrato"}`);
+      righe.push(
+        `${etichetta} ${
+          giorno.day === r.oggi ? "niente per ora" : "non registrato"
+        }`
+      );
       continue;
     }
 
@@ -154,28 +178,46 @@ export function riepilogoTesto(
       ` · P ${formatMacro(giorno.protein, "protein")}` +
       ` · G ${formatMacro(giorno.fat, "fat")}`;
     // Oggi si mostra ma si dichiara: e' un dato, non un giorno finito.
-    righe.push(`${etichetta} ${macro}${giorno.day === r.oggi ? "  (in corso)" : ""}`);
+    righe.push(
+      `${etichetta} ${macro}${giorno.day === r.oggi ? "  (in corso)" : ""}`
+    );
   }
 
   righe.push("");
   if (r.medie) {
     righe.push(
-      `Media su ${r.registrati} ${r.registrati === 1 ? "giorno registrato" : "giorni registrati"}` +
-        ` su ${r.conclusi} conclusi:`,
+      `Media su ${r.registrati} ${
+        r.registrati === 1 ? "giorno registrato" : "giorni registrati"
+      }` + ` su ${r.conclusi} conclusi:`
     );
     righe.push(
-      `${formatMacro(r.medie.kcal, "kcal")} kcal · C ${formatMacro(r.medie.carbs, "carbs")}` +
+      `${formatMacro(r.medie.kcal, "kcal")} kcal · C ${formatMacro(
+        r.medie.carbs,
+        "carbs"
+      )}` +
         ` · P ${formatMacro(r.medie.protein, "protein")}` +
-        ` · G ${formatMacro(r.medie.fat, "fat")}`,
+        ` · G ${formatMacro(r.medie.fat, "fat")}`
     );
     righe.push(
       `Target: ${formatMacro(targets.kcal, "kcal")} kcal` +
         ` · C ${formatMacro(targets.carbs, "carbs")}` +
         ` · P ${formatMacro(targets.protein, "protein")}` +
-        ` · G ${formatMacro(targets.fat, "fat")}`,
+        ` · G ${formatMacro(targets.fat, "fat")}`
     );
   } else {
-    righe.push("Nessun giorno concluso e registrato: non c'è una media da fare.");
+    righe.push(
+      "Nessun giorno concluso e registrato: non c'è una media da fare."
+    );
+  }
+
+  // Detta una volta, in fondo al blocco dell'alimentazione: senza, chi legge
+  // conclude che quella settimana hai mangiato meno proteine di quante ne hai
+  // mangiate davvero.
+  if (r.kcalNonScomposte > 0) {
+    righe.push(
+      `Di queste, ${formatMacro(r.kcalNonScomposte, "kcal")} kcal sono state` +
+        ` registrate a occhio, senza macro: i grammi qui sopra non le contano.`
+    );
   }
 
   righe.push("");
@@ -184,22 +226,24 @@ export function riepilogoTesto(
     righe.push("Nessuna seduta registrata.");
   } else {
     for (const seduta of r.sedute) {
-      const etichetta = `${nomeGiorno(seduta.day)} ${Number(seduta.day.slice(8))}`.padEnd(7);
+      const etichetta = `${nomeGiorno(seduta.day)} ${Number(
+        seduta.day.slice(8)
+      )}`.padEnd(7);
       righe.push(
         `${etichetta} ${seduta.label} — ${seduta.focus} · ${seduta.setCount} serie` +
-          ` · ${formatVolume(seduta.volume)} kg`,
+          ` · ${formatVolume(seduta.volume)} kg`
       );
     }
     righe.push("");
     righe.push(
       `${r.sedute.length} ${r.sedute.length === 1 ? "seduta" : "sedute"}` +
-        ` · ${formatVolume(r.volumeTotale)} kg sollevati in tutto`,
+        ` · ${formatVolume(r.volumeTotale)} kg sollevati in tutto`
     );
   }
 
   righe.push("");
   righe.push(
-    "I carichi degli esercizi con i manubri sono il peso di un manubrio, non il totale.",
+    "I carichi degli esercizi con i manubri sono il peso di un manubrio, non il totale."
   );
 
   return righe.join("\n");

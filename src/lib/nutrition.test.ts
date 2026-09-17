@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   alreadyOver,
+  avvisoNonScomposte,
   buildProgress,
   fitsInRemaining,
   formatMacro,
+  kcalNonScomposte,
   sumMacros,
   type MacroSource,
 } from "./nutrition";
@@ -63,7 +65,11 @@ describe("buildProgress", () => {
   it("tratta il target esatto come non sforato", () => {
     const progress = buildProgress({ ...DAILY_TARGETS });
     for (const item of progress) {
-      assert.equal(item.isOver, false, `${item.key} non deve risultare oltre target`);
+      assert.equal(
+        item.isOver,
+        false,
+        `${item.key} non deve risultare oltre target`
+      );
       assert.equal(item.remaining, 0);
       assert.equal(item.over, 0);
       assert.equal(item.percent, 100);
@@ -73,7 +79,7 @@ describe("buildProgress", () => {
   it("restituisce i quattro macro nell'ordine della UI", () => {
     assert.deepEqual(
       buildProgress(sumMacros([])).map((p) => p.key),
-      ["kcal", "carbs", "protein", "fat"],
+      ["kcal", "carbs", "protein", "fat"]
     );
   });
 });
@@ -98,7 +104,7 @@ describe("formatMacro", () => {
       for (const chiave of ["kcal", "carbs", "protein", "fat"] as const) {
         assert.ok(
           !formatMacro(valore, chiave).includes("."),
-          `${valore} come ${chiave} e' uscito con il punto`,
+          `${valore} come ${chiave} e' uscito con il punto`
         );
       }
     }
@@ -127,7 +133,10 @@ describe("fitsInRemaining", () => {
     assert.equal(verdict.fits, false);
     assert.ok(verdict.exceeds.includes("kcal"));
     assert.ok(verdict.exceeds.includes("carbs"));
-    assert.ok(!verdict.exceeds.includes("protein"), "le proteine ci stanno ancora");
+    assert.ok(
+      !verdict.exceeds.includes("protein"),
+      "le proteine ci stanno ancora"
+    );
   });
 
   it("il target esatto ci sta ancora, non e' sforo", () => {
@@ -141,14 +150,24 @@ describe("fitsInRemaining", () => {
   });
 
   it("un grammo oltre non ci sta piu'", () => {
-    const oltre = { kcal: DAILY_TARGETS.kcal - riso.kcal + 1, carbs: 0, protein: 0, fat: 0 };
+    const oltre = {
+      kcal: DAILY_TARGETS.kcal - riso.kcal + 1,
+      carbs: 0,
+      protein: 0,
+      fat: 0,
+    };
     assert.deepEqual(fitsInRemaining(oltre, riso).exceeds, ["kcal"]);
   });
 
   it("non incolpa l'alimento per un macro gia' sforato", () => {
     // carboidrati gia' oltre: aggiungere riso li peggiora, ma non e' lui a
     // farli sforare, ed elencarlo renderebbe ogni cibo "proibito"
-    const carboSforati = { kcal: 0, carbs: DAILY_TARGETS.carbs + 50, protein: 0, fat: 0 };
+    const carboSforati = {
+      kcal: 0,
+      carbs: DAILY_TARGETS.carbs + 50,
+      protein: 0,
+      fat: 0,
+    };
     assert.deepEqual(fitsInRemaining(carboSforati, riso).exceeds, []);
   });
 
@@ -165,14 +184,80 @@ describe("fitsInRemaining", () => {
 
 describe("alreadyOver", () => {
   it("elenca solo i macro gia' oltre", () => {
-    assert.deepEqual(alreadyOver({ kcal: 0, carbs: 0, protein: 0, fat: 0 }), []);
     assert.deepEqual(
-      alreadyOver({ kcal: DAILY_TARGETS.kcal + 1, carbs: 0, protein: 0, fat: DAILY_TARGETS.fat + 1 }),
-      ["kcal", "fat"],
+      alreadyOver({ kcal: 0, carbs: 0, protein: 0, fat: 0 }),
+      []
+    );
+    assert.deepEqual(
+      alreadyOver({
+        kcal: DAILY_TARGETS.kcal + 1,
+        carbs: 0,
+        protein: 0,
+        fat: DAILY_TARGETS.fat + 1,
+      }),
+      ["kcal", "fat"]
     );
   });
 
   it("il target esatto non e' oltre", () => {
     assert.deepEqual(alreadyOver({ ...DAILY_TARGETS }), []);
+  });
+});
+
+describe("calorie registrate senza macro", () => {
+  const scomposto: MacroSource = {
+    kcal: 640,
+    carbs: 88.4,
+    protein: 45.6,
+    fat: 12.5,
+  };
+  const aOcchio: MacroSource & { onlyKcal: boolean } = {
+    kcal: 350,
+    carbs: 0,
+    protein: 0,
+    fat: 0,
+    onlyKcal: true,
+  };
+  const zeroVeri: MacroSource = { kcal: 100, carbs: 0, protein: 0, fat: 0 };
+
+  it("conta solo quelle segnate a occhio", () => {
+    assert.equal(kcalNonScomposte([scomposto, aOcchio]), 350);
+  });
+
+  it("un pasto scomposto non ci entra, nemmeno se ha zero grammi di un macro", () => {
+    assert.equal(kcalNonScomposte([zeroVeri]), 0);
+  });
+
+  it("senza pasti a occhio il totale è zero", () => {
+    assert.equal(kcalNonScomposte([scomposto]), 0);
+  });
+
+  it("le somma tutte, non solo la prima", () => {
+    assert.equal(kcalNonScomposte([aOcchio, scomposto, aOcchio]), 700);
+  });
+
+  it("non tocca la somma dei macro: quelle calorie restano nell'anello", () => {
+    const totali = sumMacros([scomposto, aOcchio]);
+    assert.equal(totali.kcal, 990);
+    assert.equal(totali.carbs, 88.4);
+    assert.equal(totali.protein, 45.6);
+  });
+});
+
+describe("l'avviso delle calorie non scomposte", () => {
+  it("dice quante sono, con la virgola come tutto il resto", () => {
+    assert.match(avvisoNonScomposte(350), /350 kcal/);
+    assert.match(avvisoNonScomposte(350), /senza macro/);
+  });
+
+  it("a zero non dice niente: una riga vuota è rumore tutti i giorni", () => {
+    assert.equal(avvisoNonScomposte(0), "");
+    assert.equal(avvisoNonScomposte(-10), "");
+  });
+
+  it("non incolpa: nessun punto esclamativo, nessun 'attenzione'", () => {
+    const testo = avvisoNonScomposte(350);
+    assert.doesNotMatch(testo, /!/);
+    assert.doesNotMatch(testo, /attenzione|sbagli|dovresti/i);
   });
 });

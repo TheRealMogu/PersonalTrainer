@@ -28,8 +28,43 @@ export function sumMacros(items: MacroSource[]): MacroTotals {
       }
       return acc;
     },
-    { ...EMPTY_TOTALS },
+    { ...EMPTY_TOTALS }
   );
+}
+
+/**
+ * Le calorie registrate senza sapere da quali macro arrivano.
+ *
+ * Servono a non far mentire le barre. Se hai segnato 350 kcal mangiando
+ * fuori, i carboidrati a schermo dicono "88,4 g" ed e' vero solo per i pasti
+ * scomposti: dentro la giornata ce ne sono altri, semplicemente non si sa
+ * quanti. Un'app che tace qui sta dando per zero un numero che non conosce,
+ * ed e' la regola 5 al contrario.
+ *
+ * L'anello delle calorie invece resta giusto: quelle si sanno.
+ */
+export function kcalNonScomposte(
+  items: { kcal: number; onlyKcal?: boolean }[]
+): number {
+  return items.reduce(
+    (somma, item) => (item.onlyKcal ? somma + item.kcal : somma),
+    0
+  );
+}
+
+/**
+ * La frase da mettere sotto le barre, una volta sola.
+ *
+ * Una volta sola e non su ogni macro: ripeterla tre volte trasformerebbe
+ * un'informazione in un rimprovero, ed e' la regola 8. Stringa vuota quando
+ * non c'e' niente da dichiarare, cosi' chi la usa non deve decidere.
+ */
+export function avvisoNonScomposte(kcal: number): string {
+  if (kcal <= 0) return "";
+  return `Più ${formatMacro(
+    kcal,
+    "kcal"
+  )} kcal senza macro, registrate a occhio.`;
 }
 
 /**
@@ -53,7 +88,8 @@ export function sumMacros(items: MacroSource[]): MacroTotals {
  * leggibilita'.
  */
 export function formatMacro(value: number, key: MacroKey): string {
-  const arrotondato = key === "kcal" ? Math.round(value) : Math.round(value * 10) / 10;
+  const arrotondato =
+    key === "kcal" ? Math.round(value) : Math.round(value * 10) / 10;
   return String(arrotondato).replace(".", ",");
 }
 
@@ -72,7 +108,7 @@ export type MacroProgress = {
 
 export function buildProgress(
   totals: MacroTotals,
-  targets: Target = DAILY_TARGETS,
+  targets: Target = DAILY_TARGETS
 ): MacroProgress[] {
   return MACRO_ORDER.map((key) => {
     const consumed = totals[key];
@@ -111,10 +147,11 @@ export type FitVerdict = {
 export function fitsInRemaining(
   totals: MacroTotals,
   item: MacroSource,
-  targets: Target = DAILY_TARGETS,
+  targets: Target = DAILY_TARGETS
 ): FitVerdict {
   const exceeds = MACRO_ORDER.filter(
-    (key) => totals[key] <= targets[key] && totals[key] + item[key] > targets[key],
+    (key) =>
+      totals[key] <= targets[key] && totals[key] + item[key] > targets[key]
   );
   return { fits: exceeds.length === 0, exceeds };
 }
@@ -122,7 +159,7 @@ export function fitsInRemaining(
 /** I macro gia' oltre target, da dire una volta sola invece che su ogni alimento. */
 export function alreadyOver(
   totals: MacroTotals,
-  targets: Target = DAILY_TARGETS,
+  targets: Target = DAILY_TARGETS
 ): MacroKey[] {
   return MACRO_ORDER.filter((key) => totals[key] > targets[key]);
 }

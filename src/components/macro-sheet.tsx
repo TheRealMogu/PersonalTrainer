@@ -1,7 +1,12 @@
 "use client";
 
 import type { Meal, QuickFood } from "@/db/schema";
-import { formatMacro, type MacroProgress } from "@/lib/nutrition";
+import {
+  avvisoNonScomposte,
+  formatMacro,
+  kcalNonScomposte,
+  type MacroProgress,
+} from "@/lib/nutrition";
 import { MACRO_LABELS, MACRO_UNITS, type MacroKey } from "@/lib/targets";
 
 /** Quanti alimenti proporre: oltre diventa una lista da leggere, non una risposta. */
@@ -37,6 +42,11 @@ export function MacroSheet({
     .filter((meal) => meal[key] > 0)
     .sort((a, b) => b[key] - a[key]);
 
+  // I pasti segnati a occhio non compaiono qui sopra -- non hanno grammi da
+  // mostrare -- ma sono nella giornata. Dirlo e' l'unico modo perche' questa
+  // schermata risponda davvero a "da dove arriva".
+  const fuoriDalConto = kcalNonScomposte(meals);
+
   const proposte = progress.isOver
     ? []
     : foods
@@ -69,10 +79,23 @@ export function MacroSheet({
           <h2 className="text-[20px] font-bold leading-tight tracking-tight">
             {MACRO_LABELS[key]}
           </h2>
-          <p className={`mt-0.5 text-[15px] ${progress.isOver ? "text-over" : "text-muted"}`}>
+          <p
+            className={`mt-0.5 text-[15px] ${
+              progress.isOver ? "text-over" : "text-muted"
+            }`}
+          >
             {progress.isOver
-              ? `${formatMacro(progress.over, key)} ${unit} oltre il target di ${formatMacro(progress.target, key)}`
-              : `Restano ${formatMacro(progress.remaining, key)} ${unit} su ${formatMacro(progress.target, key)}`}
+              ? `${formatMacro(
+                  progress.over,
+                  key
+                )} ${unit} oltre il target di ${formatMacro(
+                  progress.target,
+                  key
+                )}`
+              : `Restano ${formatMacro(
+                  progress.remaining,
+                  key
+                )} ${unit} su ${formatMacro(progress.target, key)}`}
           </p>
         </header>
 
@@ -82,16 +105,24 @@ export function MacroSheet({
           </h3>
           {contributi.length === 0 ? (
             <p className="text-[15px] text-muted">
-              Niente ancora: non hai registrato pasti che ne contengono.
+              {fuoriDalConto > 0
+                ? "Nessun pasto scomposto ne contiene. Quelli segnati a occhio potrebbero, ma non se ne conoscono i grammi."
+                : "Niente ancora: non hai registrato pasti che ne contengono."}
             </p>
           ) : (
             <ul className="divide-y divide-hairline">
               {contributi.map((meal) => (
-                <li key={meal.id} className="flex items-baseline justify-between gap-3 py-2.5">
+                <li
+                  key={meal.id}
+                  className="flex items-baseline justify-between gap-3 py-2.5"
+                >
                   <span className="min-w-0 flex-1 text-[15px] leading-snug">
                     {meal.name}
                     {meal.quantity !== 1 ? (
-                      <span className="text-muted"> ×{formatMacro(meal.quantity, "carbs")}</span>
+                      <span className="text-muted">
+                        {" "}
+                        ×{formatMacro(meal.quantity, "carbs")}
+                      </span>
                     ) : null}
                   </span>
                   <span className="shrink-0 text-[15px] font-semibold tabular-nums">
@@ -101,6 +132,12 @@ export function MacroSheet({
               ))}
             </ul>
           )}
+
+          {contributi.length > 0 && fuoriDalConto > 0 ? (
+            <p className="mt-2 text-[13px] leading-snug text-muted">
+              {avvisoNonScomposte(fuoriDalConto)}
+            </p>
+          ) : null}
         </section>
 
         {proposte.length > 0 ? (
@@ -110,8 +147,13 @@ export function MacroSheet({
             </h3>
             <ul className="divide-y divide-hairline">
               {proposte.map(({ food, quante }) => (
-                <li key={food.id} className="flex items-baseline justify-between gap-3 py-2.5">
-                  <span className="min-w-0 flex-1 text-[15px] leading-snug">{food.name}</span>
+                <li
+                  key={food.id}
+                  className="flex items-baseline justify-between gap-3 py-2.5"
+                >
+                  <span className="min-w-0 flex-1 text-[15px] leading-snug">
+                    {food.name}
+                  </span>
                   <span className="shrink-0 text-[15px] tabular-nums text-muted">
                     {quante >= TROPPE ? (
                       // "fino a 24 porzioni" e' vero e inutile: sopra questa
@@ -119,11 +161,16 @@ export function MacroSheet({
                       "ci sta senza problemi"
                     ) : quante > 1 ? (
                       <>
-                        fino a <strong className="font-semibold text-ink">{quante}</strong> porzioni
+                        fino a{" "}
+                        <strong className="font-semibold text-ink">
+                          {quante}
+                        </strong>{" "}
+                        porzioni
                       </>
                     ) : (
                       <>
-                        <strong className="font-semibold text-ink">1</strong> porzione
+                        <strong className="font-semibold text-ink">1</strong>{" "}
+                        porzione
                       </>
                     )}
                   </span>
@@ -131,8 +178,8 @@ export function MacroSheet({
               ))}
             </ul>
             <p className="mt-3 text-[13px] leading-snug text-muted">
-              Conta solo {MACRO_LABELS[key].toLowerCase()}: un alimento che ci sta qui potrebbe
-              far sforare un altro macro.
+              Conta solo {MACRO_LABELS[key].toLowerCase()}: un alimento che ci
+              sta qui potrebbe far sforare un altro macro.
             </p>
           </section>
         ) : null}

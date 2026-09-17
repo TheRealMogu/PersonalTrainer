@@ -19,16 +19,23 @@ export type MealInput = {
   carbs: number;
   protein: number;
   fat: number;
+  /** Le calorie si sanno, i macro no. Vedi `meals.onlyKcal` nello schema. */
+  onlyKcal?: boolean;
 };
 
 function validate(input: MealInput): string | null {
   if (!isIsoDate(input.day)) return "Data non valida.";
   if (!isMealSlot(input.slot)) return "Momento della giornata non valido.";
-  if (!Number.isFinite(input.quantity) || input.quantity <= 0 || input.quantity > 20) {
+  if (
+    !Number.isFinite(input.quantity) ||
+    input.quantity <= 0 ||
+    input.quantity > 20
+  ) {
     return "La quantità deve stare fra 0 e 20 porzioni.";
   }
   if (!input.name.trim()) return "Il nome del pasto è obbligatorio.";
-  if (input.name.trim().length > 120) return "Il nome del pasto è troppo lungo.";
+  if (input.name.trim().length > 120)
+    return "Il nome del pasto è troppo lungo.";
 
   const numbers: [string, number][] = [
     ["kcal", input.kcal],
@@ -58,6 +65,7 @@ export async function addMeal(input: MealInput): Promise<ActionResult> {
       carbs: input.carbs,
       protein: input.protein,
       fat: input.fat,
+      onlyKcal: input.onlyKcal ?? false,
     });
   } catch (cause) {
     console.error("addMeal fallita", cause);
@@ -73,13 +81,14 @@ export async function addMeal(input: MealInput): Promise<ActionResult> {
  * cosi' dopo un "Annulla" torna al suo posto nella lista e non in fondo.
  */
 export async function restoreMeal(
-  input: MealInput & { createdAt: string },
+  input: MealInput & { createdAt: string }
 ): Promise<ActionResult> {
   const error = validate(input);
   if (error) return { ok: false, error };
 
   const createdAt = new Date(input.createdAt);
-  if (Number.isNaN(createdAt.getTime())) return { ok: false, error: "Orario non valido." };
+  if (Number.isNaN(createdAt.getTime()))
+    return { ok: false, error: "Orario non valido." };
 
   try {
     await db.insert(meals).values({
@@ -127,12 +136,18 @@ export type MealPatch = {
   fat: number;
 };
 
+/** Almeno un macro diverso da zero: il pasto e' stato scomposto. */
+function macroScritti(patch: { carbs: number; protein: number; fat: number }): boolean {
+  return patch.carbs > 0 || patch.protein > 0 || patch.fat > 0;
+}
+
 export async function updateMeal(
   id: number,
   day: string,
-  patch: MealPatch,
+  patch: MealPatch
 ): Promise<ActionResult> {
-  if (!Number.isInteger(id) || id <= 0) return { ok: false, error: "Pasto non valido." };
+  if (!Number.isInteger(id) || id <= 0)
+    return { ok: false, error: "Pasto non valido." };
 
   const error = validate({ day, ...patch });
   if (error) return { ok: false, error };
@@ -148,11 +163,21 @@ export async function updateMeal(
         carbs: patch.carbs,
         protein: patch.protein,
         fat: patch.fat,
+        // Se correggendolo hai scritto dei macro, quel pasto non e' piu' "a
+        // occhio": smettere di dichiararlo e' parte della correzione. Senza
+        // questa riga l'app continuerebbe a dire che quelle calorie non sono
+        // scomposte mentre i grammi sono li' a schermo.
+        //
+        // Al contrario non si riaccende mai da qui: un pasto normale con tre
+        // zeri resta un pasto normale con tre zeri, e indovinare il contrario
+        // vorrebbe dire decidere al posto tuo cosa sai e cosa non sai.
+        ...(macroScritti(patch) ? { onlyKcal: false } : {}),
       })
       .where(and(eq(meals.id, id), eq(meals.day, day)))
       .returning({ id: meals.id });
 
-    if (aggiornate.length === 0) return { ok: false, error: "Pasto non trovato." };
+    if (aggiornate.length === 0)
+      return { ok: false, error: "Pasto non trovato." };
   } catch (cause) {
     console.error("updateMeal fallita", cause);
     return { ok: false, error: "Modifica non riuscita. Riprova." };
@@ -162,8 +187,12 @@ export async function updateMeal(
   return { ok: true };
 }
 
-export async function deleteMeal(id: number, day: string): Promise<ActionResult> {
-  if (!Number.isInteger(id) || id <= 0) return { ok: false, error: "Pasto non valido." };
+export async function deleteMeal(
+  id: number,
+  day: string
+): Promise<ActionResult> {
+  if (!Number.isInteger(id) || id <= 0)
+    return { ok: false, error: "Pasto non valido." };
   if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };
 
   try {
@@ -190,10 +219,20 @@ export async function deleteMeal(id: number, day: string): Promise<ActionResult>
  * a un tocco di distanza. La regola 4 chiede che un errore si possa
  * disfare, non che ci sia per forza un messaggio che lo propone.
  */
-export async function setWater(day: string, bicchieri: number): Promise<ActionResult> {
+export async function setWater(
+  day: string,
+  bicchieri: number
+): Promise<ActionResult> {
   if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };
-  if (!Number.isInteger(bicchieri) || bicchieri < 0 || bicchieri > MAX_BICCHIERI) {
-    return { ok: false, error: `I bicchieri devono stare fra 0 e ${MAX_BICCHIERI}.` };
+  if (
+    !Number.isInteger(bicchieri) ||
+    bicchieri < 0 ||
+    bicchieri > MAX_BICCHIERI
+  ) {
+    return {
+      ok: false,
+      error: `I bicchieri devono stare fra 0 e ${MAX_BICCHIERI}.`,
+    };
   }
 
   try {
@@ -228,7 +267,7 @@ export async function setWater(day: string, bicchieri: number): Promise<ActionRe
 export async function segnaIntegratore(
   day: string,
   supplementId: number,
-  preso: boolean,
+  preso: boolean
 ): Promise<ActionResult> {
   if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };
   if (!Number.isInteger(supplementId) || supplementId <= 0) {
@@ -246,7 +285,10 @@ export async function segnaIntegratore(
       await db
         .delete(supplementChecks)
         .where(
-          and(eq(supplementChecks.day, day), eq(supplementChecks.supplementId, supplementId)),
+          and(
+            eq(supplementChecks.day, day),
+            eq(supplementChecks.supplementId, supplementId)
+          )
         );
     }
   } catch (cause) {

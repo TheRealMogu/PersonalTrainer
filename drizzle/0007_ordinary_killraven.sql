@@ -1,0 +1,1 @@
+ALTER TABLE "meals" ADD COLUMN "only_kcal" boolean DEFAULT false NOT NULL;
