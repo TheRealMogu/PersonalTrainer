@@ -33,7 +33,7 @@ export default function Error({
         <button
           type="button"
           onClick={reset}
-          className="mt-4 min-h-11 w-full rounded-xl bg-accent px-4 text-[15px] font-medium text-on-accent transition-opacity active:opacity-60"
+          className="mt-4 min-h-11 w-full rounded-xl bg-accent-solid px-4 text-[15px] font-medium text-on-accent transition-opacity active:opacity-60"
         >
           Riprova
         </button>

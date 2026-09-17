@@ -1,17 +1,16 @@
 import "./load-env";
-import { neon } from "@neondatabase/serverless";
 import { isNull, sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/neon-http";
+import { db } from "../src/db";
 import { quickFoods, workoutDays, workoutExercises, workoutSets } from "../src/db/schema";
 import { QUICK_FOODS_SEED, WORKOUT_SEED } from "../src/lib/seed-data";
 
+/*
+ * Il collegamento arriva da `src/db`, lo stesso che usa l'app, invece di
+ * costruirne uno qui con il driver di Neon scritto a mano. Cosi' il seed
+ * funziona anche contro un Postgres normale -- in locale e sulla macchina
+ * della CI, dove Neon non si deve nemmeno provare a raggiungerla.
+ */
 async function main() {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
-    throw new Error("DATABASE_URL non impostata: copia .env.example in .env.local");
-  }
-
-  const db = drizzle(neon(connectionString));
 
   // I tasti rapidi non sono riferiti da nessuno: si possono sempre rifare.
   console.log(`Ricarico ${QUICK_FOODS_SEED.length} tasti rapidi…`);

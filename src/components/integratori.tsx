@@ -98,7 +98,7 @@ export function Integratori({
                 aria-hidden="true"
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold transition-colors duration-200 ease-ios ${
                   integratore.preso
-                    ? "border-accent bg-accent text-on-accent"
+                    ? "border-accent bg-accent-solid text-on-accent"
                     : "border-hairline text-transparent"
                 }`}
               >

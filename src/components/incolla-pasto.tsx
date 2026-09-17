@@ -306,7 +306,7 @@ export function IncollaPasto({
                   aria-pressed={slot === value}
                   className={`min-h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors duration-200 ease-ios ${
                     slot === value
-                      ? "bg-accent text-on-accent"
+                      ? "bg-accent-solid text-on-accent"
                       : "border border-hairline bg-raised text-muted"
                   }`}
                 >
@@ -319,7 +319,7 @@ export function IncollaPasto({
               type="button"
               onClick={leggi}
               disabled={!testo.trim()}
-              className="mt-3 min-h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
+              className="mt-3 min-h-12 w-full rounded-xl bg-accent-solid text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
             >
               Leggi
             </button>
@@ -391,7 +391,7 @@ export function IncollaPasto({
                           aria-hidden="true"
                           className={`flex h-6 w-6 items-center justify-center rounded-md border text-[13px] font-bold ${
                             riga.incluso
-                              ? "border-accent bg-accent text-on-accent"
+                              ? "border-accent bg-accent-solid text-on-accent"
                               : "border-hairline bg-raised text-transparent"
                           }`}
                         >
@@ -473,7 +473,7 @@ export function IncollaPasto({
                               aria-pressed={riga.slot === value}
                               className={`min-h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors duration-200 ease-ios ${
                                 riga.slot === value
-                                  ? "bg-accent text-on-accent"
+                                  ? "bg-accent-solid text-on-accent"
                                   : "border border-hairline bg-surface text-muted"
                               }`}
                             >
@@ -522,7 +522,7 @@ export function IncollaPasto({
               type="button"
               disabled={scelte.length === 0}
               onClick={salva}
-              className="min-h-12 flex-1 rounded-xl bg-accent text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
+              className="min-h-12 flex-1 rounded-xl bg-accent-solid text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
             >
               {scelte.length === 1 ? "Aggiungi 1 alimento" : `Aggiungi ${scelte.length} alimenti`}
             </button>

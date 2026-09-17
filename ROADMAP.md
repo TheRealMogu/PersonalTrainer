@@ -111,19 +111,31 @@ L'app presuppone che tutto vada bene. Non è vero.
 
 ## 4. Qualità che non si vede ma si sente
 
-- [ ] **Test end-to-end nella pipeline.** Le prove col browser le ho fatte a
-      mano a ogni modifica. Vanno messe in CI, altrimenti la prossima
-      regressione la scopre l'uso.
-- [ ] **Verifica dei contrasti automatica**, non a occhio: una regola che
-      fallisce la build se un testo scende sotto 4.5:1.
-- [ ] **Controllo dei bersagli tattili in CI**, per non riscoprire a mano i
-      controlli sotto i 44 px (è già successo due volte).
+- [x] **Test end-to-end nella pipeline.** Fatto: `npm run e2e`, e in CI gira
+      contro un Postgres vero (non Neon: da una macchina di GitHub il database
+      di produzione non si tocca). Ha richiesto una cosa che valeva da sola —
+      il driver adesso si sceglie dall'indirizzo invece che riscrivendo
+      `src/db/index.ts` a mano prima di ogni prova. Una cosa da ricordarsi
+      prima o poi la si dimentica, e quella volta il driver di prova finisce
+      in produzione.
+- [x] **Verifica dei contrasti automatica.** Fatto, e ha trovato subito una
+      cosa vera: il blu dei collegamenti faceva 4,21:1 sullo sfondo della
+      pagina. Sul bianco faceva 4,70 e sembrava a posto — misurare sul bianco
+      e fermarsi lì era il modo di non vederlo.
+
+      Il controllo compone le trasparenze e fa convertire i colori al browser
+      disegnandoli su una canvas. Non è pignoleria: Tailwind v4 scrive
+      `oklab(...)` ovunque ci sia un'opacità, e leggerne i numeri con una
+      regex dava contrasti finti da 3,04:1 su testo che si legge benissimo.
+      Tre giri di misure sono serviti a separare i bug veri dai miei.
+- [x] **Controllo dei bersagli tattili in CI.** Fatto, ed è successo una
+      terza volta: il salto *N pasti ↓* aggiunto poche ore prima era 59×28.
+      Trovato dalla misura, non guardandolo.
 - [ ] **Numeri di versione**: oggi l'IPA non ha una versione riconoscibile.
       Serve per sapere quale build hai sul telefono.
-- [ ] **Aggiornare le azioni di GitHub.** Il primo giro ha avvisato che
-      `checkout`, `setup-node` e `upload-artifact` puntano a una versione di
-      Node in dismissione. Funzionano ancora (girano su una più nuova), ma
-      prima o poi smetteranno.
+- [x] **Aggiornare le azioni di GitHub.** Fatto per `checkout` e
+      `setup-node` (v4 → v5) nel workflow dei controlli. `upload-artifact`
+      resta da guardare quando si tocca il workflow dell'IPA.
 
 ## 5. Dati personali fuori dal codice
 

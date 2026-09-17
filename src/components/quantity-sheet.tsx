@@ -75,7 +75,7 @@ export function QuantitySheet({
                 }}
                 className={`h-12 flex-1 rounded-xl text-[15px] font-semibold tabular-nums transition-colors duration-200 ease-ios ${
                   active
-                    ? "bg-accent text-on-accent"
+                    ? "bg-accent-solid text-on-accent"
                     : "border border-hairline bg-raised text-ink"
                 }`}
               >
@@ -106,7 +106,7 @@ export function QuantitySheet({
               onClick={() => setSlot(value)}
               className={`h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors duration-200 ease-ios ${
                 slot === value
-                  ? "bg-accent text-on-accent"
+                  ? "bg-accent-solid text-on-accent"
                   : "border border-hairline bg-raised text-muted"
               }`}
             >
@@ -138,7 +138,7 @@ export function QuantitySheet({
             type="button"
             disabled={!valid}
             onClick={() => onConfirm(effective, slot)}
-            className="min-h-12 flex-1 rounded-xl bg-accent text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
+            className="min-h-12 flex-1 rounded-xl bg-accent-solid text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
           >
             Aggiungi
           </button>

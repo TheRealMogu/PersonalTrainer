@@ -273,7 +273,7 @@ function Scheda({
           type="button"
           disabled={!nomeValido}
           onClick={() => onSalva(valori)}
-          className="min-h-12 flex-1 rounded-xl bg-accent text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
+          className="min-h-12 flex-1 rounded-xl bg-accent-solid text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
         >
           Salva
         </button>

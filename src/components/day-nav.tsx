@@ -68,7 +68,12 @@ export function DayNav({ day, pasti }: { day: string; pasti: number }) {
         ) : pasti > 0 ? (
           <a
             href="#pasti"
-            className="inline-block py-1 text-[13px] text-accent"
+            /*
+              44 px pieni: era 59×28, e la regola 2 non fa sconti nemmeno a un
+              collegamento piccolo dentro una barra. Trovato dalle prove col
+              browser, non a occhio -- come le due volte precedenti.
+            */
+            className="inline-flex min-h-11 items-center justify-center px-3 text-[13px] text-accent tocco active:opacity-60"
           >
             {pasti === 1 ? "1 pasto" : `${pasti} pasti`} ↓
           </a>

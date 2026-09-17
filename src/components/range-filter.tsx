@@ -34,7 +34,7 @@ export function RangeFilter({ active }: { active: number }) {
             aria-current={selected ? "true" : undefined}
             className={`relative flex min-h-11 items-center rounded-full px-5 text-[13px] font-medium transition-colors duration-200 ease-ios ${
               selected
-                ? "bg-accent text-on-accent"
+                ? "bg-accent-solid text-on-accent"
                 : "border border-hairline bg-surface text-muted"
             }`}
           >

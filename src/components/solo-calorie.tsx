@@ -94,7 +94,7 @@ export function SoloCalorie({
           type="button"
           onClick={salva}
           disabled={!valido}
-          className="min-h-11 shrink-0 rounded-xl bg-accent px-4 text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
+          className="min-h-11 shrink-0 rounded-xl bg-accent-solid px-4 text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
         >
           Aggiungi
         </button>

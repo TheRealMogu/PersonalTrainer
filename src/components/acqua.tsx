@@ -81,7 +81,7 @@ export function Acqua({
           onClick={() => cambia(1)}
           disabled={ottimistici >= MAX_BICCHIERI}
           aria-label="Segna un bicchiere d'acqua"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-[20px] font-semibold text-on-accent tocco-riquadro active:opacity-80 disabled:opacity-40"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent-solid text-[20px] font-semibold text-on-accent tocco-riquadro active:opacity-80 disabled:opacity-40"
         >
           +
         </button>
@@ -101,7 +101,7 @@ export function Acqua({
           <span
             key={indice}
             className={`h-2 flex-1 rounded-full transition-colors duration-200 ease-ios ${
-              indice < ottimistici ? "bg-accent" : "bg-track"
+              indice < ottimistici ? "bg-accent-solid" : "bg-track"
             }`}
           />
         ))}

@@ -22,7 +22,7 @@ export function RetryButton() {
           setTentativi((n) => n + 1);
           startTransition(() => router.refresh());
         }}
-        className="min-h-11 w-full rounded-xl bg-accent px-4 text-[15px] font-medium text-on-accent tocco active:opacity-60 disabled:opacity-60"
+        className="min-h-11 w-full rounded-xl bg-accent-solid px-4 text-[15px] font-medium text-on-accent tocco active:opacity-60 disabled:opacity-60"
       >
         {pending ? "Riprovo…" : "Riprova"}
       </button>

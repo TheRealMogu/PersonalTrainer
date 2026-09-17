@@ -112,11 +112,22 @@ Costate tempo una volta. Non ripaghiamole.
   su `127.0.0.1`.** Con l'indirizzo numerico Next blocca `/_next/hmr` come
   richiesta cross-origin e la pagina non si idrata: i tasti si vedono e non
   fanno niente. Sembra un bug del codice, non lo e'.
-- **La rete di questo ambiente non raggiunge Neon.** Per provare in locale:
-  Postgres normale e driver `pg`, applicando i file in `drizzle/*.sql` con
-  `psql`. Contro il database vero ci pensa il workflow *Migrazioni*, che gira
-  da solo a ogni push su `main`; `db:seed` resta a mano.
-- **Le migration devono essere additive.** Il workflow *Migrazioni* e il
+- **La rete di questo ambiente non raggiunge Neon.** Non serve piu' toccare
+  `src/db/index.ts`: il driver si sceglie dall'indirizzo, quindi basta una
+  `DATABASE_URL` che punti a un Postgres normale. I file in `drizzle/*.sql` si
+  applicano con `psql`. Contro il database vero ci pensa il workflow
+  *Migrazioni*, che gira da solo a ogni push su `main`.
+- **Tailwind v4 scrive i colori in `oklab(...)`** ogni volta che c'e'
+  un'opacita' (`bg-surface/85`). Leggerne i numeri con una regex, come se
+  fossero r/g/b, da' risultati senza senso: un quasi bianco diventa un quasi
+  nero. Per misurare un colore lo si fa **disegnare** su una canvas e si legge
+  il pixel -- `fillStyle` da solo non converte, restituisce l'oklab tale e
+  quale. Costato tre giri di misure in `e2e/regole.mjs`.
+- **Misurare il contrasto sul bianco non basta.** Le schede sono bianche ma la
+  pagina sotto e' `#f2f2f7`, e i collegamenti stanno li': un blu da 4,70:1 sul
+  bianco scende a 4,21:1 sullo sfondo pagina, cioe' sotto la regola 5. Il
+  controllo compone le trasparenze risalendo l'albero, come fa il browser.
+- - **Le migration devono essere additive.** Il workflow *Migrazioni* e il
   deploy di Vercel partono insieme sullo stesso push, quindi per qualche
   secondo il codice nuovo puo' girare sul database vecchio o viceversa. Una
   tabella nuova o una colonna con un valore predefinito non danno fastidio a
@@ -132,6 +143,7 @@ npm test             # test unitari
 npm run lint
 npm run typecheck
 npm run build
+npm run e2e          # prove col browser (server gia' acceso su :3000)
 npm run db:generate  # dopo aver cambiato lo schema: committa il .sql
 npm run db:migrate   # applica a Neon (di solito lo fa GitHub Actions da solo)
 npm run db:seed      # cibi rapidi e scheda

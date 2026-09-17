@@ -41,7 +41,7 @@ export function StartWorkoutButton({
         }
         className={`min-h-11 w-full rounded-xl text-[15px] font-semibold tocco active:opacity-80 disabled:opacity-50 ${
           variante === "principale"
-            ? "bg-accent text-on-accent"
+            ? "bg-accent-solid text-on-accent"
             : "border border-hairline text-accent active:bg-raised"
         }`}
       >

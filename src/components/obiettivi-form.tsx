@@ -155,7 +155,7 @@ export function ObiettiviForm({ iniziali }: { iniziali: Obiettivi }) {
         type="button"
         disabled={problema !== null || inCorso}
         onClick={salva}
-        className="mb-4 min-h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
+        className="mb-4 min-h-12 w-full rounded-xl bg-accent-solid text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
       >
         {salvato ? "Salvato ✓" : inCorso ? "Salvo…" : "Salva gli obiettivi"}
       </button>

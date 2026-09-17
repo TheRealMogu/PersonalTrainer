@@ -123,7 +123,7 @@ export function CambiaScheda({ attuale }: { attuale: GiornataAttuale[] }) {
           type="button"
           onClick={guarda}
           disabled={testo.trim() === ""}
-          className="mt-2 min-h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
+          className="mt-2 min-h-12 w-full rounded-xl bg-accent-solid text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-40"
         >
           Guarda cosa cambia
         </button>
@@ -275,7 +275,7 @@ export function CambiaScheda({ attuale }: { attuale: GiornataAttuale[] }) {
               <button
                 type="button"
                 onClick={applica}
-                className="mt-3 min-h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-on-accent tocco active:opacity-80"
+                className="mt-3 min-h-12 w-full rounded-xl bg-accent-solid text-[15px] font-semibold text-on-accent tocco active:opacity-80"
               >
                 Applica il cambio
               </button>

@@ -98,7 +98,7 @@ export function ManualMealForm({
             onClick={() => setSlot(value)}
             className={`h-11 flex-1 rounded-xl text-[13px] font-medium transition-colors duration-200 ease-ios ${
               slot === value
-                ? "bg-accent text-on-accent"
+                ? "bg-accent-solid text-on-accent"
                 : "border border-hairline bg-raised text-muted"
             }`}
           >
@@ -130,7 +130,7 @@ export function ManualMealForm({
       <div className="flex gap-2 pt-1">
         <button
           type="submit"
-          className="min-h-11 flex-1 rounded-xl bg-accent py-3 text-[15px] font-semibold text-on-accent tocco active:opacity-80"
+          className="min-h-11 flex-1 rounded-xl bg-accent-solid py-3 text-[15px] font-semibold text-on-accent tocco active:opacity-80"
         >
           Salva
         </button>

@@ -112,7 +112,7 @@ export function QuickFoods({
         aria-pressed={soloCheCiSta}
         className={`mb-3 min-h-11 w-full rounded-xl px-4 text-[13px] font-medium transition-colors duration-200 ease-ios ${
           soloCheCiSta
-            ? "bg-accent text-on-accent"
+            ? "bg-accent-solid text-on-accent"
             : "border border-hairline bg-raised text-muted"
         }`}
       >

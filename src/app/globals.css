@@ -16,13 +16,40 @@
   --color-surface: #ffffff;
   --color-raised: #f7f7fa;
   --color-hairline: #e3e3e8;
-  /* 3.26:1 sul bianco: e' la linea del target, se non si vede il grafico non si legge. */
+  /*
+   * 3,26:1 sul bianco. E' il colore di una **linea**, non di un testo: la
+   * riga del target nei grafici e le frecce decorative, dove il minimo e' 3:1
+   * (WCAG 1.4.11) e non 4,5. Per il testo c'e' `--color-muted`, e usarlo qui
+   * al posto suo e' l'errore che le prove col browser hanno trovato nel
+   * riepilogo della settimana.
+   */
   --color-reference: #8e8e93;
   --color-ink: #1c1c1e;
   --color-muted: #6e6e73;
 
   /* azione e stato */
-  --color-accent: #0071e3;
+  /*
+   * 5,93:1 sul bianco e 5,31:1 sullo sfondo pagina.
+   *
+   * Era #0071e3, che sul bianco fa 4,70:1 e sembrava a posto -- ma sullo
+   * sfondo della pagina (#f2f2f7) scende a 4,21:1, sotto il 4,5 della
+   * regola 5. E' li' che stanno i collegamenti "Piano", "Aggiungi un
+   * alimento", "3 pasti": misurare sul bianco e fermarsi era il modo di non
+   * vederlo. `--color-kcal` resta #0071e3: quello e' un colore validato per
+   * il daltonismo insieme agli altri macro, e non si ritocca per un motivo
+   * che non lo riguarda.
+   */
+  --color-accent: #0062c4;
+  /*
+   * Il blu dei tasti pieni, separato da quello del testo.
+   *
+   * Servono due token perche' tirano in direzioni opposte: sul fondo scuro il
+   * blu deve essere *chiaro* per leggersi come testo, e *scuro* perche' il
+   * bianco sopra si legga. Misurato: con un solo blu il tema scuro dava
+   * 3,37:1 al testo dentro i tasti -- sotto il 4,5 della regola 5, e si
+   * vedeva. Nel tema chiaro i due coincidono, perche' li' 4,70:1 basta.
+   */
+  --color-accent-solid: #0062c4;
   --color-over: #d92d20;
   --color-on-accent: #ffffff;
 
@@ -135,6 +162,8 @@
     --color-muted: #9b9ba1;
 
     --color-accent: #3d8ee8;
+    /* Bianco sopra: 4,95:1. Col #3d8ee8 del testo sarebbe stato 3,37:1. */
+    --color-accent-solid: #1f6fd0;
     --color-over: #ff6b5e;
     --color-on-accent: #ffffff;
 

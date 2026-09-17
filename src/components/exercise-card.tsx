@@ -179,7 +179,7 @@ export function ExerciseCard({
           onClick={handleLog}
           disabled={disabled}
           aria-label={`Segna la serie di ${exercise.name}`}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent tocco active:opacity-80 disabled:opacity-50"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-solid text-on-accent tocco active:opacity-80 disabled:opacity-50"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path
