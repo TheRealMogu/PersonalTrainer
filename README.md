@@ -184,11 +184,38 @@ vai su **Deployments → ⋯ → Redeploy**.
 > variabile viene iniettata in automatico: verifica solo che il nome sia
 > `DATABASE_URL`.
 
-Le migration non girano da sole al deploy. Dopo aver cambiato lo schema:
+### Le migration si applicano da sole
+
+Dopo aver cambiato lo schema serve solo generare il file e committarlo:
 
 ```bash
 npm run db:generate   # committa il file .sql generato
-npm run db:migrate    # applicalo a Neon dalla tua macchina
+```
+
+Ad ogni push su `main` il workflow **Migrazioni** applica a Neon quelle non
+ancora applicate. Perché funzioni serve il segreto una volta sola:
+
+**Settings → Secrets and variables → Actions → New repository secret**
+- Nome: `DATABASE_URL`
+- Valore: la stessa connection string di Neon che hai messo su Vercel
+
+Senza il segreto il workflow non fallisce: salta il passaggio e lo scrive nel
+riepilogo. La prima volta lo puoi lanciare a mano da **Actions → Migrazioni →
+Run workflow**, senza aspettare un push.
+
+`drizzle-kit` tiene il conto di quelle già applicate in una tabella sua,
+quindi rilanciarlo non rifà niente due volte.
+
+> **Le migration vanno tenute additive.** Il workflow e il deploy di Vercel
+> partono insieme sullo stesso push, quindi per qualche secondo il codice
+> nuovo può girare sul database vecchio o viceversa. Una tabella nuova o una
+> colonna con un valore predefinito non danno fastidio; togliere o rinominare
+> una colonna va fatto in due passaggi.
+
+Se preferisci applicarle dalla tua macchina resta possibile:
+
+```bash
+npm run db:migrate
 ```
 
 ## 5. Metterla sull'iPhone

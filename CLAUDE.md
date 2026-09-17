@@ -109,9 +109,17 @@ Costate tempo una volta. Non ripaghiamole.
   su `127.0.0.1`.** Con l'indirizzo numerico Next blocca `/_next/hmr` come
   richiesta cross-origin e la pagina non si idrata: i tasti si vedono e non
   fanno niente. Sembra un bug del codice, non lo e'.
-- **La rete di questo ambiente non raggiunge Neon.** `db:migrate` e
-  `db:seed` contro il database vero li lancia l'utente dalla sua macchina.
-  Per provare in locale: Postgres normale e driver `pg`.
+- **La rete di questo ambiente non raggiunge Neon.** Per provare in locale:
+  Postgres normale e driver `pg`, applicando i file in `drizzle/*.sql` con
+  `psql`. Contro il database vero ci pensa il workflow *Migrazioni*, che gira
+  da solo a ogni push su `main`; `db:seed` resta a mano.
+- **Le migration devono essere additive.** Il workflow *Migrazioni* e il
+  deploy di Vercel partono insieme sullo stesso push, quindi per qualche
+  secondo il codice nuovo puo' girare sul database vecchio o viceversa. Una
+  tabella nuova o una colonna con un valore predefinito non danno fastidio a
+  nessuno dei due; una colonna rinominata o tolta si', e va fatta in due
+  passaggi -- prima si aggiunge, poi in un secondo momento si toglie la
+  vecchia.
 
 ## Comandi
 
@@ -122,7 +130,7 @@ npm run lint
 npm run typecheck
 npm run build
 npm run db:generate  # dopo aver cambiato lo schema: committa il .sql
-npm run db:migrate   # applica a Neon (dalla macchina dell'utente)
+npm run db:migrate   # applica a Neon (di solito lo fa GitHub Actions da solo)
 npm run db:seed      # cibi rapidi e scheda
 ```
 
