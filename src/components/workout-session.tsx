@@ -21,7 +21,13 @@ import {
   subscribe,
 } from "@/lib/pending-store";
 import { proponiAnnullamento } from "@/lib/undo-seduta-store";
-import { formatVolume, groupByExercise, totalVolume, type LoggedSet } from "@/lib/workout";
+import {
+  avanzamentoSeduta,
+  formatVolume,
+  groupByExercise,
+  totalVolume,
+  type LoggedSet,
+} from "@/lib/workout";
 import { AnimatedNumber } from "./animated-number";
 import { EditSetSheet } from "./edit-set-sheet";
 import { ExerciseCard } from "./exercise-card";
@@ -114,6 +120,7 @@ export function WorkoutSession({
 
   const byExercise = groupByExercise(tutteLeSerie);
   const volume = totalVolume(tutteLeSerie);
+  const avanzamento = avanzamentoSeduta(exercises, tutteLeSerie);
 
   const inviaInCoda = useCallback(
     (item: PendingSet) =>
@@ -296,6 +303,14 @@ export function WorkoutSession({
                 <AnimatedNumber value={volume} format={formatVolume} /> kg sollevati
               </>
             ) : null}
+          </p>
+          {/*
+            Il cronometro dice da quanto sei in palestra, non quanto manca.
+            Questa riga risponde all'altra meta' della domanda.
+          */}
+          <p className="mt-0.5 text-[13px] tabular-nums leading-snug text-muted">
+            {avanzamento.eserciziFatti} di {avanzamento.eserciziTotali} esercizi ·{" "}
+            {avanzamento.serieFatte}/{avanzamento.serieTotali} serie
           </p>
         </div>
         <button

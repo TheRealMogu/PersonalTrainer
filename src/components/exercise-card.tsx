@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { WorkoutExercise } from "@/db/schema";
 import {
   caricoPerManubrio,
+  confrontaSerie,
   etichettaCarico,
   formatWeight,
   parseWeight,
@@ -71,11 +72,15 @@ export function ExerciseCard({
         <p className="mt-1 text-[13px] text-muted">
           Ultima volta: {lastTime.map((s) => `${formatWeight(s.weight)}×${s.reps}`).join(" · ")}
         </p>
-      ) : null}
+      ) : (
+        <p className="mt-1 text-[13px] text-muted">Prima volta su questo esercizio.</p>
+      )}
 
       {sets.length > 0 ? (
         <ul className="mt-3 divide-y divide-hairline">
-          {sets.map((set) => (
+          {sets.map((set) => {
+            const confronto = confrontaSerie(set, lastTime);
+            return (
             <li key={set.id} className="flex items-center gap-1 py-1">
               {/*
                 La riga si tocca e si corregge. Prima l'unico modo di
@@ -100,6 +105,18 @@ export function ExerciseCard({
                     <span className="ml-2 text-[13px] font-normal text-muted">da mandare</span>
                   ) : null}
                 </span>
+                {/*
+                  Quanto sei andato meglio o peggio della stessa serie
+                  dell'ultima volta. E' la domanda che ti fai davvero fra una
+                  serie e l'altra, e prima la dovevi fare a mente leggendo la
+                  riga "Ultima volta" in cima. Senza colore: una serie piu'
+                  leggera non e' un guasto ne' un fuori target.
+                */}
+                {confronto ? (
+                  <span className="shrink-0 pr-1 text-[13px] tabular-nums text-muted">
+                    {confronto.testo}
+                  </span>
+                ) : null}
               </button>
               <button
                 type="button"
@@ -119,7 +136,8 @@ export function ExerciseCard({
                 </svg>
               </button>
             </li>
-          ))}
+            );
+          })}
         </ul>
       ) : null}
 

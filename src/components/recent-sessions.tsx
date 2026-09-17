@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { deleteSession } from "@/app/allenamento/actions";
 import { proponiAnnullamento } from "@/lib/undo-seduta-store";
@@ -50,18 +51,32 @@ export function RecentSessions({ sessions }: { sessions: RecentSession[] }) {
       <ul className="divide-y divide-hairline">
         {sessions.map((session) => (
           <li key={session.id} className="flex items-center gap-2 py-1">
-            <div className="min-w-0 flex-1 py-1.5">
-              <p className="truncate text-[15px]">
-                {session.label} — {session.focus}
-              </p>
-              <p className="mt-0.5 text-[13px] tabular-nums text-muted">
-                {session.day.slice(8, 10)}/{session.day.slice(5, 7)} ·{" "}
-                {session.setCount === 1 ? "1 serie" : `${session.setCount} serie`}
-              </p>
-            </div>
-            <span className="shrink-0 text-[15px] font-semibold tabular-nums">
-              {formatVolume(session.volume)} kg
-            </span>
+            {/*
+              La riga si apre. Prima era un vicolo cieco in lettura: mostrava
+              il volume e un cestino, quindi i carichi entravano nel database
+              e non tornavano piu' fuori -- si poteva cancellare una seduta
+              ma non guardarla.
+            */}
+            <Link
+              href={`/allenamento/${session.id}`}
+              className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-lg py-1.5 tocco active:bg-raised"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[15px]">
+                  {session.label} — {session.focus}
+                </span>
+                <span className="mt-0.5 block text-[13px] tabular-nums text-muted">
+                  {session.day.slice(8, 10)}/{session.day.slice(5, 7)} ·{" "}
+                  {session.setCount === 1 ? "1 serie" : `${session.setCount} serie`}
+                </span>
+              </span>
+              <span className="shrink-0 text-[15px] font-semibold tabular-nums">
+                {formatVolume(session.volume)} kg
+              </span>
+              <span aria-hidden="true" className="shrink-0 text-[13px] text-reference">
+                ›
+              </span>
+            </Link>
             <button
               type="button"
               onClick={() => handleDelete(session)}

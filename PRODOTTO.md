@@ -81,6 +81,9 @@ proprio le schermate che vanno riviste.
 | Segnare una serie senza segnale | 1 gesto | 1 (resta sul telefono) | ok |
 | Sapere com'è andata la settimana | 0 gesti | 0 (striscia in cima al diario) | ok |
 | Aprire un giorno passato | 1 gesto | 1 (dalla striscia) | ok |
+| Rivedere un allenamento passato | 1 gesto | 1 (tocca la riga in *Ultimi allenamenti*) | ok |
+| Sapere se sto andando meglio dell'ultima volta | 0 gesti | 0 (accanto a ogni serie) | ok |
+| Sapere a che punto è la seduta | 0 gesti | 0 (in cima, accanto al cronometro) | ok |
 | Sapere da dove arriva un macro | 1 gesto | 1 (tocca il riquadro) | ok |
 | Sapere cosa ci sta nel margine di un macro | 1 gesto | 1 (stesso foglio) | ok |
 
@@ -147,6 +150,12 @@ e va difesa a ogni aggiunta.
 - **Export dei dati** — Piano → *I tuoi dati*: tutto in JSON, oppure pasti e
   allenamenti in CSV. Un'app che accumula mesi di diario e non ti lascia
   portarlo via te lo tiene in ostaggio.
+- **Dettaglio di un allenamento** — dalla lista *Ultimi allenamenti* si apre
+  la seduta: volume, durata, serie per serie con accanto quanto sei andato
+  meglio o peggio della stessa serie dell'ultima volta, e l'elenco degli
+  esercizi saltati. Prima quella lista era un vicolo cieco in lettura: dava
+  il volume e un cestino, quindi i carichi entravano nel database e non
+  tornavano più fuori.
 - **Riepilogo della settimana** — in cima allo Storico: i sette giorni da
   lunedì a domenica, le sedute con il volume, e la media che dichiara sempre
   su quanti giorni è fatta. Un tocco lo copia come testo, da mandare al

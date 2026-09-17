@@ -5,7 +5,9 @@ import {
   estimatedOneRepMax,
   formatElapsed,
   formatVolume,
+  avanzamentoSeduta,
   caricoPerManubrio,
+  confrontaSerie,
   etichettaCarico,
   formatWeight,
   groupByExercise,
@@ -242,5 +244,103 @@ describe("come si scrive il carico", () => {
    */
   it("l'etichetta resta corta abbastanza per un telefono da 320 px", () => {
     assert.ok(etichettaCarico("Curl manubri").length <= 14);
+  });
+});
+
+describe("confronto con l'ultima volta", () => {
+  const prima = [
+    { setNumber: 1, weight: 25, reps: 8 },
+    { setNumber: 2, weight: 27.5, reps: 8 },
+    { setNumber: 3, weight: 30, reps: 7 },
+  ];
+
+  it("senza storia non dice niente, invece di inventare un pareggio", () => {
+    assert.equal(confrontaSerie({ setNumber: 1, weight: 25, reps: 8 }, []), null);
+  });
+
+  it("confronta la serie con quella di pari numero, non con l'ultima", () => {
+    // 27,5 contro la SECONDA di prima (27,5) = pari, non contro la terza
+    assert.deepEqual(confrontaSerie({ setNumber: 2, weight: 27.5, reps: 8 }, prima), {
+      migliore: false,
+      testo: "=",
+    });
+  });
+
+  it("il carico batte le ripetizioni", () => {
+    assert.deepEqual(confrontaSerie({ setNumber: 1, weight: 27.5, reps: 6 }, prima), {
+      migliore: true,
+      testo: "+2,5 kg",
+    });
+  });
+
+  it("a parità di carico conta le ripetizioni", () => {
+    assert.deepEqual(confrontaSerie({ setNumber: 1, weight: 25, reps: 10 }, prima), {
+      migliore: true,
+      testo: "+2 rip",
+    });
+    assert.deepEqual(confrontaSerie({ setNumber: 1, weight: 25, reps: 6 }, prima), {
+      migliore: false,
+      testo: "−2 rip",
+    });
+  });
+
+  it("segnala anche quando si è andati sotto, senza drammi", () => {
+    assert.deepEqual(confrontaSerie({ setNumber: 3, weight: 27.5, reps: 7 }, prima), {
+      migliore: false,
+      testo: "−2,5 kg",
+    });
+  });
+
+  it("i mezzi chili si vedono, il rumore di virgola mobile no", () => {
+    assert.deepEqual(confrontaSerie({ setNumber: 1, weight: 25.5, reps: 8 }, prima), {
+      migliore: true,
+      testo: "+0,5 kg",
+    });
+    // 25.000000001 non è un miglioramento
+    assert.deepEqual(confrontaSerie({ setNumber: 1, weight: 25.00000001, reps: 8 }, prima), {
+      migliore: false,
+      testo: "=",
+    });
+  });
+
+  it("una serie in più dell'ultima volta non ha con cosa confrontarsi", () => {
+    assert.equal(confrontaSerie({ setNumber: 4, weight: 30, reps: 7 }, prima), null);
+  });
+});
+
+describe("a che punto è la seduta", () => {
+  const esercizi = [
+    { id: 1, sets: 3 },
+    { id: 2, sets: 4 },
+    { id: 3, sets: 3 },
+  ];
+
+  it("conta fatto solo l'esercizio con tutte le serie previste", () => {
+    const serie = [
+      { exerciseId: 1 }, { exerciseId: 1 }, { exerciseId: 1 },
+      { exerciseId: 2 }, { exerciseId: 2 },
+    ];
+    assert.deepEqual(avanzamentoSeduta(esercizi, serie), {
+      eserciziFatti: 1,
+      eserciziTotali: 3,
+      serieFatte: 5,
+      serieTotali: 10,
+    });
+  });
+
+  it("una serie in più non fa passare il conto oltre il previsto", () => {
+    const serie = Array.from({ length: 5 }, () => ({ exerciseId: 1 }));
+    const a = avanzamentoSeduta(esercizi, serie);
+    assert.equal(a.eserciziFatti, 1);
+    assert.equal(a.serieFatte, 5, "le serie in più si contano davvero");
+  });
+
+  it("a seduta vuota non finge di aver iniziato", () => {
+    assert.deepEqual(avanzamentoSeduta(esercizi, []), {
+      eserciziFatti: 0,
+      eserciziTotali: 3,
+      serieFatte: 0,
+      serieTotali: 10,
+    });
   });
 });

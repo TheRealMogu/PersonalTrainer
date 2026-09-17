@@ -1,4 +1,4 @@
-import type { WorkoutSet } from "@/db/schema";
+import type { WorkoutExercise, WorkoutSet } from "@/db/schema";
 
 /** Una serie come la mostra la UI, senza i campi di servizio del database. */
 export type LoggedSet = Pick<WorkoutSet, "id" | "exerciseId" | "setNumber" | "weight" | "reps"> & {
@@ -72,6 +72,75 @@ export function caricoPerManubrio(nomeEsercizio: string): boolean {
 /** L'etichetta sopra al campo del carico. Corta: ci sta anche a 320 px. */
 export function etichettaCarico(nomeEsercizio: string): string {
   return caricoPerManubrio(nomeEsercizio) ? "kg a manubrio" : "kg";
+}
+
+/**
+ * Come e' andata questa serie rispetto alla stessa serie dell'ultima volta.
+ *
+ * E' la domanda che ci si fa davvero fra una serie e l'altra -- "sto andando
+ * meglio di prima?" -- e finora l'app la lasciava fare a mente: in cima
+ * all'esercizio c'era scritto "Ultima volta: 25x8 - 27,5x8 - 30x7" e il
+ * confronto lo dovevi fare tu, con le mani sudate e trenta secondi di
+ * recupero.
+ *
+ * Il confronto e' fra pari numero di serie: la seconda con la seconda. Non
+ * fra volumi totali, perche' una serie in meno farebbe sembrare un
+ * peggioramento quello che e' solo un esercizio non finito.
+ *
+ * Nessun colore: il rosso in quest'app e' per il fuori target e per i guasti
+ * (regola 9), e una serie piu' leggera non e' ne' l'uno ne' l'altro -- puo'
+ * essere una scarica programmata o una giornata storta. Il segno basta.
+ */
+export type Confronto = { migliore: boolean; testo: string } | null;
+
+export function confrontaSerie(
+  serie: Pick<LoggedSet, "setNumber" | "weight" | "reps">,
+  precedenti: Pick<LoggedSet, "setNumber" | "weight" | "reps">[],
+): Confronto {
+  const prima = precedenti.find((p) => p.setNumber === serie.setNumber);
+  if (!prima) return null;
+
+  const diffPeso = serie.weight - prima.weight;
+  if (Math.abs(diffPeso) >= 0.05) {
+    const segno = diffPeso > 0 ? "+" : "−";
+    return { migliore: diffPeso > 0, testo: `${segno}${formatWeight(Math.abs(diffPeso))} kg` };
+  }
+
+  // Stesso carico: allora conta quante ripetizioni in piu' hai tirato fuori.
+  const diffReps = serie.reps - prima.reps;
+  if (diffReps === 0) return { migliore: false, testo: "=" };
+  const segno = diffReps > 0 ? "+" : "−";
+  return { migliore: diffReps > 0, testo: `${segno}${Math.abs(diffReps)} rip` };
+}
+
+export type Avanzamento = {
+  eserciziFatti: number;
+  eserciziTotali: number;
+  serieFatte: number;
+  serieTotali: number;
+};
+
+/**
+ * A che punto e' la seduta.
+ *
+ * Il cronometro dice da quanto sei in palestra, non quanto manca. Un
+ * esercizio conta come fatto quando ha tutte le serie previste: a meta' non
+ * e' fatto, e dirlo altrimenti farebbe sembrare finita una seduta che non lo
+ * e'.
+ */
+export function avanzamentoSeduta(
+  esercizi: Pick<WorkoutExercise, "id" | "sets">[],
+  serie: Pick<LoggedSet, "exerciseId">[],
+): Avanzamento {
+  const perEsercizio = new Map<number, number>();
+  for (const s of serie) perEsercizio.set(s.exerciseId, (perEsercizio.get(s.exerciseId) ?? 0) + 1);
+
+  return {
+    eserciziFatti: esercizi.filter((e) => (perEsercizio.get(e.id) ?? 0) >= e.sets).length,
+    eserciziTotali: esercizi.length,
+    serieFatte: serie.length,
+    serieTotali: esercizi.reduce((somma, e) => somma + e.sets, 0),
+  };
 }
 
 export type SetSuggestion = { weight: number; reps: number };
