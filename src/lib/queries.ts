@@ -35,6 +35,7 @@ import {
   integratoriDelGiorno,
   type IntegratoreDelGiorno,
 } from "@/lib/integratori";
+import { TUTTO, type IntervalloExport } from "@/lib/intervallo-export";
 import { OBIETTIVI_PREDEFINITI, type Obiettivi } from "@/lib/targets";
 import type { LoggedSet } from "@/lib/workout";
 
@@ -500,15 +501,38 @@ export async function getExerciseProgress(
  * Senza limite di righe di proposito: l'export serve proprio a portarsi via
  * tutto. Per un diario personale sono qualche migliaio di righe, non milioni.
  */
-export async function getAllMealsForExport() {
-  return db
-    .select()
-    .from(meals)
-    .orderBy(asc(meals.day), asc(meals.createdAt), asc(meals.id));
+/**
+ * I pasti da esportare, eventualmente solo di un periodo.
+ *
+ * Senza intervallo esce tutto, come prima. Con un intervallo esce quello: il
+ * file dira' da solo cosa contiene, perche' un CSV parziale che sembra
+ * completo fa concludere a chi lo legge che hai mangiato solo quello.
+ */
+export async function getAllMealsForExport(
+  intervallo: IntervalloExport = TUTTO
+) {
+  const filtri = [];
+  if (intervallo.da !== null) filtri.push(gte(meals.day, intervallo.da));
+  if (intervallo.a !== null) filtri.push(lte(meals.day, intervallo.a));
+
+  const query = db.select().from(meals);
+  return (filtri.length > 0 ? query.where(and(...filtri)) : query).orderBy(
+    asc(meals.day),
+    asc(meals.createdAt),
+    asc(meals.id)
+  );
 }
 
-export async function getAllSetsForExport() {
-  return db
+export async function getAllSetsForExport(
+  intervallo: IntervalloExport = TUTTO
+) {
+  const filtri = [];
+  if (intervallo.da !== null)
+    filtri.push(gte(workoutSessions.day, intervallo.da));
+  if (intervallo.a !== null)
+    filtri.push(lte(workoutSessions.day, intervallo.a));
+
+  const query = db
     .select({
       sessionId: workoutSets.sessionId,
       day: workoutSessions.day,
@@ -526,10 +550,11 @@ export async function getAllSetsForExport() {
     .innerJoin(
       workoutExercises,
       eq(workoutSets.exerciseId, workoutExercises.id)
-    )
-    .orderBy(
-      asc(workoutSessions.day),
-      asc(workoutSets.createdAt),
-      asc(workoutSets.id)
     );
+
+  return (filtri.length > 0 ? query.where(and(...filtri)) : query).orderBy(
+    asc(workoutSessions.day),
+    asc(workoutSets.createdAt),
+    asc(workoutSets.id)
+  );
 }

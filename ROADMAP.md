@@ -230,9 +230,25 @@ leggibile qualcosa che oggi non lo è.
       si legge lo stesso, ma il totale di seduta mescola mezzi carichi e
       carichi interi. Raddoppiarlo cambierebbe anche i numeri già registrati:
       da decidere, non da fare di nascosto.
-- [ ] **Export filtrato per date.** Oggi *I tuoi dati* scarica tutto lo
-      storico. Per mandare una settimana sola serve aprire il CSV e tagliarlo
-      a mano.
+- [x] **Export filtrato per date.** Fatto: `?da=` e `?a=` sulla rotta, e tre
+      tasti pronti in *Piano → I tuoi dati* (pasti e allenamenti di questa
+      settimana, tutto questo mese).
+
+      La parte che conta non è il filtro, è che **il file dica cosa
+      contiene**: il nome porta il periodo
+      (`pasti-2026-09-14_2026-09-20.csv` contro `pasti-tutto-2026-09-17.csv`)
+      e il JSON lo scrive dentro, in cima. Un export parziale che sembra
+      completo è peggio di nessun export — chi lo riceve conclude che hai
+      mangiato solo quello, ed è la regola dei denominatori applicata a un
+      file invece che a una media.
+
+      Un intervallo al contrario dà 400 e viene spiegato, non girato di
+      nascosto: un file che contiene un periodo diverso da quello chiesto è
+      peggio di un errore, perché l'errore lo vedi.
+
+      Nel CSV dei pasti c'è anche la colonna `solo_kcal`: senza, i tre zeri
+      di un pasto segnato a occhio sembrerebbero grammi misurati pure fuori
+      dall'app.
 - [x] **Separatore decimale dei macro.** Fatto. `formatMacro` scrive con la
       virgola, come `formatWeight` e `formatAcqua`.
 
