@@ -196,6 +196,20 @@ leggibile qualcosa che oggi non lo è.
 - [x] **Carico per manubrio invece di "kg".** Fatto: sugli esercizi che nel
       programma dicono "manubri" il campo si chiama *kg a manubrio*. Prima
       diceva solo "kg" e ogni serie registrata era ambigua.
+- [x] **Dettaglio di un allenamento passato.** Fatto: `/allenamento/[id]`.
+      La lista degli ultimi allenamenti era un vicolo cieco in lettura --
+      volume e cestino, niente da aprire.
+- [x] **"Sto andando meglio?" accanto a ogni serie.** Fatto: il confronto con
+      la stessa serie dell'ultima volta, sia nella seduta in corso sia nel
+      dettaglio. Prima c'era solo "Ultima volta: 25×8 · 27,5×8 · 30×7" in
+      cima all'esercizio, e il confronto lo facevi a mente con trenta secondi
+      di recupero.
+- [ ] **La seduta è un muro di schede uguali.** Otto esercizi, otto
+      rettangoli identici: quello che stai facendo adesso ha lo stesso peso
+      visivo di quello fra quaranta minuti. L'idea è comprimere i finiti
+      (titolo + riepilogo, niente campi) e tenere aperto solo quello in
+      corso. Cambia il modo di usare la schermata, quindi va deciso guardando
+      un prima/dopo, non a parole.
 - [ ] **Card d'insight in linguaggio naturale sul diario.** Una riga che
       legge i numeri al posto tuo: "ti restano 1.390 kcal e 86 g di proteine —
       un petto di pollo e una colazione ci stanno". Oggi i numeri ci sono ma

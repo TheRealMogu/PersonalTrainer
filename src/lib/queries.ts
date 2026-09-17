@@ -163,6 +163,90 @@ export async function getPreviousSets(
   return result;
 }
 
+export type SedutaDettaglio = {
+  id: number;
+  day: string;
+  label: string;
+  focus: string;
+  startedAt: Date;
+  endedAt: Date | null;
+  esercizi: {
+    id: number;
+    name: string;
+    sets: number;
+    reps: string;
+    serie: LoggedSet[];
+    /** Le serie della volta prima, per il confronto riga per riga. */
+    precedenti: LoggedSet[];
+  }[];
+};
+
+/**
+ * Una seduta passata, per intero: esercizi, serie, carichi e confronto con la
+ * volta prima.
+ *
+ * Mancava del tutto. La lista degli ultimi allenamenti mostrava il volume e
+ * un cestino: si poteva cancellare una seduta ma non aprirla, quindi i dati
+ * entravano e non uscivano piu'. Gli esercizi restano nell'ordine del
+ * programma, anche quelli saltati: sapere cosa NON hai fatto e' parte del
+ * sapere com'e' andata.
+ */
+export async function getSessionDetail(id: number): Promise<SedutaDettaglio | null> {
+  const [riga] = await db
+    .select({
+      id: workoutSessions.id,
+      dayId: workoutSessions.dayId,
+      day: workoutSessions.day,
+      label: workoutDays.label,
+      focus: workoutDays.focus,
+      startedAt: workoutSessions.startedAt,
+      endedAt: workoutSessions.endedAt,
+    })
+    .from(workoutSessions)
+    .innerJoin(workoutDays, eq(workoutSessions.dayId, workoutDays.id))
+    .where(eq(workoutSessions.id, id));
+
+  if (!riga) return null;
+
+  const esercizi = await db
+    .select()
+    .from(workoutExercises)
+    .where(eq(workoutExercises.dayId, riga.dayId))
+    .orderBy(asc(workoutExercises.sortOrder), asc(workoutExercises.id));
+
+  const [serie, precedenti] = await Promise.all([
+    getSessionSets(id),
+    getPreviousSets(
+      esercizi.map((e) => e.id),
+      id,
+    ),
+  ]);
+
+  const perEsercizio = new Map<number, LoggedSet[]>();
+  for (const s of serie) {
+    const lista = perEsercizio.get(s.exerciseId);
+    if (lista) lista.push(s);
+    else perEsercizio.set(s.exerciseId, [s]);
+  }
+
+  return {
+    id: riga.id,
+    day: riga.day,
+    label: riga.label,
+    focus: riga.focus,
+    startedAt: riga.startedAt,
+    endedAt: riga.endedAt,
+    esercizi: esercizi.map((e) => ({
+      id: e.id,
+      name: e.name,
+      sets: e.sets,
+      reps: e.reps,
+      serie: perEsercizio.get(e.id) ?? [],
+      precedenti: precedenti.get(e.id) ?? [],
+    })),
+  };
+}
+
 /** Sedute concluse, dalla piu' recente, col volume gia' sommato. */
 export async function getRecentSessions(limit = 20) {
   return db
