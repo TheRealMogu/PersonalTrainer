@@ -2,21 +2,37 @@ import { DAILY_TARGETS, MACRO_ORDER, type MacroKey } from "./targets";
 import { shiftIsoDate } from "./date";
 import type { MacroTotals } from "./nutrition";
 
-export type DailyTotals = MacroTotals & { day: string };
+export type DailyTotals = MacroTotals & {
+  day: string;
+  /**
+   * Di quelle kcal, quante sono state registrate senza macro.
+   *
+   * Facoltativa perche' non tutte le fonti la sanno (una riga costruita a
+   * mano in un test, per esempio). Assente vuol dire zero, ed e' l'unico
+   * posto in questa app dove assente puo' voler dire zero: qui lo zero e'
+   * "nessuna riga registrata a occhio", non "nessun dato".
+   */
+  kcalNonScomposte?: number;
+};
 
 /** Elenco di date consecutive, dalla piu' vecchia alla piu' recente. */
 export function buildDateRange(lastDay: string, days: number): string[] {
-  return Array.from({ length: days }, (_, index) => shiftIsoDate(lastDay, index - days + 1));
+  return Array.from({ length: days }, (_, index) =>
+    shiftIsoDate(lastDay, index - days + 1)
+  );
 }
 
 /**
  * Allinea le righe del database all'intervallo, inserendo a zero i giorni
  * senza pasti: il grafico deve mostrare tutti i giorni, non solo quelli pieni.
  */
-export function fillMissingDays(rows: DailyTotals[], range: string[]): DailyTotals[] {
+export function fillMissingDays(
+  rows: DailyTotals[],
+  range: string[]
+): DailyTotals[] {
   const byDay = new Map(rows.map((row) => [row.day, row]));
   return range.map(
-    (day) => byDay.get(day) ?? { day, kcal: 0, carbs: 0, protein: 0, fat: 0 },
+    (day) => byDay.get(day) ?? { day, kcal: 0, carbs: 0, protein: 0, fat: 0 }
   );
 }
 
@@ -55,21 +71,26 @@ export type HistoryStats = {
 export function buildHistoryStats(
   days: DailyTotals[],
   today: string,
-  targets: Record<MacroKey, number> = DAILY_TARGETS,
+  targets: Record<MacroKey, number> = DAILY_TARGETS
 ): HistoryStats {
   const conclusi = days.filter((day) => day.day !== today);
   const logged = conclusi.filter(isLogged);
   const todayRow = days.find((day) => day.day === today);
 
   const averages = { kcal: 0, carbs: 0, protein: 0, fat: 0 } as MacroTotals;
-  const daysWithinTarget = { kcal: 0, carbs: 0, protein: 0, fat: 0 } as Record<MacroKey, number>;
+  const daysWithinTarget = { kcal: 0, carbs: 0, protein: 0, fat: 0 } as Record<
+    MacroKey,
+    number
+  >;
 
   for (const key of MACRO_ORDER) {
     if (logged.length > 0) {
       const total = logged.reduce((sum, day) => sum + day[key], 0);
       averages[key] = total / logged.length;
     }
-    daysWithinTarget[key] = logged.filter((day) => day[key] <= targets[key]).length;
+    daysWithinTarget[key] = logged.filter(
+      (day) => day[key] <= targets[key]
+    ).length;
   }
 
   return {
@@ -91,7 +112,7 @@ const HEADROOM = 1.12;
 export function axisMax(
   days: DailyTotals[],
   key: MacroKey,
-  target: number = DAILY_TARGETS[key],
+  target: number = DAILY_TARGETS[key]
 ): number {
   const peak = days.reduce((max, day) => Math.max(max, day[key]), 0);
   return Math.max(target, peak) * HEADROOM;

@@ -13,10 +13,16 @@ import {
 import type { Meal, QuickFood } from "@/db/schema";
 import type { IntegratoreDelGiorno } from "@/lib/integratori";
 import type { MealSlot } from "@/lib/meal-slots";
-import { buildProgress, sumMacros } from "@/lib/nutrition";
+import {
+  avvisoNonScomposte,
+  buildProgress,
+  kcalNonScomposte,
+  sumMacros,
+} from "@/lib/nutrition";
 import type { MacroKey, Obiettivi } from "@/lib/targets";
 import { Acqua } from "./acqua";
 import { Integratori } from "./integratori";
+import { SoloCalorie } from "./solo-calorie";
 import { Card } from "./card";
 import { CalorieRing } from "./calorie-ring";
 import { IncollaPasto } from "./incolla-pasto";
@@ -78,16 +84,20 @@ export function Diary({
         case "remove":
           return state.filter((meal) => meal.id !== action.id);
         case "replace":
-          return state.map((meal) => (meal.id === action.meal.id ? action.meal : meal));
+          return state.map((meal) =>
+            meal.id === action.meal.id ? action.meal : meal
+          );
         case "restore":
           return [...state, action.meal].sort(
-            (a, b) => a.createdAt.getTime() - b.createdAt.getTime() || a.id - b.id,
+            (a, b) =>
+              a.createdAt.getTime() - b.createdAt.getTime() || a.id - b.id
           );
       }
-    },
+    }
   );
 
   const totals = sumMacros(optimisticMeals);
+  const fuoriDalConto = kcalNonScomposte(optimisticMeals);
   const progress = buildProgress(totals, obiettivi.macro);
 
   function handleAdd(input: Omit<MealInput, "day">) {
@@ -95,7 +105,13 @@ export function Diary({
     startTransition(async () => {
       applyOptimistic({
         type: "add",
-        meal: { id: tempId.current--, day, createdAt: new Date(), ...input },
+        meal: {
+          id: tempId.current--,
+          day,
+          createdAt: new Date(),
+          ...input,
+          onlyKcal: input.onlyKcal ?? false,
+        },
       });
 
       const result = await addMeal({ day, ...input });
@@ -122,11 +138,19 @@ export function Diary({
       for (const input of inputs) {
         applyOptimistic({
           type: "add",
-          meal: { id: tempId.current--, day, createdAt: new Date(), ...input },
+          meal: {
+            id: tempId.current--,
+            day,
+            createdAt: new Date(),
+            ...input,
+            onlyKcal: input.onlyKcal ?? false,
+          },
         });
       }
 
-      const esiti = await Promise.all(inputs.map((input) => addMeal({ day, ...input })));
+      const esiti = await Promise.all(
+        inputs.map((input) => addMeal({ day, ...input }))
+      );
       const fallito = esiti.find((esito) => !esito.ok);
       if (fallito && !fallito.ok) setError(fallito.error);
       router.refresh();
@@ -213,6 +237,18 @@ export function Diary({
         </div>
 
         {/*
+          Una riga sola, sotto i tre riquadri, e non una dentro ognuno: le
+          calorie registrate a occhio non sono un rimprovero da ripetere tre
+          volte (regola 8). Ma senza di lei i macro direbbero una cosa falsa
+          -- "88,4 g di carboidrati" e' vero solo per i pasti scomposti.
+        */}
+        {avvisoNonScomposte(fuoriDalConto) ? (
+          <p className="mt-2 text-[13px] leading-snug text-muted">
+            {avvisoNonScomposte(fuoriDalConto)}
+          </p>
+        ) : null}
+
+        {/*
           L'acqua sta qui dentro, sotto i macro, e non in una scheda sua: e'
           la prima schermata, quella che si vede senza scorrere, ed e' l'unico
           posto in cui "quanti bicchieri ho bevuto" costa zero gesti. Una
@@ -220,7 +256,11 @@ export function Diary({
           guardano -- e una cosa che non si guarda non si segna.
         */}
         <div className="mt-4 border-t border-hairline pt-4">
-          <Acqua day={day} bicchieri={acqua} obiettivo={obiettivi.bicchieriAcqua} />
+          <Acqua
+            day={day}
+            bicchieri={acqua}
+            obiettivo={obiettivi.bicchieriAcqua}
+          />
         </div>
 
         {/*
@@ -262,7 +302,12 @@ export function Diary({
               due tocchi, compilare cinque campi per ogni alimento ne costa
               dodici.
             */}
-            <IncollaPasto defaultSlot={defaultSlot} foods={quickFoods} onAdd={handleAddMany} />
+            <IncollaPasto
+              defaultSlot={defaultSlot}
+              foods={quickFoods}
+              onAdd={handleAddMany}
+            />
+            <SoloCalorie defaultSlot={defaultSlot} onAdd={handleAdd} />
             <ManualMealForm defaultSlot={defaultSlot} onAdd={handleAdd} />
           </div>
         </Card>
@@ -283,9 +328,19 @@ export function Diary({
         paga volentieri: quello che hai gia' mangiato te lo ricordi, quello
         che ti resta no -- e quello resta in cima, nell'anello.
       */}
-      <Section title={optimisticMeals.length === 1 ? "1 pasto" : `${optimisticMeals.length} pasti`}>
+      <Section
+        title={
+          optimisticMeals.length === 1
+            ? "1 pasto"
+            : `${optimisticMeals.length} pasti`
+        }
+      >
         <Card>
-          <MealList meals={optimisticMeals} onEdit={setEditing} onDelete={handleDelete} />
+          <MealList
+            meals={optimisticMeals}
+            onEdit={setEditing}
+            onDelete={handleDelete}
+          />
         </Card>
       </Section>
 

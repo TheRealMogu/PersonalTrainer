@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { costruisciRiepilogo, riepilogoTesto, type SedutaRiepilogo } from "./riepilogo";
+import {
+  costruisciRiepilogo,
+  riepilogoTesto,
+  type SedutaRiepilogo,
+} from "./riepilogo";
 import type { DailyTotals } from "./history";
 
 function giorno(day: string, kcal: number): DailyTotals {
@@ -8,10 +12,28 @@ function giorno(day: string, kcal: number): DailyTotals {
 }
 
 const SEDUTE: SedutaRiepilogo[] = [
-  { day: "2026-09-08", label: "Day 1", focus: "Push", volume: 4548, setCount: 24 },
-  { day: "2026-09-10", label: "Day 2", focus: "Pull", volume: 3910, setCount: 22 },
+  {
+    day: "2026-09-08",
+    label: "Day 1",
+    focus: "Push",
+    volume: 4548,
+    setCount: 24,
+  },
+  {
+    day: "2026-09-10",
+    label: "Day 2",
+    focus: "Pull",
+    volume: 3910,
+    setCount: 22,
+  },
   // fuori settimana: non deve entrare
-  { day: "2026-09-15", label: "Day 3", focus: "Full Body", volume: 5000, setCount: 20 },
+  {
+    day: "2026-09-15",
+    label: "Day 3",
+    focus: "Full Body",
+    volume: 5000,
+    setCount: 20,
+  },
 ];
 
 describe("costruisciRiepilogo", () => {
@@ -26,10 +48,14 @@ describe("costruisciRiepilogo", () => {
 
   it("non conta oggi fra i giorni conclusi", () => {
     const r = costruisciRiepilogo(
-      [giorno("2026-09-07", 1900), giorno("2026-09-08", 1800), giorno("2026-09-09", 900)],
+      [
+        giorno("2026-09-07", 1900),
+        giorno("2026-09-08", 1800),
+        giorno("2026-09-09", 900),
+      ],
       [],
       "2026-09-09",
-      "2026-09-09",
+      "2026-09-09"
     );
     assert.equal(r.conclusi, 2, "lunedì e martedì");
     assert.equal(r.registrati, 2);
@@ -38,7 +64,12 @@ describe("costruisciRiepilogo", () => {
   });
 
   it("i giorni non ancora arrivati non abbassano niente", () => {
-    const r = costruisciRiepilogo([giorno("2026-09-07", 1900)], [], "2026-09-08", "2026-09-08");
+    const r = costruisciRiepilogo(
+      [giorno("2026-09-07", 1900)],
+      [],
+      "2026-09-08",
+      "2026-09-08"
+    );
     assert.equal(r.conclusi, 1);
     assert.equal(r.medie?.kcal, 1900);
   });
@@ -48,7 +79,7 @@ describe("costruisciRiepilogo", () => {
       [giorno("2026-09-07", 1900)],
       [],
       "2026-09-09",
-      "2026-09-09",
+      "2026-09-09"
     );
     assert.equal(r.conclusi, 2);
     assert.equal(r.registrati, 1);
@@ -56,19 +87,33 @@ describe("costruisciRiepilogo", () => {
   });
 
   it("senza nessun giorno concluso non inventa una media", () => {
-    const r = costruisciRiepilogo([giorno("2026-09-07", 900)], [], "2026-09-07", "2026-09-07");
+    const r = costruisciRiepilogo(
+      [giorno("2026-09-07", 900)],
+      [],
+      "2026-09-07",
+      "2026-09-07"
+    );
     assert.equal(r.medie, null);
   });
 
   it("tiene solo le sedute della settimana", () => {
     const r = costruisciRiepilogo([], SEDUTE, "2026-09-09", "2026-09-09");
-    assert.deepEqual(r.sedute.map((s) => s.day), ["2026-09-08", "2026-09-10"]);
+    assert.deepEqual(
+      r.sedute.map((s) => s.day),
+      ["2026-09-08", "2026-09-10"]
+    );
     assert.equal(r.volumeTotale, 4548 + 3910);
   });
 
   it("sa se la settimana è finita", () => {
-    assert.equal(costruisciRiepilogo([], [], "2026-09-07", "2026-09-09").inCorso, true);
-    assert.equal(costruisciRiepilogo([], [], "2026-09-07", "2026-09-14").inCorso, false);
+    assert.equal(
+      costruisciRiepilogo([], [], "2026-09-07", "2026-09-09").inCorso,
+      true
+    );
+    assert.equal(
+      costruisciRiepilogo([], [], "2026-09-07", "2026-09-14").inCorso,
+      false
+    );
   });
 });
 
@@ -82,7 +127,7 @@ describe("riepilogoTesto", () => {
     ],
     SEDUTE,
     "2026-09-11",
-    "2026-09-11",
+    "2026-09-11"
   );
   const testo = riepilogoTesto(completo);
 
@@ -142,12 +187,20 @@ describe("riepilogoTesto", () => {
     // chi guarda.
     const conDecimali = riepilogoTesto(
       costruisciRiepilogo(
-        [{ day: "2026-09-07", kcal: 1845, carbs: 230.6, protein: 155.5, fat: 62.5 }],
+        [
+          {
+            day: "2026-09-07",
+            kcal: 1845,
+            carbs: 230.6,
+            protein: 155.5,
+            fat: 62.5,
+          },
+        ],
         [],
         "2026-09-08",
-        "2026-09-08",
+        "2026-09-08"
       ),
-      { kcal: 1905, carbs: 220.5, protein: 155, fat: 45 },
+      { kcal: 1905, carbs: 220.5, protein: 155, fat: 45 }
     );
     assert.match(conDecimali, /C 230,6/);
     assert.match(conDecimali, /G 62,5/);
@@ -155,14 +208,72 @@ describe("riepilogoTesto", () => {
     assert.doesNotMatch(
       conDecimali,
       /\d\.\d/,
-      "un punto fra due cifre vuol dire che un numero è uscito alla maniera inglese",
+      "un punto fra due cifre vuol dire che un numero è uscito alla maniera inglese"
     );
   });
 
   it("senza dati non finge: lo scrive", () => {
-    const vuoto = riepilogoTesto(costruisciRiepilogo([], [], "2026-09-07", "2026-09-07"));
+    const vuoto = riepilogoTesto(
+      costruisciRiepilogo([], [], "2026-09-07", "2026-09-07")
+    );
     assert.match(vuoto, /non c'è una media da fare/);
     assert.match(vuoto, /Nessuna seduta registrata/);
-    assert.doesNotMatch(vuoto, /\b0 kcal\b/, "un giorno vuoto non è zero calorie");
+    assert.doesNotMatch(
+      vuoto,
+      /\b0 kcal\b/,
+      "un giorno vuoto non è zero calorie"
+    );
+  });
+});
+
+describe("le calorie registrate a occhio nel riepilogo", () => {
+  const conAOcchio = costruisciRiepilogo(
+    [
+      {
+        day: "2026-09-07",
+        kcal: 1900,
+        carbs: 210,
+        protein: 150,
+        fat: 50,
+        kcalNonScomposte: 0,
+      },
+      {
+        day: "2026-09-08",
+        kcal: 1600,
+        carbs: 120,
+        protein: 90,
+        fat: 30,
+        kcalNonScomposte: 450,
+      },
+    ],
+    [],
+    "2026-09-11",
+    "2026-09-11"
+  );
+
+  it("le somma sui giorni della settimana", () => {
+    assert.equal(conAOcchio.kcalNonScomposte, 450);
+  });
+
+  it("il testo lo dice a chi legge, che l'app non ce l'ha davanti", () => {
+    const testo = riepilogoTesto(conAOcchio);
+    assert.match(testo, /450 kcal/);
+    assert.match(testo, /senza macro/);
+  });
+
+  it("lo dice una volta sola, non su ogni giorno", () => {
+    const occorrenze = riepilogoTesto(conAOcchio).match(/senza macro/g) ?? [];
+    assert.equal(occorrenze.length, 1);
+  });
+
+  it("se è tutto scomposto non aggiunge niente", () => {
+    const pulito = costruisciRiepilogo(
+      [{ day: "2026-09-07", kcal: 1900, carbs: 210, protein: 150, fat: 50 }],
+      [],
+      "2026-09-11",
+      "2026-09-11"
+    );
+    assert.equal(pulito.kcalNonScomposte, 0);
+    assert.doesNotMatch(riepilogoTesto(pulito), /senza macro/);
   });
 });

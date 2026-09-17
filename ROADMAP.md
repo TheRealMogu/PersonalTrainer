@@ -386,12 +386,26 @@ Ogni fase ha un bersaglio misurabile. Se una fase non abbassa il numero, non
   e non "uno in più", così un doppio tocco su rete lenta non conta due
   bicchieri.
 
-**Fase 4 — Aggiunta rapida di sole calorie.** *(mezza giornata)*
+**Fase 4 — Aggiunta rapida di sole calorie.** ✅ *fatta*
 - Un campo «350 kcal» e basta, senza nome né macro, per quando mangi fuori e
-  non hai voglia di scomporre il piatto.
+  non hai voglia di scomporre il piatto. Si salva come *Fuori casa*.
 - Serve a non lasciare buchi: un giorno registrato male vale più di un giorno
   non registrato, perché la media resta vera.
-- Bersaglio: **2 gesti**.
+- Bersaglio: **2 gesti. Centrato**: tocca *Solo calorie* (1), scrivi, tocca
+  *Aggiungi* (2). Il campo prende il fuoco da solo, altrimenti ne sarebbero
+  tre. Riscontro misurato in 62-68 ms con 200 ms di latenza.
+- **Il nodo era la regola 5**, non l'interfaccia. Salvare i macro a zero
+  perché la colonna non può essere vuota è inventare tre numeri: zero grammi
+  di proteine e «non lo so» sono cose diverse, e le barre direbbero una cosa
+  falsa. Quindi il pasto se lo porta scritto (colonna `only_kcal`) e chi
+  legge i totali lo dichiara: una riga sotto i riquadri, una nel foglio *Da
+  dove arriva*, una nel testo che si manda al personal trainer — che è chi
+  rischia di più di concludere che quella settimana hai mangiato poche
+  proteine.
+- Detta **una volta sola** e non su ogni macro (regola 8), in grigio e non in
+  rosso: non è un guasto e non è un fuori target. Misurato: `rgb(110,110,115)`,
+  contrasto 5,07:1 in chiaro e 6,16:1 in scuro.
+- L'anello delle calorie resta esatto, ed è il punto: le calorie si sanno.
 
 **Fase 5 — Trovare un prodotto che non hai in archivio.**
 - Ricerca per nome su Open Food Facts: gratis, senza chiave, 263.566 prodotti

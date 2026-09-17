@@ -97,6 +97,7 @@ proprio le schermate che vanno riviste.
 | Sapere cosa devo ancora prendere oggi | 0 gesti | 0 su schermo alto (finisce a 804 px); **1** su 320×568 | ok sopra gli 850 px |
 | Aggiungere un integratore | 3 gesti | 3 (Piano → elenco → *Aggiungi*) | ok |
 | Togliere un integratore dal diario | 3 gesti | 3 (elenco → riga → *Non lo prendo più*) | ok |
+| Registrare un pasto di cui sai solo le calorie | 2 gesti | 2 (*Solo calorie* → scrivi → *Aggiungi*) | ok |
 
 Le righe **sopra il tetto** sono misurate su una giornata vera (10 pasti
 registrati, schermo da 390 px). Le prime due righe dell'aggiunta sono
@@ -178,6 +179,14 @@ e va difesa a ogni aggiunta.
 - **Acqua** — bicchieri +/− nella scheda in cima al diario, con il totale in
   litri. Nessun macro, nessuna stima, nessuna scelta da fare: è un contatore.
   Il "meno" è l'annullamento, a un tocco di distanza.
+- **Solo calorie** — Aggiungi → *Solo calorie*: un campo, un numero, fatto.
+  Per quando mangi fuori e scomporre il piatto non succederà mai. Le calorie
+  entrano nell'anello, che resta esatto; i macro restano fuori dal conto, e
+  le barre lo dicono invece di darli per zero — «non lo so» e «zero grammi»
+  sono cose diverse, e confonderle è il modo più rapido di far dire all'app
+  una cosa falsa. Detto una volta, in grigio: non è un guasto, non è un fuori
+  target, e non è un rimprovero.
+
 - **Integratori** — Piano → *I tuoi integratori*: l'elenco è tuo, e nel
   diario diventa una riga di spunte sotto l'acqua. Un tocco segna, un altro
   toglie — il secondo tocco *è* l'annullamento del primo, quindi non c'è

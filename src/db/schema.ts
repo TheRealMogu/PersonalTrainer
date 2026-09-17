@@ -38,11 +38,25 @@ export const meals = pgTable(
     carbs: real("carbs").notNull(),
     protein: real("protein").notNull(),
     fat: real("fat").notNull(),
+    /**
+     * Le calorie ci sono, i macro no: registrato "a occhio" mangiando fuori.
+     *
+     * I tre macro restano a zero perche' la colonna non puo' essere vuota, ma
+     * **zero qui non vuol dire zero grammi**: vuol dire "non lo so". La
+     * differenza e' tutta la regola 5 -- un giorno non registrato non e'
+     * zero -- e senza questa colonna sarebbe indistinguibile, perche' un
+     * pasto con kcal e tre zeri e' esattamente quello che scriverebbe
+     * qualcuno convinto di aver mangiato solo alcol.
+     *
+     * Chi legge i totali deve dirlo invece di far finta: le barre dei macro
+     * dichiarano quante calorie restano fuori dal conto.
+     */
+    onlyKcal: boolean("only_kcal").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
-  (table) => [index("meals_day_idx").on(table.day)],
+  (table) => [index("meals_day_idx").on(table.day)]
 );
 
 /** Cibi ricorrenti mostrati come tasti rapidi nel diario. */
@@ -77,7 +91,9 @@ export const targets = pgTable("targets", {
   fat: real("fat").notNull(),
   /** Bicchieri d'acqua al giorno. La dimensione del bicchiere resta fissa. */
   waterGlasses: integer("water_glasses").notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 /**
@@ -93,7 +109,9 @@ export const waterDays = pgTable("water_days", {
   /** Chiave primaria: di acqua ce n'e' una quantita' sola al giorno. */
   day: date("day").primaryKey(),
   glasses: integer("glasses").notNull().default(0),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 /** Giornate del programma di allenamento (es. "Day 1 — Push"). */
@@ -117,7 +135,7 @@ export const workoutExercises = pgTable(
     reps: text("reps").notNull(),
     sortOrder: integer("sort_order").notNull().default(0),
   },
-  (table) => [index("workout_exercises_day_idx").on(table.dayId)],
+  (table) => [index("workout_exercises_day_idx").on(table.dayId)]
 );
 
 /**
@@ -133,10 +151,12 @@ export const workoutSessions = pgTable(
       .notNull()
       .references(() => workoutDays.id, { onDelete: "cascade" }),
     day: date("day").notNull(),
-    startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+    startedAt: timestamp("started_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     endedAt: timestamp("ended_at", { withTimezone: true }),
   },
-  (table) => [index("workout_sessions_day_idx").on(table.day)],
+  (table) => [index("workout_sessions_day_idx").on(table.day)]
 );
 
 /** Una serie eseguita: il carico e le ripetizioni che hai davvero fatto. */
@@ -162,7 +182,9 @@ export const workoutSets = pgTable(
      * Nullo sulle serie registrate prima che esistesse.
      */
     clientId: text("client_id"),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     index("workout_sets_session_idx").on(table.sessionId),
@@ -170,7 +192,7 @@ export const workoutSets = pgTable(
     // Unico fra i non nulli: Postgres tratta ogni NULL come diverso dagli
     // altri, quindi le serie vecchie non danno fastidio.
     uniqueIndex("workout_sets_client_id_key").on(table.clientId),
-  ],
+  ]
 );
 
 /**
@@ -213,9 +235,11 @@ export const supplementChecks = pgTable(
     supplementId: integer("supplement_id")
       .notNull()
       .references(() => supplements.id, { onDelete: "cascade" }),
-    takenAt: timestamp("taken_at", { withTimezone: true }).notNull().defaultNow(),
+    takenAt: timestamp("taken_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
-  (table) => [primaryKey({ columns: [table.day, table.supplementId] })],
+  (table) => [primaryKey({ columns: [table.day, table.supplementId] })]
 );
 
 export type Meal = typeof meals.$inferSelect;
