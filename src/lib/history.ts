@@ -52,7 +52,11 @@ export type HistoryStats = {
  *
  * Nel grafico oggi si vede lo stesso: li' e' un dato, non una media.
  */
-export function buildHistoryStats(days: DailyTotals[], today: string): HistoryStats {
+export function buildHistoryStats(
+  days: DailyTotals[],
+  today: string,
+  targets: Record<MacroKey, number> = DAILY_TARGETS,
+): HistoryStats {
   const conclusi = days.filter((day) => day.day !== today);
   const logged = conclusi.filter(isLogged);
   const todayRow = days.find((day) => day.day === today);
@@ -65,7 +69,7 @@ export function buildHistoryStats(days: DailyTotals[], today: string): HistorySt
       const total = logged.reduce((sum, day) => sum + day[key], 0);
       averages[key] = total / logged.length;
     }
-    daysWithinTarget[key] = logged.filter((day) => day[key] <= DAILY_TARGETS[key]).length;
+    daysWithinTarget[key] = logged.filter((day) => day[key] <= targets[key]).length;
   }
 
   return {
@@ -84,7 +88,11 @@ const HEADROOM = 1.12;
  * Scala dell'asse Y: non scende mai sotto il target (cosi' la linea di
  * riferimento e' sempre nel grafico) e sale se un giorno lo supera.
  */
-export function axisMax(days: DailyTotals[], key: MacroKey): number {
+export function axisMax(
+  days: DailyTotals[],
+  key: MacroKey,
+  target: number = DAILY_TARGETS[key],
+): number {
   const peak = days.reduce((max, day) => Math.max(max, day[key]), 0);
-  return Math.max(DAILY_TARGETS[key], peak) * HEADROOM;
+  return Math.max(target, peak) * HEADROOM;
 }

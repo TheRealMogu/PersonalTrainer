@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import type { QuickFood } from "@/db/schema";
 import type { MealSlot } from "@/lib/meal-slots";
 import { alreadyOver, fitsInRemaining, formatMacro, type MacroTotals } from "@/lib/nutrition";
-import { MACRO_LABELS, MACRO_ORDER } from "@/lib/targets";
+import { MACRO_LABELS, MACRO_ORDER, type MacroKey } from "@/lib/targets";
 import { QuantitySheet } from "./quantity-sheet";
 
 /** Oltre questa soglia il tocco e' "tenuto premuto" e apre le quantita'. */
@@ -19,11 +19,13 @@ export function QuickFoods({
   foods,
   defaultSlot,
   totals,
+  targets,
   onAdd,
 }: {
   foods: QuickFood[];
   defaultSlot: MealSlot;
   totals: MacroTotals;
+  targets: Record<MacroKey, number>;
   onAdd: (food: QuickFood, quantity: number, slot: MealSlot) => void;
 }) {
   const [sheetFor, setSheetFor] = useState<QuickFood | null>(null);
@@ -47,11 +49,11 @@ export function QuickFoods({
   // Il verdetto si ricalcola a ogni pasto aggiunto: e' la sottrazione che
   // faresti a mente, fatta da chi ha gia' i numeri.
   const verdicts = useMemo(
-    () => new Map(foods.map((food) => [food.id, fitsInRemaining(totals, food)])),
-    [foods, totals],
+    () => new Map(foods.map((food) => [food.id, fitsInRemaining(totals, food, targets)])),
+    [foods, totals, targets],
   );
   const quantiCiStanno = [...verdicts.values()].filter((v) => v.fits).length;
-  const giaOltre = useMemo(() => alreadyOver(totals), [totals]);
+  const giaOltre = useMemo(() => alreadyOver(totals, targets), [totals, targets]);
   const visible = soloCheCiSta ? foods.filter((food) => verdicts.get(food.id)?.fits) : foods;
 
   if (foods.length === 0) {

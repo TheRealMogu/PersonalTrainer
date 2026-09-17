@@ -5,7 +5,14 @@ import { WeekStrip } from "@/components/week-strip";
 import { isIsoDate, todayIso } from "@/lib/date";
 import { buildDateRange, fillMissingDays, type DailyTotals } from "@/lib/history";
 import { slotForHour } from "@/lib/meal-slots";
-import { getDailyTotals, getMealsByDay, getQuickFoods, getWater } from "@/lib/queries";
+import {
+  getDailyTotals,
+  getMealsByDay,
+  getObiettivi,
+  getQuickFoods,
+  getWater,
+} from "@/lib/queries";
+import type { Obiettivi } from "@/lib/targets";
 import type { Meal, QuickFood } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -28,12 +35,14 @@ export default async function DiarioPage({
   let quickFoods: QuickFood[];
   let totaliSettimana: DailyTotals[];
   let acqua: number;
+  let obiettivi: Obiettivi;
   try {
-    [meals, quickFoods, totaliSettimana, acqua] = await Promise.all([
+    [meals, quickFoods, totaliSettimana, acqua, obiettivi] = await Promise.all([
       getMealsByDay(day),
       getQuickFoods(),
       getDailyTotals(settimana[0], today),
       getWater(day),
+      getObiettivi(),
     ]);
   } catch (error) {
     // Si registra comunque nei log del server: nascondere l'errore all'utente
@@ -60,6 +69,7 @@ export default async function DiarioPage({
         days={fillMissingDays(totaliSettimana, settimana)}
         current={day}
         today={today}
+        targets={obiettivi.macro}
       />
       {/* `key` sul giorno: cambiando data lo stato ottimistico riparte pulito */}
       <Diary
@@ -69,6 +79,7 @@ export default async function DiarioPage({
         quickFoods={quickFoods}
         defaultSlot={slotForHour(hourInRome)}
         acqua={acqua}
+        obiettivi={obiettivi}
       />
     </main>
   );

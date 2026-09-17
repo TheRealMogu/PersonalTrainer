@@ -1,7 +1,7 @@
 import { weekdayInitial } from "@/lib/date";
 import { axisMax, isLogged, type DailyTotals } from "@/lib/history";
 import { formatMacro } from "@/lib/nutrition";
-import { DAILY_TARGETS, MACRO_LABELS, MACRO_UNITS, type MacroKey } from "@/lib/targets";
+import { MACRO_LABELS, MACRO_UNITS, type MacroKey } from "@/lib/targets";
 
 /* Geometria del grafico, in unita' del viewBox. */
 const WIDTH = 320;
@@ -50,14 +50,16 @@ export function MacroHistoryChart({
   macro,
   days,
   today,
+  target,
 }: {
   macro: MacroKey;
   days: DailyTotals[];
   /** Serve a smorzare la colonna di oggi: e' un giorno a meta', non un dato. */
   today?: string;
+  target: number;
 }) {
-  const target = DAILY_TARGETS[macro];
-  const max = axisMax(days, macro);
+
+  const max = axisMax(days, macro, target);
   const unit = MACRO_UNITS[macro];
 
   const band = WIDTH / days.length;

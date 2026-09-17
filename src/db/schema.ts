@@ -56,6 +56,29 @@ export const quickFoods = pgTable("quick_foods", {
 });
 
 /**
+ * I numeri che il personal trainer puo' cambiare: target dei macro e
+ * bicchieri d'acqua al giorno.
+ *
+ * Una riga sola, con `id` sempre a 1. Stavano in `src/lib/targets.ts`, cioe'
+ * nel codice: cambiarli voleva dire un deploy, e il PT li cambia a ogni fase.
+ * Una cosa che nella vita cambia deve essere una riga di database.
+ *
+ * I valori del codice restano come punto di partenza: se la riga non c'e'
+ * ancora, l'app usa quelli e funziona lo stesso. Nessuna schermata deve
+ * aspettare che qualcuno apra le impostazioni.
+ */
+export const targets = pgTable("targets", {
+  id: integer("id").primaryKey().default(1),
+  kcal: integer("kcal").notNull(),
+  carbs: real("carbs").notNull(),
+  protein: real("protein").notNull(),
+  fat: real("fat").notNull(),
+  /** Bicchieri d'acqua al giorno. La dimensione del bicchiere resta fissa. */
+  waterGlasses: integer("water_glasses").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
  * L'acqua bevuta, un conteggio per giornata.
  *
  * Una riga per giorno e non una per bicchiere: un bicchiere non ha niente da
@@ -152,6 +175,7 @@ export type Meal = typeof meals.$inferSelect;
 export type NewMeal = typeof meals.$inferInsert;
 export type QuickFood = typeof quickFoods.$inferSelect;
 export type WaterDay = typeof waterDays.$inferSelect;
+export type Targets = typeof targets.$inferSelect;
 export type WorkoutDay = typeof workoutDays.$inferSelect;
 export type WorkoutExercise = typeof workoutExercises.$inferSelect;
 export type WorkoutSession = typeof workoutSessions.$inferSelect;

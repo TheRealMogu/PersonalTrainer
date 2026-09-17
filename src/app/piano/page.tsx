@@ -4,9 +4,23 @@ import { LogoutButton } from "@/components/logout-button";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 import { PLAN_SECTIONS } from "@/lib/plan";
-import { DAILY_TARGETS, MACRO_LABELS, MACRO_ORDER, MACRO_UNITS } from "@/lib/targets";
+import { MACRO_LABELS, MACRO_ORDER, MACRO_UNITS, type Obiettivi } from "@/lib/targets";
+import { getObiettivi } from "@/lib/queries";
+import { OBIETTIVI_PREDEFINITI } from "@/lib/targets";
 
-export default function PianoPage() {
+export const dynamic = "force-dynamic";
+
+export default async function PianoPage() {
+  // Se la lettura fallisce si mostrano i valori di partenza invece di una
+  // schermata d'errore: il Piano contiene anche le regole del PT e
+  // l'accesso, che non c'entrano niente con i target.
+  let obiettivi: Obiettivi = OBIETTIVI_PREDEFINITI;
+  try {
+    obiettivi = await getObiettivi();
+  } catch (error) {
+    console.error("[piano] obiettivi non letti:", error);
+  }
+
   return (
     <main>
       <PageHeader title="Piano" subtitle="Linee guida del personal trainer" />
@@ -21,11 +35,23 @@ export default function PianoPage() {
               >
                 <dt className="text-[15px]">{MACRO_LABELS[key]}</dt>
                 <dd className="text-[15px] font-semibold tabular-nums">
-                  {DAILY_TARGETS[key]} {MACRO_UNITS[key]}
+                  {obiettivi.macro[key]} {MACRO_UNITS[key]}
                 </dd>
               </div>
             ))}
+            <div className="flex items-baseline justify-between py-3 last:pb-0">
+              <dt className="text-[15px]">Acqua</dt>
+              <dd className="text-[15px] font-semibold tabular-nums">
+                {obiettivi.bicchieriAcqua} bicchieri
+              </dd>
+            </div>
           </dl>
+          <Link
+            href="/obiettivi"
+            className="mt-4 flex min-h-12 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
+          >
+            Cambia gli obiettivi
+          </Link>
         </Card>
       </Section>
 

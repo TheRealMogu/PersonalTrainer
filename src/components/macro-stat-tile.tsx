@@ -13,8 +13,15 @@ const MACRO_COLOR: Record<MacroKey, string> = {
  * Il valore usa le cifre proporzionali: `tabular-nums` serve nelle colonne,
  * non su un numero grande isolato.
  */
-export function MacroStatTile({ macro, average }: { macro: MacroKey; average: number }) {
-  const target = DAILY_TARGETS[macro];
+export function MacroStatTile({
+  macro,
+  average,
+  target = DAILY_TARGETS[macro],
+}: {
+  macro: MacroKey;
+  average: number;
+  target?: number;
+}) {
   const delta = average - target;
   const isOver = delta > 0;
   const rounded = Number(formatMacro(Math.abs(delta), macro));

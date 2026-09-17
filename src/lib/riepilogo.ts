@@ -3,7 +3,7 @@ import { formatVolume } from "./workout";
 import { lunediDellaSettimana, shiftIsoDate } from "./date";
 import { buildDateRange, isLogged, type DailyTotals } from "./history";
 import type { MacroTotals } from "./nutrition";
-import { DAILY_TARGETS, MACRO_ORDER } from "./targets";
+import { DAILY_TARGETS, MACRO_ORDER, type MacroKey } from "./targets";
 
 /** Una seduta conclusa, come serve al riepilogo. */
 export type SedutaRiepilogo = {
@@ -124,7 +124,10 @@ export function costruisciRiepilogo(
  * sempre su quanti giorni e' fatta la media e quali mancano -- un numero
  * senza il suo denominatore e' un numero che si puo' leggere come si vuole.
  */
-export function riepilogoTesto(r: Riepilogo): string {
+export function riepilogoTesto(
+  r: Riepilogo,
+  targets: Record<MacroKey, number> = DAILY_TARGETS,
+): string {
   const righe: string[] = [];
 
   righe.push(`Settimana ${giornoMese(r.lunedi)} – ${giornoMese(r.domenica)}`);
@@ -166,8 +169,8 @@ export function riepilogoTesto(r: Riepilogo): string {
         ` · G ${formatMacro(r.medie.fat, "fat")}`,
     );
     righe.push(
-      `Target: ${DAILY_TARGETS.kcal} kcal · C ${DAILY_TARGETS.carbs}` +
-        ` · P ${DAILY_TARGETS.protein} · G ${DAILY_TARGETS.fat}`,
+      `Target: ${targets.kcal} kcal · C ${targets.carbs}` +
+        ` · P ${targets.protein} · G ${targets.fat}`,
     );
   } else {
     righe.push("Nessun giorno concluso e registrato: non c'è una media da fare.");

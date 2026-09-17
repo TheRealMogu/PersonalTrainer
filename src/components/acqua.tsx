@@ -17,7 +17,15 @@ import { bicchieriDaMostrare, formatAcqua, MAX_BICCHIERI, progressoAcqua } from 
  * Il "meno" fa da annullamento: e' l'inverso esatto del "piu'", a un tocco.
  * Per questo non c'e' nessun messaggio che propone di disfare.
  */
-export function Acqua({ day, bicchieri }: { day: string; bicchieri: number }) {
+export function Acqua({
+  day,
+  bicchieri,
+  obiettivo,
+}: {
+  day: string;
+  bicchieri: number;
+  obiettivo: number;
+}) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [errore, setErrore] = useState<string | null>(null);
@@ -25,7 +33,7 @@ export function Acqua({ day, bicchieri }: { day: string; bicchieri: number }) {
   // Il numero si muove al tocco, il salvataggio prosegue dietro: senza, su
   // rete lenta si tocca due volte e si segna un bicchiere in piu'.
   const [ottimistici, applica] = useOptimistic(bicchieri, (_, nuovo: number) => nuovo);
-  const progresso = progressoAcqua(ottimistici);
+  const progresso = progressoAcqua(ottimistici, obiettivo);
 
   function cambia(delta: number) {
     const nuovo = Math.max(0, Math.min(MAX_BICCHIERI, ottimistici + delta));
@@ -43,7 +51,7 @@ export function Acqua({ day, bicchieri }: { day: string; bicchieri: number }) {
     });
   }
 
-  const totale = bicchieriDaMostrare(ottimistici);
+  const totale = bicchieriDaMostrare(ottimistici, obiettivo);
 
   return (
     <div>

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { weekdayInitial } from "@/lib/date";
 import type { DailyTotals } from "@/lib/history";
 import { isLogged } from "@/lib/history";
-import { DAILY_TARGETS } from "@/lib/targets";
+import { DAILY_TARGETS, type MacroKey } from "@/lib/targets";
 
 /** Altezza minima visibile: una colonna da zero pixel sembrerebbe assente. */
 const MIN_ALTEZZA = 6;
@@ -28,12 +28,14 @@ export function WeekStrip({
   days,
   current,
   today,
+  targets = DAILY_TARGETS,
 }: {
   days: DailyTotals[];
   current: string;
   today: string;
+  targets?: Record<MacroKey, number>;
 }) {
-  const massimo = Math.max(DAILY_TARGETS.kcal, ...days.map((d) => d.kcal));
+  const massimo = Math.max(targets.kcal, ...days.map((d) => d.kcal));
 
   return (
     // A tutta larghezza, fuori dai margini della pagina: sette bersagli da 44
@@ -45,7 +47,7 @@ export function WeekStrip({
     >
       {days.map((giorno) => {
         const registrato = isLogged(giorno);
-        const oltre = giorno.kcal > DAILY_TARGETS.kcal;
+        const oltre = giorno.kcal > targets.kcal;
         const eOggi = giorno.day === today;
         const eAperto = giorno.day === current;
 

@@ -36,9 +36,12 @@ export type ProgressoAcqua = {
   percent: number;
 };
 
-export function progressoAcqua(bicchieri: number): ProgressoAcqua {
+export function progressoAcqua(
+  bicchieri: number,
+  obiettivoBicchieri: number = OBIETTIVO_ACQUA.bicchieri,
+): ProgressoAcqua {
   const sicuri = Math.max(0, Math.min(MAX_BICCHIERI, Math.round(bicchieri)));
-  const obiettivo = OBIETTIVO_ACQUA.bicchieri;
+  const obiettivo = Math.max(1, Math.round(obiettivoBicchieri));
   const ml = sicuri * OBIETTIVO_ACQUA.mlPerBicchiere;
 
   return {
@@ -59,6 +62,9 @@ export function progressoAcqua(bicchieri: number): ProgressoAcqua {
  * l'obiettivo deve vedere i bicchieri in piu', non un contatore che si ferma.
  * Il tetto e' lo stesso dell'inserimento.
  */
-export function bicchieriDaMostrare(bicchieri: number): number {
-  return Math.min(MAX_BICCHIERI, Math.max(OBIETTIVO_ACQUA.bicchieri, bicchieri));
+export function bicchieriDaMostrare(
+  bicchieri: number,
+  obiettivoBicchieri: number = OBIETTIVO_ACQUA.bicchieri,
+): number {
+  return Math.min(MAX_BICCHIERI, Math.max(Math.max(1, obiettivoBicchieri), bicchieri));
 }

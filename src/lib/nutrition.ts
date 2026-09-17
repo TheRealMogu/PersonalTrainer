@@ -1,5 +1,8 @@
 import { DAILY_TARGETS, MACRO_ORDER, type MacroKey } from "./targets";
 
+/** I target rispetto a cui si misura. Predefiniti: quelli del codice. */
+type Target = Record<MacroKey, number>;
+
 export type MacroTotals = Record<MacroKey, number>;
 
 export type MacroSource = {
@@ -48,10 +51,13 @@ export type MacroProgress = {
   isOver: boolean;
 };
 
-export function buildProgress(totals: MacroTotals): MacroProgress[] {
+export function buildProgress(
+  totals: MacroTotals,
+  targets: Target = DAILY_TARGETS,
+): MacroProgress[] {
   return MACRO_ORDER.map((key) => {
     const consumed = totals[key];
-    const target = DAILY_TARGETS[key];
+    const target = targets[key];
     const diff = target - consumed;
     return {
       key,
@@ -83,14 +89,21 @@ export type FitVerdict = {
  * Non e' un consiglio nutrizionale: e' la sottrazione che faresti a mente,
  * fatta da chi ha gia' i numeri sotto mano.
  */
-export function fitsInRemaining(totals: MacroTotals, item: MacroSource): FitVerdict {
+export function fitsInRemaining(
+  totals: MacroTotals,
+  item: MacroSource,
+  targets: Target = DAILY_TARGETS,
+): FitVerdict {
   const exceeds = MACRO_ORDER.filter(
-    (key) => totals[key] <= DAILY_TARGETS[key] && totals[key] + item[key] > DAILY_TARGETS[key],
+    (key) => totals[key] <= targets[key] && totals[key] + item[key] > targets[key],
   );
   return { fits: exceeds.length === 0, exceeds };
 }
 
 /** I macro gia' oltre target, da dire una volta sola invece che su ogni alimento. */
-export function alreadyOver(totals: MacroTotals): MacroKey[] {
-  return MACRO_ORDER.filter((key) => totals[key] > DAILY_TARGETS[key]);
+export function alreadyOver(
+  totals: MacroTotals,
+  targets: Target = DAILY_TARGETS,
+): MacroKey[] {
+  return MACRO_ORDER.filter((key) => totals[key] > targets[key]);
 }

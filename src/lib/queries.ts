@@ -5,6 +5,7 @@ import type { DailyTotals } from "@/lib/history";
 import {
   meals,
   quickFoods,
+  targets,
   waterDays,
   workoutDays,
   workoutExercises,
@@ -15,6 +16,7 @@ import {
   type WorkoutExercise,
   type WorkoutSession,
 } from "@/db/schema";
+import { OBIETTIVI_PREDEFINITI, type Obiettivi } from "@/lib/targets";
 import type { LoggedSet } from "@/lib/workout";
 
 export async function getMealsByDay(day: string): Promise<Meal[]> {
@@ -48,6 +50,24 @@ export async function getDailyTotals(from: string, to: string): Promise<DailyTot
     protein: Number(row.protein),
     fat: Number(row.fat),
   }));
+}
+
+/**
+ * Gli obiettivi attivi: quelli scritti in *Piano -> Obiettivi*, oppure quelli
+ * di partenza se non ne sono stati ancora scritti.
+ *
+ * Non si lancia mai un errore da qui. Se la riga non c'e' l'app deve aprirsi
+ * lo stesso con i numeri predefiniti: una schermata che aspetta di sapere i
+ * target per mostrare qualcosa e' una schermata che non si apre.
+ */
+export async function getObiettivi(): Promise<Obiettivi> {
+  const [riga] = await db.select().from(targets).where(eq(targets.id, 1));
+  if (!riga) return OBIETTIVI_PREDEFINITI;
+
+  return {
+    macro: { kcal: riga.kcal, carbs: riga.carbs, protein: riga.protein, fat: riga.fat },
+    bicchieriAcqua: riga.waterGlasses,
+  };
 }
 
 /** I bicchieri d'acqua di una giornata. Nessuna riga vuol dire nessun bicchiere. */
