@@ -1,0 +1,68 @@
+name: Migrazioni
+
+# Applica le migration a Neon da sola, a ogni push su main.
+#
+# Prima toccava farlo a mano dopo ogni deploy, e succedeva quello che doveva
+# succedere: il codice nuovo andava in produzione e il database restava
+# indietro, quindi l'app rispondeva con un errore su una colonna che non
+# c'era ancora. Chi se ne accorgeva era l'utente, non chi aveva fatto il
+# deploy.
+#
+# Gira solo su push a `main`, mai su pull_request: la repo e' pubblica, e su
+# `pull_request` chiunque potrebbe aprire una PR e far girare del codice.
+# Con `push` i segreti li vede solo chi ha gia' i permessi di scrittura.
+on:
+  push:
+    branches: ["main"]
+  # Per lanciarla a mano: Actions -> Migrazioni -> Run workflow.
+  workflow_dispatch:
+
+# Due push ravvicinati non devono migrare insieme: la seconda aspetta.
+concurrency:
+  group: migrazioni
+  cancel-in-progress: false
+
+jobs:
+  migra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      # Il segreto si controlla passando dall'ambiente e non interpolandolo
+      # nel comando: cosi' non finisce mai in una riga di shell.
+      - name: Il segreto c'è?
+        id: segreto
+        env:
+          DB: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -n "$DB" ]; then
+            echo "presente=si" >> "$GITHUB_OUTPUT"
+          else
+            echo "presente=no" >> "$GITHUB_OUTPUT"
+            echo "::warning::DATABASE_URL non è fra i segreti del repo: le migration non vengono applicate. Settings → Secrets and variables → Actions → New repository secret."
+          fi
+
+      - name: Applica le migration
+        if: steps.segreto.outputs.presente == 'si'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        # drizzle-kit tiene il conto di quelle gia' applicate in una tabella
+        # sua: rilanciarlo non rifa' niente due volte.
+        run: npm run db:migrate
+
+      - name: Riepilogo
+        run: |
+          if [ "${{ steps.segreto.outputs.presente }}" = "si" ]; then
+            echo "Migration applicate." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Saltate: manca il segreto DATABASE_URL." >> "$GITHUB_STEP_SUMMARY"
+          fi

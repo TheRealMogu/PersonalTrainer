@@ -710,6 +710,21 @@ stesso per gli esercizi archiviati e per i valori di un alimento corretto —
 ed è già così per i pasti, perché quando aggiungi un cibo rapido al diario i
 numeri vengono **copiati** nella riga del pasto, non riferiti.
 
+## 6-octies. Quello che non deve più toccare a te
+
+- [x] **Applicare le migration.** Fatto: il workflow *Migrazioni* gira a ogni
+      push su `main`. Prima il codice andava in produzione e il database
+      restava indietro finché non lo aggiornavi a mano, e chi se ne accorgeva
+      era l'utente con un errore su una colonna che non c'era. Serve il
+      segreto `DATABASE_URL` nel repo, una volta sola.
+- [ ] **Il seed dei dati iniziali** resta a mano, ed è giusto così finché
+      cancella a cascata lo storico di allenamento (vedi 6-quinquies). Quando
+      gli esercizi si archivieranno invece di sparire, anche questo potrà
+      diventare automatico.
+- [ ] **Backup di Neon.** Il piano gratuito tiene una finestra di ripristino
+      breve. Un export periodico che finisce da qualche parte è la differenza
+      fra perdere un giorno e perdere tutto.
+
 ## 7. Cose che restano fuori, di proposito
 
 Scritte per non riaprirle ogni volta.
