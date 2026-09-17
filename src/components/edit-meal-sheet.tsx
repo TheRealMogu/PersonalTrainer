@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { addQuickFood } from "@/app/alimenti/actions";
 import type { MealPatch } from "@/app/actions";
 import type { Meal } from "@/db/schema";
 import { formatMacro } from "@/lib/nutrition";
@@ -15,6 +16,20 @@ const CAMPI: { campo: MacroKey; label: string; unita: string }[] = [
   { campo: "protein", label: "Proteine", unita: "g" },
   { campo: "fat", label: "Grassi", unita: "g" },
 ];
+
+/**
+ * La porzione scritta fra parentesi in fondo al nome, se c'e'.
+ *
+ * "Incolla da Claude" compone i nomi cosi' -- "Pane integrale (80 g)" --
+ * perche' nel diario la porzione non ha un campo suo. Un tasto rapido invece
+ * ce l'ha, quindi si separa: il nome torna pulito e la porzione va dove si
+ * legge.
+ */
+function separaPorzione(nome: string): { nome: string; porzione: string | null } {
+  const trovata = nome.match(/^(.*?)\s*\(([^()]{1,80})\)\s*$/);
+  if (!trovata || !trovata[1].trim()) return { nome: nome.trim(), porzione: null };
+  return { nome: trovata[1].trim(), porzione: trovata[2].trim() };
+}
 
 /** Accetta sia la virgola che il punto, come tutti i campi numerici dell'app. */
 function parseNumero(value: string): number {
@@ -52,6 +67,8 @@ export function EditMealSheet({
   const [slot, setSlot] = useState<MealSlot>(meal.slot as MealSlot);
   const [nome, setNome] = useState(meal.name);
   const [dettagli, setDettagli] = useState(false);
+  const [salvato, setSalvato] = useState<"no" | "fatto" | string>("no");
+  const [salvataggio, startSalvataggio] = useTransition();
 
   /*
    * I macro corretti a mano vincono sul riscalamento: se li hai scritti tu,
@@ -241,6 +258,51 @@ export function EditMealSheet({
               </button>
             ) : null}
           </div>
+        ) : null}
+
+        {/*
+          Il verso che fa crescere l'archivio.
+          
+          Senza questo, ogni prodotto nuovo va incollato da capo tutte le
+          volte: il lavoro si ripete identico all'infinito. Con questo, un
+          incollaggio si paga una volta e diventa un tasto -- l'archivio si
+          riempie mangiando, che e' l'unico modo in cui puo' riempirsi da
+          solo.
+
+          I valori salvati sono quelli di UNA porzione: se stai registrando
+          due porzioni, il tasto rapido deve valerne una, altrimenti la
+          prossima volta ne conteresti il doppio.
+        */}
+        <button
+          type="button"
+          disabled={!valid || !nomeValido || salvataggio || salvato === "fatto"}
+          onClick={() => {
+            const separato = separaPorzione(patch.name);
+            startSalvataggio(async () => {
+              const esito = await addQuickFood({
+                name: separato.nome,
+                portion: separato.porzione,
+                kcal: patch.kcal / effective,
+                carbs: patch.carbs / effective,
+                protein: patch.protein / effective,
+                fat: patch.fat / effective,
+              });
+              setSalvato(esito.ok ? "fatto" : esito.error);
+            });
+          }}
+          className="mt-3 min-h-11 w-full rounded-xl border border-dashed border-hairline text-[15px] font-medium text-accent tocco active:bg-raised disabled:opacity-40"
+        >
+          {salvato === "fatto"
+            ? "Salvato fra i tasti rapidi ✓"
+            : salvataggio
+              ? "Salvo…"
+              : "Salva fra i tasti rapidi"}
+        </button>
+
+        {typeof salvato === "string" && salvato !== "no" && salvato !== "fatto" ? (
+          <p role="alert" className="mt-2 text-[13px] text-muted">
+            {salvato}
+          </p>
         ) : null}
 
         {!nomeValido ? (

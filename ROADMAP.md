@@ -358,12 +358,17 @@ Ogni fase ha un bersaglio misurabile. Se una fase non abbassa il numero, non
 - È la fase che sposta di più: chi mangia quasi sempre le stesse cose non
   dovrebbe ricomporle da capo ogni mattina.
 
-**Fase 3 — L'acqua.** *(mezza giornata)*
-- Bicchieri +/− sul diario, niente macro, niente stime. Un obiettivo
-  giornaliero in `targets.ts`.
-- Va **dopo** la Fase 1, non prima: metterla adesso vorrebbe dire aggiungere
-  roba in fondo a una schermata che non si apre.
+**Fase 3 — L'acqua.** ✅ *fatta*
+- Bicchieri +/− dentro la scheda del riepilogo, sotto i macro: niente macro,
+  niente stime, niente scelta della dimensione del bicchiere. Obiettivo in
+  `targets.ts` (8 bicchieri da 250 ml).
 - Bersaglio: **1 gesto per un bicchiere, 0 per vedere a che punto sei**.
+  **Centrato**: la riga finisce a 631 px su uno schermo da 844, quindi si
+  vede senza scorrere a 320, 390 e 430 px; riscontro al tocco in 5-7 ms.
+- Il "meno" fa da annullamento — è l'inverso esatto del "più", a un tocco —
+  quindi non c'è nessun messaggio che propone di disfare. Si manda il totale
+  e non "uno in più", così un doppio tocco su rete lenta non conta due
+  bicchieri.
 
 **Fase 4 — Aggiunta rapida di sole calorie.** *(mezza giornata)*
 - Un campo «350 kcal» e basta, senza nome né macro, per quando mangi fuori e
@@ -372,15 +377,20 @@ Ogni fase ha un bersaglio misurabile. Se una fase non abbassa il numero, non
   non registrato, perché la media resta vera.
 - Bersaglio: **2 gesti**.
 
-**Fase 5 — Codice a barre.** *(2–3 giorni, ed è quella che può fallire)*
-- Fotocamera → EAN → valori dalla confezione. La scorciatoia più usata in
-  assoluto nelle app vere.
-- Due incognite serie: serve un archivio prodotti (Open Food Facts è aperto e
-  gratuito, ma sui prodotti italiani è incompleto), e dentro Capacitor serve
-  un plugin per la fotocamera con i permessi iOS.
-- Ripiego se l'archivio non basta: la foto dell'etichetta va già in chat, e
-  *Incolla da Claude* legge i numeri della tabella nutrizionale.
-- Bersaglio: **3 gesti**, e almeno 7 prodotti su 10 del tuo carrello trovati.
+**Fase 5 — Trovare un prodotto che non hai in archivio.**
+- Ricerca per nome su Open Food Facts: gratis, senza chiave, 263.566 prodotti
+  italiani, ed è lo stesso archivio su cui è costruita Yuka.
+- **Prima la ricerca per nome, non lo scanner.** La ricerca non ha bisogno di
+  niente di nativo e gira oggi; lo scanner su iOS vuole un plugin Capacitor,
+  Xcode e i permessi — cioè la parte cara, per una comodità.
+- Ripiego quando la scheda del prodotto è incompleta (capita, è
+  collaborativo): la foto dell'etichetta va già in chat, e *Incolla da
+  Claude* legge la tabella nutrizionale.
+- Bersaglio: **3 gesti**, e almeno 7 prodotti su 10 del tuo carrello trovati
+  **con i valori nutrizionali compilati** — da misurare per prima cosa, non
+  da dare per buono.
+- Il confronto con le alternative a pagamento e i dettagli stanno nella
+  sezione 6-sexies.
 
 **Fase 6 — Ricordarsi che l'app esiste.** *(da valutare)*
 - Il problema smette di essere l'attrito e diventa la memoria: se non apri
@@ -418,7 +428,7 @@ su sei non si toccano affatto dall'app.
 | Pasto | ✅ | ✅ nome, quantità, momento e tutti i macro | ✅ con annulla |
 | Serie di allenamento | ✅ | ✅ carico e ripetizioni | ✅ con annulla |
 | Seduta | ✅ | ❌ non si cambia data né giornata | ✅ con annulla |
-| **Cibo rapido** | ❌ solo dal seed | ❌ | ❌ |
+| Cibo rapido | ✅ | ✅ | ✅ con annulla |
 | **Esercizio del programma** | ❌ solo dal seed | ❌ | ❌ |
 | **Target giornalieri** | ❌ stanno nel codice | ❌ | ❌ |
 
@@ -435,23 +445,270 @@ che **cancella a cascata lo storico di allenamento**.
       trenta calorie, riscalare la quantità sposta l'errore invece di
       toglierlo. Nome e macro stanno dietro a un tocco, così il caso
       frequente — mezza porzione — resta a portata di pollice.
-- [ ] **Cibi rapidi: aggiungere, correggere, togliere.** Il buco più grosso,
-      e quello già incontrato: *«molte volte non mangio le stesse cose e
-      magari i prodotti variano»*. Se lo yogurt cambia ricetta, oggi i suoi
-      valori restano sbagliati per sempre. Serve anche il verso opposto:
-      **«salva come tasto rapido»** su un pasto appena inserito, che
-      trasforma un incollaggio in un tasto riusabile e riduce il lavoro
-      futuro invece di aggiungerne.
+- [x] **Cibi rapidi: aggiungere, correggere, togliere.** Fatto, in *Piano →
+      I tuoi alimenti*. Con il verso che conta: **«salva fra i tasti rapidi»**
+      su un pasto appena inserito, che trasforma un incollaggio in un tasto
+      riusabile. L'archivio cresce mangiando, non scaricando — ed è per
+      questo che un archivio esterno resta una comodità e non una
+      dipendenza.
 - [ ] **Esercizi del programma: rinominare, cambiare serie e ripetizioni,
       aggiungere, togliere, riordinare.** Quando il personal trainer cambia
       la scheda, oggi l'unica strada è `db:seed`, che rifiuta di partire se
       esistono serie registrate — e con `--forza-allenamento` le cancella. In
       pratica: o perdi lo storico o tieni la scheda vecchia.
 - [ ] **Target giornalieri modificabili.** Stanno in `src/lib/targets.ts`:
-      cambiarli richiede un deploy. Il PT li cambia a ogni fase.
+      cambiarli richiede un deploy. Il PT li cambia a ogni fase. Il disegno
+      per esteso è nella sezione 6-quinquies.
 - [ ] **Seduta: cambiare data e giornata.** Se apri "Day 1" invece di "Day 2"
       puoi solo scartare e rifare; se ti dimentichi di registrare l'altroieri,
       non puoi registrarlo a posteriori.
+
+## 6-quinquies. Cambiare scheda e obiettivi da solo, senza sporcare lo storico
+
+> «Quando cambiano gli obiettivi, o il PT mi manda altri esercizi, voglio
+> essere autonomo. Do a un'AI i documenti nuovi, l'app mi dice in che formato
+> li vuole, si può fare undo, e quando si va avanti non ci devono essere
+> sporcizie dal vecchio al nuovo o dal nuovo al vecchio.»
+
+È lo stesso giro di *Incolla da Claude*, applicato al programma invece che a
+un pasto: l'app dà il formato, tu dai i documenti del PT a una chat, riporti
+indietro la risposta, guardi cosa cambia e confermi. Cambia però la posta in
+gioco — un pasto sbagliato è un pasto, una scheda sbagliata sono mesi di
+carichi.
+
+### Perché oggi non si può, in una riga
+
+`workout_sets` punta a `workout_exercises` con **ON DELETE CASCADE**, e
+`workout_exercises` punta a `workout_days` con lo stesso vincolo. Sostituire
+il programma cancella gli esercizi, e con loro **tutte le serie registrate**.
+Per questo `db:seed` si rifiuta di partire se trovi serie in archivio, e
+`--forza-allenamento` le cancella: non è prudenza, è l'unica cosa che poteva
+fare senza uno schema diverso.
+
+### La regola che deve reggere: niente si cancella, si archivia
+
+Un esercizio che ha serie registrate **non si elimina mai**. Esce dal
+programma corrente e resta nell'archivio, così i carichi di marzo si leggono
+anche se a settembre quell'esercizio non lo fai più.
+
+Serve una colonna sola: `workout_exercises.archiviato_il` (nullo = è nel
+programma di adesso). Cambia di conseguenza chi legge:
+
+- la seduta e la scheda mostrano solo i non archiviati;
+- lo storico e il dettaglio di una seduta passata li mostrano tutti, perché
+  raccontano quello che è successo, non quello che si fa adesso;
+- il confronto «meglio dell'ultima volta» continua a funzionare, perché gli
+  identificativi non cambiano.
+
+**È questa la risposta a "niente sporcizie".** Non un'operazione di pulizia
+fatta bene: uno schema in cui la sporcizia non può nascere, perché nessuna
+riga viene riscritta o buttata.
+
+### Come deve andare, passo per passo
+
+1. **L'app dà il formato.** Come per i pasti: un prompt da copiare, che si
+   porta dietro la scheda com'è adesso — così la chat sa cosa sta
+   sostituendo e può dire «questo esercizio resta uguale».
+2. **Si incolla la risposta.** JSON con giornate, esercizi, serie,
+   ripetizioni, e i target giornalieri se cambiano anche quelli.
+3. **Prima di toccare niente, si vede il confronto.** Riga per riga, in tre
+   gruppi: **restano uguali**, **cambiano** (con il valore vecchio accanto al
+   nuovo), **escono dal programma** (e per ognuno: quante serie hai
+   registrato, cioè quanto storico stai mettendo da parte). Più gli
+   **aggiunti**. Niente si scrive finché non hai letto questa schermata: è la
+   stessa ragione per cui i pasti stimati si confermano prima di salvare.
+4. **Si applica tutto insieme o niente.** Una transazione sola: se salta a
+   metà, il programma vecchio è ancora quello buono. Senza, un cambio
+   interrotto lascia una scheda mezza vecchia e mezza nuova, che è
+   esattamente la sporcizia da evitare.
+5. **L'undo riporta indietro tutto il cambio.** Non esercizio per esercizio:
+   un'unica azione che rimette il programma com'era, archiviati compresi.
+   Costa una fotografia del prima da tenere da parte — la stessa cosa che fa
+   già `deleteSession` col suo `SessionBackup`.
+
+### Dove va messo
+
+Una schermata sua, dentro **Piano**: è lì che stanno i target e le regole del
+PT, ed è la schermata che si apre quando qualcosa è cambiato — non il diario,
+che si apre tutti i giorni. Il cambio di scheda capita ogni qualche mese: non
+deve costare niente al gesto quotidiano.
+
+### In che ordine, e cosa si può già fare prima
+
+Il pezzo grosso è il punto 3 (il confronto) e il punto 5 (l'undo del cambio).
+Ma due cose si possono fare subito e valgono da sole:
+
+- [ ] **Target giornalieri modificabili.** Stanno in `src/lib/targets.ts`:
+      oggi cambiarli richiede un deploy, e il PT li cambia a ogni fase. Una
+      tabella `targets` con una riga, un campo per macro, e la schermata in
+      Piano. È il pezzo più piccolo di tutto questo e sblocca metà del
+      problema da solo.
+- [ ] **`archiviato_il` sugli esercizi**, con le letture aggiornate. Senza
+      questa colonna nessun cambio scheda è sicuro; con questa, anche il
+      `db:seed` può smettere di cancellare.
+- [ ] **Prompt + incolla + confronto + applica in transazione.**
+- [ ] **Undo del cambio scheda**, con la fotografia del prima.
+
+### Come si misura che è andata bene
+
+Una prova sola, e deve passare per intero: si registrano delle serie, si
+cambia scheda togliendo l'esercizio che le ha, e **dopo il cambio quelle
+serie si leggono ancora** — nel dettaglio della seduta e nella progressione.
+Poi si fa undo e il programma torna identico a prima, campo per campo.
+Finché questa prova non esiste, la funzione non esiste.
+
+## 6-sexies. Trovare un prodotto da solo: quali API esistono, davvero
+
+Cercate a settembre 2026. La conclusione è corta: **una sola vale la pena, e
+le altre non sono un ripiego, sono fuori scala.**
+
+### Open Food Facts — questa
+
+- **Gratis, senza chiave.** Nessuna variabile d'ambiente da configurare,
+  nessun conto a consumo. A differenza dell'idea dell'API di Claude che
+  avevamo scartato, qui non c'è niente da pagare e niente da ricordarsi.
+- **263.566 prodotti italiani** in archivio (il totale mondiale ha superato i
+  4 milioni).
+- **È il database su cui è costruita Yuka**, e un'altra centinaia di app. La
+  domanda «come fa Yuka» ha come risposta «usa questo».
+- Chiamata: `GET world.openfoodfacts.org/api/v2/product/{ean}.json`.
+  Torna `product_name`, `brands`, `quantity`, e `nutriments` con i valori per
+  100 g **e** per porzione, più Nutri-Score, ingredienti e immagini.
+- C'è anche la **ricerca per nome**, che è la parte che ci interessa di più
+  (sotto il perché).
+- Licenza ODbL: i dati si possono usare e ridistribuire citando la fonte.
+- Chiedono un `User-Agent` che dica chi sei. Va messo, è buona educazione e
+  costa una riga.
+
+**Il difetto, ed è vero:** è collaborativo, quindi la completezza varia da
+prodotto a prodotto. Alcune schede hanno la foto ma non i valori. Non è un
+motivo per scartarlo — è il motivo per cui il ripiego serve sempre, e il
+ripiego ce l'abbiamo già: la foto dell'etichetta va in chat e *Incolla da
+Claude* legge la tabella nutrizionale.
+
+### Le altre, e perché no
+
+| | Perché no |
+|---|---|
+| **Nutritionix** | Ottimo su prodotti confezionati e catene di ristoranti, ma **da 1.850 $/mese** e centrato sugli Stati Uniti. |
+| **Edamam** | Ha anche il testo libero, ma il piano gratuito è molto limitato e si arriva a **999 $/mese**. Il testo libero ce l'abbiamo già gratis. |
+| **FatSecret** | Copertura internazionale buona e ha il codice a barre, ma serve un contratto commerciale. |
+| **USDA FoodData Central** | Gratis e serio, ma **niente codice a barre** e cibi americani: inutile per lo scaffale di un supermercato italiano. |
+| **API di MyFitnessPal** | Non è pubblica. Non è un'opzione. |
+
+Per un'app che usa una persona sola, pagare da 999 a 1.850 dollari al mese
+per sapere quante calorie ha uno yogurt è fuori discussione.
+
+### La parte che nessuno si aspetta: la ricerca viene prima della fotocamera
+
+L'istinto dice «serve lo scanner del codice a barre». Contando il lavoro,
+conviene il contrario:
+
+- **La ricerca per nome non ha bisogno di niente di nativo.** Un campo, una
+  chiamata, una lista, si tocca il prodotto e diventa un tasto rapido. Gira
+  nel browser, gira dentro Capacitor, gira oggi.
+- **Lo scanner sì.** Su iOS `BarcodeDetector` non esiste nel WebView: serve
+  un plugin Capacitor per la fotocamera, quindi Xcode, un Mac e i permessi
+  iOS nel progetto. È la parte cara, ed è cara per una comodità — digitare
+  tredici cifre è brutto ma funziona.
+
+Quindi l'ordine giusto è: **prima la ricerca, poi il codice digitato a mano,
+e lo scanner solo se i primi due si rivelano scomodi all'uso.** Così
+l'«aggiunta dinamica dei prodotti» arriva senza toccare il guscio iOS.
+
+### I passi
+
+- [ ] **Cerca un prodotto per nome** dentro *Aggiungi*: campo, risultati con
+      marca e kcal per 100 g, si tocca e finisce nel diario. Un solo giro di
+      rete, nessuna configurazione.
+- [ ] **Salvalo come tasto rapido**, con la porzione che usi tu. È il punto
+      in cui l'archivio smette di essere quello del seed e diventa il tuo —
+      e si incastra con il punto «cibi rapidi modificabili» di 6-quater.
+- [ ] **Codice a barre digitato a mano**, per quando il nome non basta a
+      distinguere due varianti dello stesso prodotto.
+- [ ] **Scanner con la fotocamera**, solo dopo, e solo se serve davvero.
+
+### Due cose da sapere prima di scriverne una riga
+
+1. **Da questo ambiente non si può provare.** Il proxy di rete blocca
+   `world.openfoodfacts.org`, `api.nal.usda.gov` e `platform.fatsecret.com`:
+   verificato, tutti e tre rispondono con connessione rifiutata. Quindi
+   nessuna delle affermazioni qui sopra sulla *forma* della risposta è stata
+   provata sul campo — vengono dalla documentazione. La prima cosa da fare,
+   quando si comincia, è una chiamata vera con tre prodotti che compri
+   davvero, e guardare quanti hanno i valori nutrizionali compilati.
+2. **La chiamata va fatta dal server**, non dal telefono: così passa dal
+   nostro dominio, non espone niente, e in futuro si può mettere in cache un
+   prodotto già cercato invece di richiederlo ogni volta.
+
+## 6-septies. Tutto è dato, niente è codice
+
+> «In tutti i processi devo essere pienamente autonomo di modificare kcal,
+> allenamento, acqua, vitamine e cibo nel database: aggiungere, togliere,
+> modificare.»
+
+È il principio che tiene insieme 6-quater, 6-quinquies e 6-sexies, e vale la
+pena scriverlo una volta sola, per esteso:
+
+**Ogni cosa che nella vita può cambiare deve essere una riga di database, non
+una riga di codice.** Se per cambiarla serve un deploy — o peggio un
+`db:seed` — non è configurabile: è cablata. E una cosa cablata, il giorno che
+il PT cambia idea, diventa un motivo per non aggiornare l'app invece che uno
+per aprirla.
+
+### Lo stato, riga per riga
+
+| Cosa | Dove sta oggi | Aggiungere | Correggere | Togliere |
+|---|---|---|---|---|
+| **Cibo** (tasti rapidi) | database | ✅ | ✅ | ✅ con annulla |
+| **Acqua** (bicchieri al giorno) | database | ✅ | ✅ (il "meno") | ✅ (il "meno") |
+| **Obiettivo acqua** | `targets.ts` | ❌ | ❌ | ❌ |
+| **Target kcal e macro** | `targets.ts` | ❌ | ❌ | ❌ |
+| **Allenamento** (giornate ed esercizi) | database, ma solo dal seed | ❌ | ❌ | ❌ |
+| **Vitamine e integratori** | non esistono | ❌ | ❌ | ❌ |
+
+### Le vitamine: cosa sono, qui dentro
+
+Non sono cibo e non vanno nei pasti. Non hanno macro, non entrano nel budget
+calorico, e la domanda a cui rispondono è un'altra: **«l'ho presa oggi?»**,
+non «quanto mi resta».
+
+Quindi seguono la forma dell'acqua, non quella del cibo: un elenco di cose da
+prendere — definito da te, modificabile — e una spunta al giorno per
+ciascuna. Con lo stesso vincolo dell'acqua: **se chiedesse di scegliere
+dosaggi e orari costerebbe più di quanto vale, e non la si segnerebbe.**
+
+Due tabelle: gli integratori (nome, dose come testo libero, attivo sì/no) e
+le spunte per giorno. Una riga in cima al diario, sotto l'acqua, che compare
+solo se hai definito almeno un integratore — chi non li prende non deve
+vedere una riga vuota tutti i giorni.
+
+### In che ordine, dal più economico
+
+Sono ordinati per costo, non per importanza: le prime due sono mezze
+giornate, l'ultima è la più grossa di tutta la roadmap.
+
+- [ ] **Obiettivo acqua modificabile.** Una riga di impostazioni, un numero.
+      Mezz'ora, ed è il banco di prova per la tabella delle impostazioni che
+      serve anche ai target.
+- [ ] **Target kcal e macro modificabili.** Stessa tabella, quattro numeri, e
+      una schermata in Piano. Il PT li cambia a ogni fase; oggi serve un
+      deploy.
+- [ ] **Vitamine e integratori.** Due tabelle nuove, una riga nel diario, una
+      schermata di gestione. Nessuna dipendenza dalle altre voci.
+- [ ] **Allenamento modificabile.** La più cara, e ha un nodo vero descritto
+      in 6-quinquies: `ON DELETE CASCADE` fra serie ed esercizi, quindi
+      cambiare la scheda cancella i carichi. Prima serve `archiviato_il`, poi
+      tutto il resto diventa possibile.
+
+### La regola che vale per tutte
+
+Quando una di queste diventa modificabile, **i dati già registrati non si
+riscrivono.** Un target cambiato a settembre non cambia se a marzo eri in
+target: le statistiche di marzo vanno lette col target di marzo. Vale lo
+stesso per gli esercizi archiviati e per i valori di un alimento corretto —
+ed è già così per i pasti, perché quando aggiungi un cibo rapido al diario i
+numeri vengono **copiati** nella riga del pasto, non riferiti.
 
 ## 7. Cose che restano fuori, di proposito
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card } from "@/components/card";
 import { LogoutButton } from "@/components/logout-button";
 import { PageHeader } from "@/components/page-header";
@@ -45,6 +46,22 @@ export default function PianoPage() {
           </Card>
         </Section>
       ))}
+
+      <Section title="I tuoi alimenti">
+        <Card>
+          <p className="mb-4 text-[15px] leading-snug text-muted">
+            I tasti rapidi del diario. Si aggiungono, si correggono e si
+            tolgono da qui — e crescono da soli ogni volta che salvi un pasto
+            fra i rapidi.
+          </p>
+          <Link
+            href="/alimenti"
+            className="flex min-h-12 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
+          >
+            Apri l&apos;archivio
+          </Link>
+        </Card>
+      </Section>
 
       {/*
         I dati restano tuoi. Se un giorno il progetto si ferma, o Neon cambia

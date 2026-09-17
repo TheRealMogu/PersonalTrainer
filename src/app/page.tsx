@@ -5,7 +5,7 @@ import { WeekStrip } from "@/components/week-strip";
 import { isIsoDate, todayIso } from "@/lib/date";
 import { buildDateRange, fillMissingDays, type DailyTotals } from "@/lib/history";
 import { slotForHour } from "@/lib/meal-slots";
-import { getDailyTotals, getMealsByDay, getQuickFoods } from "@/lib/queries";
+import { getDailyTotals, getMealsByDay, getQuickFoods, getWater } from "@/lib/queries";
 import type { Meal, QuickFood } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -27,11 +27,13 @@ export default async function DiarioPage({
   let meals: Meal[];
   let quickFoods: QuickFood[];
   let totaliSettimana: DailyTotals[];
+  let acqua: number;
   try {
-    [meals, quickFoods, totaliSettimana] = await Promise.all([
+    [meals, quickFoods, totaliSettimana, acqua] = await Promise.all([
       getMealsByDay(day),
       getQuickFoods(),
       getDailyTotals(settimana[0], today),
+      getWater(day),
     ]);
   } catch (error) {
     // Si registra comunque nei log del server: nascondere l'errore all'utente
@@ -66,6 +68,7 @@ export default async function DiarioPage({
         meals={meals}
         quickFoods={quickFoods}
         defaultSlot={slotForHour(hourInRome)}
+        acqua={acqua}
       />
     </main>
   );
