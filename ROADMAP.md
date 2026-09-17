@@ -662,8 +662,8 @@ per aprirla.
 |---|---|---|---|---|
 | **Cibo** (tasti rapidi) | database | ✅ | ✅ | ✅ con annulla |
 | **Acqua** (bicchieri al giorno) | database | ✅ | ✅ (il "meno") | ✅ (il "meno") |
-| **Obiettivo acqua** | `targets.ts` | ❌ | ❌ | ❌ |
-| **Target kcal e macro** | `targets.ts` | ❌ | ❌ | ❌ |
+| **Obiettivo acqua** | database (`targets`) | ✅ | ✅ | — (c'è sempre) |
+| **Target kcal e macro** | database (`targets`) | ✅ | ✅ | — (c'è sempre) |
 | **Allenamento** (giornate ed esercizi) | database, ma solo dal seed | ❌ | ❌ | ❌ |
 | **Vitamine e integratori** | non esistono | ❌ | ❌ | ❌ |
 
@@ -688,12 +688,20 @@ vedere una riga vuota tutti i giorni.
 Sono ordinati per costo, non per importanza: le prime due sono mezze
 giornate, l'ultima è la più grossa di tutta la roadmap.
 
-- [ ] **Obiettivo acqua modificabile.** Una riga di impostazioni, un numero.
-      Mezz'ora, ed è il banco di prova per la tabella delle impostazioni che
-      serve anche ai target.
-- [ ] **Target kcal e macro modificabili.** Stessa tabella, quattro numeri, e
-      una schermata in Piano. Il PT li cambia a ogni fase; oggi serve un
-      deploy.
+- [x] **Obiettivo acqua modificabile.** Fatto: stessa schermata dei target,
+      perché è la stessa riga di database.
+- [x] **Target kcal e macro modificabili.** Fatto: tabella `targets` (una
+      riga sola), schermata *Piano → Cambia gli obiettivi*, e i numeri letti
+      da lì in undici punti che prima leggevano una costante. **Non era la
+      mezz'ora scritta qui sopra**: la tabella è la parte breve, filare i
+      target attraverso anello, barre, storico, riepilogo e acqua è il resto.
+      La stima sbagliata è rimasta scritta apposta.
+
+      Fuori: se la lettura fallisce valgono i predefiniti invece di una
+      schermata bianca; un numero fuori scala viene spiegato e blocca il
+      salvataggio, ma i macro che non tornano al grammo con le calorie
+      vengono solo segnalati — una dieta può avere un margine voluto, e
+      un'app che rifiuta i numeri del PT si fa scavalcare.
 - [ ] **Vitamine e integratori.** Due tabelle nuove, una riga nel diario, una
       schermata di gestione. Nessuna dipendenza dalle altre voci.
 - [ ] **Allenamento modificabile.** La più cara, e ha un nodo vero descritto
@@ -709,6 +717,23 @@ target: le statistiche di marzo vanno lette col target di marzo. Vale lo
 stesso per gli esercizi archiviati e per i valori di un alimento corretto —
 ed è già così per i pasti, perché quando aggiungi un cibo rapido al diario i
 numeri vengono **copiati** nella riga del pasto, non riferiti.
+
+**Questa regola i target la violano, oggi.** La tabella `targets` ha una riga
+sola: cambiare i numeri a settembre riscrive la lettura di marzo, e «giorni
+entro il target» nello Storico si ricalcola all'indietro sul target nuovo. I
+pasti registrati non si toccano — quelli restano come erano — ma il giudizio
+su quei pasti sì.
+
+Non è stato risolto subito di proposito: la correzione è un `valido_da` sulla
+riga, quindi più righe e una lettura per data, e ogni statistica che oggi
+chiede «il target» dovrebbe chiedere «il target di quel giorno». Vale la pena
+farlo quando i target cambiano davvero una seconda volta e lo Storico ha mesi
+dentro; farlo prima è pagare una complicazione per una storia che non c'è
+ancora.
+
+- [ ] **Target con data di validità.** `valido_da` sulla riga, lettura per
+      giorno, statistiche che chiedono il target di quel giorno. Da fare al
+      primo cambio vero di fase, non prima.
 
 ## 6-octies. Quello che non deve più toccare a te
 

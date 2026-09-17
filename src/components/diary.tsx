@@ -13,7 +13,7 @@ import {
 import type { Meal, QuickFood } from "@/db/schema";
 import type { MealSlot } from "@/lib/meal-slots";
 import { buildProgress, sumMacros } from "@/lib/nutrition";
-import type { MacroKey } from "@/lib/targets";
+import type { MacroKey, Obiettivi } from "@/lib/targets";
 import { Acqua } from "./acqua";
 import { Card } from "./card";
 import { CalorieRing } from "./calorie-ring";
@@ -48,12 +48,14 @@ export function Diary({
   quickFoods,
   defaultSlot,
   acqua,
+  obiettivi,
 }: {
   day: string;
   meals: Meal[];
   quickFoods: QuickFood[];
   defaultSlot: MealSlot;
   acqua: number;
+  obiettivi: Obiettivi;
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -82,7 +84,7 @@ export function Diary({
   );
 
   const totals = sumMacros(optimisticMeals);
-  const progress = buildProgress(totals);
+  const progress = buildProgress(totals, obiettivi.macro);
 
   function handleAdd(input: Omit<MealInput, "day">) {
     setError(null);
@@ -214,7 +216,7 @@ export function Diary({
           guardano -- e una cosa che non si guarda non si segna.
         */}
         <div className="mt-4 border-t border-hairline pt-4">
-          <Acqua day={day} bicchieri={acqua} />
+          <Acqua day={day} bicchieri={acqua} obiettivo={obiettivi.bicchieriAcqua} />
         </div>
       </Card>
 
@@ -224,6 +226,7 @@ export function Diary({
             foods={quickFoods}
             defaultSlot={defaultSlot}
             totals={totals}
+            targets={obiettivi.macro}
             onAdd={(food, quantity, slot) =>
               handleAdd({
                 slot,

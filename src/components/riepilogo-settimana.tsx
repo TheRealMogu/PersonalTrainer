@@ -9,7 +9,7 @@ import {
   riepilogoTesto,
   type Riepilogo,
 } from "@/lib/riepilogo";
-import { DAILY_TARGETS } from "@/lib/targets";
+import { DAILY_TARGETS, type MacroKey } from "@/lib/targets";
 import { formatVolume } from "@/lib/workout";
 
 /**
@@ -25,12 +25,18 @@ import { formatVolume } from "@/lib/workout";
  * nessuno sa quanti giorni ci sono dentro, e una media senza il suo
  * denominatore si legge come si vuole.
  */
-export function RiepilogoSettimana({ riepilogo }: { riepilogo: Riepilogo }) {
+export function RiepilogoSettimana({
+  riepilogo,
+  targets = DAILY_TARGETS,
+}: {
+  riepilogo: Riepilogo;
+  targets?: Record<MacroKey, number>;
+}) {
   const [copiato, setCopiato] = useState(false);
 
   async function copia() {
     try {
-      await navigator.clipboard.writeText(riepilogoTesto(riepilogo));
+      await navigator.clipboard.writeText(riepilogoTesto(riepilogo, targets));
       setCopiato(true);
       setTimeout(() => setCopiato(false), 2000);
     } catch {
@@ -111,7 +117,7 @@ export function RiepilogoSettimana({ riepilogo }: { riepilogo: Riepilogo }) {
             <p className="mt-2 text-[13px] leading-snug text-muted">
               Media su {riepilogo.registrati}{" "}
               {riepilogo.registrati === 1 ? "giorno registrato" : "giorni registrati"} su{" "}
-              {riepilogo.conclusi} conclusi. Target {DAILY_TARGETS.kcal} kcal.
+              {riepilogo.conclusi} conclusi. Target {targets.kcal} kcal.
             </p>
           </>
         ) : (

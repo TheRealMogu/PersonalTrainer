@@ -10,9 +10,14 @@ import { RiepilogoSettimana } from "@/components/riepilogo-settimana";
 import { Section } from "@/components/section";
 import { lunediDellaSettimana, shiftIsoDate, todayIso } from "@/lib/date";
 import { buildDateRange, buildHistoryStats, fillMissingDays } from "@/lib/history";
-import { getDailyTotals, getExerciseProgress, getSessionsInRange } from "@/lib/queries";
+import {
+  getDailyTotals,
+  getExerciseProgress,
+  getObiettivi,
+  getSessionsInRange,
+} from "@/lib/queries";
 import { costruisciRiepilogo } from "@/lib/riepilogo";
-import { MACRO_LABELS, MACRO_ORDER } from "@/lib/targets";
+import { MACRO_LABELS, MACRO_ORDER, type Obiettivi } from "@/lib/targets";
 
 export const dynamic = "force-dynamic";
 
@@ -44,12 +49,14 @@ export default async function StoricoPage({
   let exerciseProgress: Awaited<ReturnType<typeof getExerciseProgress>>;
   let settimana: Awaited<ReturnType<typeof getDailyTotals>>;
   let sedute: Awaited<ReturnType<typeof getSessionsInRange>>;
+  let obiettivi: Obiettivi;
   try {
-    [rows, exerciseProgress, settimana, sedute] = await Promise.all([
+    [rows, exerciseProgress, settimana, sedute, obiettivi] = await Promise.all([
       getDailyTotals(dates[0], today),
       getExerciseProgress(),
       getDailyTotals(lunedi, domenica),
       getSessionsInRange(lunedi, domenica),
+      getObiettivi(),
     ]);
   } catch (error) {
     console.error("[storico] lettura dei dati fallita:", error);
@@ -62,7 +69,7 @@ export default async function StoricoPage({
   }
 
   const days = fillMissingDays(rows, dates);
-  const stats = buildHistoryStats(days, today);
+  const stats = buildHistoryStats(days, today, obiettivi.macro);
   const riepilogo = costruisciRiepilogo(settimana, sedute, today, today);
 
   return (
@@ -76,7 +83,7 @@ export default async function StoricoPage({
       */}
       <Section title="Questa settimana">
         <Card>
-          <RiepilogoSettimana riepilogo={riepilogo} />
+          <RiepilogoSettimana riepilogo={riepilogo} targets={obiettivi.macro} />
         </Card>
       </Section>
 
@@ -115,7 +122,12 @@ export default async function StoricoPage({
             <Card>
               <div className="grid grid-cols-2 gap-2">
                 {MACRO_ORDER.map((macro) => (
-                  <MacroStatTile key={macro} macro={macro} average={stats.averages[macro]} />
+                  <MacroStatTile
+                    key={macro}
+                    macro={macro}
+                    average={stats.averages[macro]}
+                    target={obiettivi.macro[macro]}
+                  />
                 ))}
               </div>
               <p className="mt-3 text-[13px] text-muted">
@@ -156,7 +168,13 @@ export default async function StoricoPage({
           <Card>
             <div className="flex flex-col gap-8">
               {MACRO_ORDER.map((macro) => (
-                <MacroHistoryChart key={macro} macro={macro} days={days} today={today} />
+                <MacroHistoryChart
+                  key={macro}
+                  macro={macro}
+                  days={days}
+                  today={today}
+                  target={obiettivi.macro[macro]}
+                />
               ))}
             </div>
             <p className="mt-4 text-[13px] text-muted">

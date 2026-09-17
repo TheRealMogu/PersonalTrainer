@@ -90,6 +90,8 @@ proprio le schermate che vanno riviste.
 | Sapere a che punto è la seduta | 0 gesti | 0 (in cima, accanto al cronometro) | ok |
 | Sapere da dove arriva un macro | 1 gesto | 1 (tocca il riquadro) | ok |
 | Sapere cosa ci sta nel margine di un macro | 1 gesto | 1 (stesso foglio) | ok |
+| Cambiare i target dopo che il PT li ha cambiati | 3 gesti | 3 (Piano → *Cambia gli obiettivi* → campo) | ok |
+| Cambiare l'obiettivo dell'acqua | 3 gesti | 3 (stessa schermata) | ok |
 
 Le righe **sopra il tetto** sono misurate su una giornata vera (10 pasti
 registrati, schermo da 390 px). Le prime due righe dell'aggiunta sono
@@ -148,7 +150,7 @@ e va difesa a ogni aggiunta.
   macro con un colore ciascuno, pasti divisi per momento della giornata col
   totale di ognuno, quantità variabili (½, 1½, 0,75…), eliminazione
   annullabile, navigazione fra i giorni.
-- **Piano** — i target e le regole del PT.
+- **Piano** — i target e le regole del PT, con la porta per cambiarli.
 - **Allenamento** — il programma T1 e la seduta vera: cronometro, serie con
   carico e ripetizioni, timer di recupero, volume sollevato, e il carico
   dell'ultima volta già proposto nei campi.
@@ -171,6 +173,14 @@ e va difesa a ogni aggiunta.
 - **Acqua** — bicchieri +/− nella scheda in cima al diario, con il totale in
   litri. Nessun macro, nessuna stima, nessuna scelta da fare: è un contatore.
   Il "meno" è l'annullamento, a un tocco di distanza.
+- **Obiettivi modificabili** — Piano → *Cambia gli obiettivi*: calorie,
+  carboidrati, proteine, grassi e bicchieri d'acqua si scrivono a mano, e da
+  lì in poi valgono ovunque — anello, barre, storico, riepilogo della
+  settimana, scheda dell'acqua. Prima erano una costante nel codice: quando
+  il PT cambiava la dieta servivo io. Un numero fuori scala viene spiegato e
+  il salvataggio si ferma, ma nessun numero viene corretto di nascosto: se i
+  macro non tornano al grammo con le calorie l'app lo fa notare e salva lo
+  stesso, perché una dieta può avere un margine voluto.
 - **Dettaglio di un allenamento** — dalla lista *Ultimi allenamenti* si apre
   la seduta: volume, durata, serie per serie con accanto quanto sei andato
   meglio o peggio della stessa serie dell'ultima volta, e l'elenco degli
