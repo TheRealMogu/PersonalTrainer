@@ -45,34 +45,48 @@ previsto, cioè quasi nulla.
 ## Il metro di misura: i gesti
 
 La comodità non è un'opinione, si conta. Ogni azione quotidiana ha un costo in
-tocchi, e ogni costo ha un tetto. Se un gesto sfora il tetto, è un bug di
+gesti, e ogni costo ha un tetto. Se un gesto sfora il tetto, è un bug di
 prodotto, non una mancanza di funzionalità.
+
+**Lo scorrimento è un gesto, e si conta: mezza schermata = 1.** Non era così,
+ed è per questo che questa tabella ha dichiarato «aggiungere un cibo
+ricorrente: 1 tocco, ok» per due mesi, mentre sul telefono quel tasto stava
+882 px più in basso — quasi due schermate di pollice prima del primo tocco
+utile. Un metro che non misura la parte cara non serve a niente, e assolve
+proprio le schermate che vanno riviste.
 
 | Gesto quotidiano | Tetto | Oggi | Stato |
 |---|---|---|---|
-| Vedere quanto mi resta | 0 tocchi (apro l'app) | 0 | ok |
-| Vedere cosa ho mangiato | 0 tocchi | 0 | ok |
-| Aggiungere un cibo ricorrente | 1 tocco | 1 | ok |
-| Aggiungere lo stesso cibo in quantità diversa | 2 tocchi | 2 (tasto "+" → quantità) | ok |
-| Correggere un pasto già inserito | 2 tocchi | 2 (tocca la riga → quantità) | ok |
-| Annullare un errore | 1 tocco | 1 | ok |
-| Entrare nell'app | 0 tocchi dopo il primo accesso | 0 | ok |
-| Segnare il carico di una serie | 2 tocchi | 1 (campi già pronti) | ok |
-| Vedere il carico dell'ultima volta | 0 tocchi | 0 | ok |
-| Sapere cosa mi entra ancora | 0 tocchi | 0 (conteggio sempre visibile) | ok |
-| Capire dove sono finite le calorie | 0 tocchi | 0 (totale per pasto) | ok |
-| Sapere quale allenamento tocca | 0 tocchi | 0 (scheda "Tocca a te") | ok |
-| Correggere una serie sbagliata | 2 tocchi | 2 (tocca la riga → salva) | ok |
-| Rimediare a una serie eliminata | 1 tocco | 1 (Annulla) | ok |
-| Rimediare a "Fine" toccato per sbaglio | 1 tocco | 1 (Annulla) | ok |
-| Uscire da una giornata avviata sbagliata | 1 tocco | 1 (Scarta) | ok |
-| Spostare un pasto di momento | 2 tocchi | 2 (tocca la riga → momento) | ok |
-| Portarsi via i propri dati | 2 tocchi | 2 (Piano → scarica) | ok |
-| Segnare una serie senza segnale | 1 tocco | 1 (resta sul telefono) | ok |
-| Sapere com'è andata la settimana | 0 tocchi | 0 (striscia in cima al diario) | ok |
-| Aprire un giorno passato | 1 tocco | 1 (dalla striscia) | ok |
-| Sapere da dove arriva un macro | 1 tocco | 1 (tocca il riquadro) | ok |
-| Sapere cosa ci sta nel margine di un macro | 1 tocco | 1 (stesso foglio) | ok |
+| Vedere quanto mi resta | 0 gesti (apro l'app) | 0 | ok |
+| Vedere cosa ho mangiato | 1 gesto | 0 | ok |
+| Aggiungere un cibo ricorrente | 1 gesto | **5** (4 di scorrimento + 1 tocco) | **da rivedere** |
+| Aggiungere lo stesso cibo in quantità diversa | 2 gesti | **6** | **da rivedere** |
+| Registrare qualcosa che non è fra i tasti rapidi | 2 gesti | **7** (*Incolla da Claude* sta a 2,8 schermate) | **da rivedere** |
+| Ripetere un pasto che fai sempre uguale | 1 gesto | — (non esiste) | **manca** |
+| Segnare un bicchiere d'acqua | 1 gesto | — (non esiste) | **manca** |
+| Correggere un pasto già inserito | 2 gesti | 2 (tocca la riga → quantità) | ok |
+| Annullare un errore | 1 gesto | 1 | ok |
+| Entrare nell'app | 0 gesti dopo il primo accesso | 0 | ok |
+| Segnare il carico di una serie | 2 gesti | 1 (campi già pronti) | ok |
+| Vedere il carico dell'ultima volta | 0 gesti | 0 | ok |
+| Sapere cosa mi entra ancora | 0 gesti | 0 (conteggio sempre visibile) | ok |
+| Capire dove sono finite le calorie | 0 gesti | 0 (totale per pasto) | ok |
+| Sapere quale allenamento tocca | 0 gesti | 0 (scheda "Tocca a te") | ok |
+| Correggere una serie sbagliata | 2 gesti | 2 (tocca la riga → salva) | ok |
+| Rimediare a una serie eliminata | 1 gesto | 1 (Annulla) | ok |
+| Rimediare a "Fine" toccato per sbaglio | 1 gesto | 1 (Annulla) | ok |
+| Uscire da una giornata avviata sbagliata | 1 gesto | 1 (Scarta) | ok |
+| Spostare un pasto di momento | 2 gesti | 2 (tocca la riga → momento) | ok |
+| Portarsi via i propri dati | 2 gesti | 2 (Piano → scarica) | ok |
+| Segnare una serie senza segnale | 1 gesto | 1 (resta sul telefono) | ok |
+| Sapere com'è andata la settimana | 0 gesti | 0 (striscia in cima al diario) | ok |
+| Aprire un giorno passato | 1 gesto | 1 (dalla striscia) | ok |
+| Sapere da dove arriva un macro | 1 gesto | 1 (tocca il riquadro) | ok |
+| Sapere cosa ci sta nel margine di un macro | 1 gesto | 1 (stesso foglio) | ok |
+
+Le righe marcate **da rivedere** sono misurate su una giornata vera (10 pasti
+registrati, schermo da 390 px) il 17 settembre 2026. Il piano per riportarle
+sotto il tetto è la sezione 6-ter di [ROADMAP.md](ROADMAP.md).
 
 Due regole che valgono sempre:
 
