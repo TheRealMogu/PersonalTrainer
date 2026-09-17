@@ -120,6 +120,13 @@ export const workoutDays = pgTable("workout_days", {
   label: text("label").notNull(),
   focus: text("focus").notNull(),
   sortOrder: integer("sort_order").notNull().default(0),
+  /**
+   * Come per gli esercizi: nullo = e' nel programma di adesso.
+   *
+   * Serve anche qui perche' `workout_sessions` punta alle giornate, e una
+   * giornata cancellata si porterebbe via le sedute che ci hai fatto sopra.
+   */
+  archiviatoIl: timestamp("archiviato_il", { withTimezone: true }),
 });
 
 /** Esercizi di una giornata, con serie e ripetizioni. */
@@ -134,6 +141,24 @@ export const workoutExercises = pgTable(
     sets: integer("sets").notNull(),
     reps: text("reps").notNull(),
     sortOrder: integer("sort_order").notNull().default(0),
+    /**
+     * Quando e' uscito dal programma. Nullo = lo fai adesso.
+     *
+     * E' la colonna che rende sicuro cambiare scheda. `workout_sets` punta
+     * qui con `ON DELETE CASCADE`: cancellare un esercizio si porta via tutte
+     * le serie registrate su di lui, cioe' mesi di carichi. Per questo il
+     * seed si rifiuta di partire quando trova serie in archivio.
+     *
+     * Con questa colonna un esercizio non si cancella mai: esce dal programma
+     * e resta leggibile. I carichi di marzo si leggono anche se a settembre
+     * quell'esercizio non lo fai piu'.
+     *
+     * Chi legge cambia di conseguenza: la scheda e la seduta mostrano solo i
+     * non archiviati (e' quello che fai adesso), lo storico e il dettaglio di
+     * una seduta passata li mostrano tutti (raccontano quello che e'
+     * successo).
+     */
+    archiviatoIl: timestamp("archiviato_il", { withTimezone: true }),
   },
   (table) => [index("workout_exercises_day_idx").on(table.dayId)]
 );

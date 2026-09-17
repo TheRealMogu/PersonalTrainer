@@ -238,15 +238,24 @@ export type WorkoutDayWithExercises = {
   exercises: WorkoutExercise[];
 };
 
+/**
+ * Il programma di adesso: solo quello che fai oggi.
+ *
+ * Gli archiviati restano nel database e si leggono ancora nel dettaglio di
+ * una seduta passata -- li' si racconta quello che e' successo. Qui si dice
+ * cosa fare, e un esercizio che il personal trainer ha tolto non va fatto.
+ */
 export async function getWorkout(): Promise<WorkoutDayWithExercises[]> {
   const [days, exercises] = await Promise.all([
     db
       .select()
       .from(workoutDays)
+      .where(isNull(workoutDays.archiviatoIl))
       .orderBy(asc(workoutDays.sortOrder), asc(workoutDays.id)),
     db
       .select()
       .from(workoutExercises)
+      .where(isNull(workoutExercises.archiviatoIl))
       .orderBy(asc(workoutExercises.sortOrder), asc(workoutExercises.id)),
   ]);
 
@@ -390,6 +399,10 @@ export async function getSessionDetail(
 
   if (!riga) return null;
 
+  // Anche gli archiviati, di proposito: questa schermata racconta una seduta
+  // che hai fatto davvero. Se a settembre il PT toglie la panca inclinata, i
+  // carichi della panca inclinata di marzo devono restare leggibili -- e la
+  // riga senza il nome dell'esercizio sarebbe un dato monco.
   const esercizi = await db
     .select()
     .from(workoutExercises)
@@ -494,6 +507,8 @@ export type ExerciseProgressPoint = {
 export type ExerciseProgress = {
   exerciseId: number;
   name: string;
+  /** Non e' piu' nel programma: i carichi restano, ma non lo fai piu'. */
+  archiviato: boolean;
   points: ExerciseProgressPoint[];
 };
 
@@ -512,6 +527,10 @@ export async function getExerciseProgress(
       day: workoutSessions.day,
       weight: workoutSets.weight,
       reps: workoutSets.reps,
+      // Gli archiviati restano nel grafico: quei carichi li hai sollevati
+      // davvero. Ma si dice che non sono piu' in programma, altrimenti sembra
+      // che tu abbia smesso di migliorare su un esercizio che non fai piu'.
+      archiviato: workoutExercises.archiviatoIl,
     })
     .from(workoutSets)
     .innerJoin(
@@ -524,7 +543,11 @@ export async function getExerciseProgress(
   // Raggruppa per esercizio e per giornata, tenendo la serie migliore.
   const byExercise = new Map<
     number,
-    { name: string; days: Map<string, ExerciseProgressPoint> }
+    {
+      name: string;
+      archiviato: boolean;
+      days: Map<string, ExerciseProgressPoint>;
+    }
   >();
 
   for (const row of rows) {
@@ -532,7 +555,11 @@ export async function getExerciseProgress(
       row.weight > 0 && row.reps > 0 ? row.weight * (1 + row.reps / 30) : 0;
     let entry = byExercise.get(row.exerciseId);
     if (!entry) {
-      entry = { name: row.name, days: new Map() };
+      entry = {
+        name: row.name,
+        archiviato: row.archiviato !== null,
+        days: new Map(),
+      };
       byExercise.set(row.exerciseId, entry);
     }
 
@@ -560,6 +587,7 @@ export async function getExerciseProgress(
       .map(([exerciseId, entry]) => ({
         exerciseId,
         name: entry.name,
+        archiviato: entry.archiviato,
         points: [...entry.days.values()].slice(-limitPerExercise),
       }))
       // Solo esercizi con almeno due sedute: con un punto solo non c'e' andamento.

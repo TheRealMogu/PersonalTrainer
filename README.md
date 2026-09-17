@@ -106,14 +106,15 @@ DEV_ORIGINS="192.168.1.22"
 Senza, Next blocca il ricaricamento automatico da indirizzi diversi da
 `localhost` e la pagina non si aggiorna più da sola.
 
-Il seed ricarica sempre i tasti rapidi. **Non tocca `meals`**, e se trova
-serie di allenamento già registrate **lascia stare il programma**: gli
-esercizi sono riferiti dalle serie con `ON DELETE CASCADE`, quindi rifarlo
-cancellerebbe lo storico dei carichi. Per forzare comunque:
+Il seed ricarica sempre i tasti rapidi e **non tocca `meals`**. Il programma
+di allenamento lo **archivia** invece di cancellarlo: gli esercizi di prima
+restano nel database con `archiviato_il` valorizzato, quindi le serie che ci
+avevi registrato sopra si leggono ancora nello storico e nel dettaglio delle
+sedute passate.
 
-```bash
-npm run db:seed -- --forza-allenamento
-```
+Per cambiare scheda sul serio non serve il seed: c'è **Piano → Cambia la
+scheda**, che fa vedere cosa cambia riga per riga *prima* di toccare
+qualcosa, applica tutto in una transazione sola e si annulla.
 
 ### Script disponibili
 
