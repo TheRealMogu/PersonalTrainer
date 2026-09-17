@@ -233,9 +233,25 @@ leggibile qualcosa che oggi non lo è.
 - [ ] **Export filtrato per date.** Oggi *I tuoi dati* scarica tutto lo
       storico. Per mandare una settimana sola serve aprire il CSV e tagliarlo
       a mano.
-- [ ] **Separatore decimale dei macro.** I chili usano la virgola
-      (`formatWeight`), i macro il punto (`formatMacro`): "12,5 kg" e
-      "C 230.6" nella stessa schermata. Da uniformare sulla virgola.
+- [x] **Separatore decimale dei macro.** Fatto. `formatMacro` scrive con la
+      virgola, come `formatWeight` e `formatAcqua`.
+
+      Cercandolo è saltato fuori il resto: **sei punti stampavano il target
+      grezzo** senza passare dal formattatore (anello, grafico dello storico,
+      foglio del macro, riquadro, Piano, e la riga *Target:* del testo
+      copiabile). Finché i target erano costanti intere non si vedeva; da
+      quando si scrivono a mano, un target di 62,5 g usciva "62.5". Ora
+      passano tutti di lì.
+
+      Anche il campo modificabile mostra la virgola: leggere "62.5" nel campo
+      mentre il resto dell'app scrive "62,5" fa sembrare due numeri diversi.
+      Il punto continua a essere accettato in scrittura.
+
+      Le migliaia di kcal restano senza raggruppamento ("1845 kcal", non
+      "1.845"), mentre il volume in palestra lo usa: differenza voluta e
+      scritta nel codice — lì si arriva a cinque cifre, qui ci si ferma a
+      quattro e il punto costa un carattere nell'anello senza far guadagnare
+      niente.
 - [ ] **Dati da Apple Watch o Fitbit.** Le calorie bruciate e i passi
       renderebbero il budget giornaliero vero invece che fisso. Costa parecchio:
       per Apple Health serve un plugin HealthKit dentro il guscio Capacitor,

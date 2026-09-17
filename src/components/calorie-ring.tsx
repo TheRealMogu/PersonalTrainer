@@ -27,8 +27,8 @@ export function CalorieRing({ progress }: { progress: MacroProgress }) {
           role="img"
           aria-label={
             isOver
-              ? `${formatMacro(consumed, "kcal")} kcal su ${target}, oltre il target di ${formatMacro(over, "kcal")}`
-              : `${formatMacro(consumed, "kcal")} kcal su ${target}, ne restano ${formatMacro(remaining, "kcal")}`
+              ? `${formatMacro(consumed, "kcal")} kcal su ${formatMacro(target, "kcal")}, oltre il target di ${formatMacro(over, "kcal")}`
+              : `${formatMacro(consumed, "kcal")} kcal su ${formatMacro(target, "kcal")}, ne restano ${formatMacro(remaining, "kcal")}`
           }
         >
           {/* traccia */}
@@ -75,7 +75,7 @@ export function CalorieRing({ progress }: { progress: MacroProgress }) {
           format={(valore) => formatMacro(valore, "kcal")}
           className="font-semibold text-ink"
         />{" "}
-        di {target} kcal
+        di {formatMacro(target, "kcal")} kcal
       </p>
     </div>
   );

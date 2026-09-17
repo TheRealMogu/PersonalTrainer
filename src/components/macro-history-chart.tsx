@@ -75,7 +75,7 @@ export function MacroHistoryChart({
       <figcaption className="mb-1 flex items-baseline justify-between">
         <span className="text-[15px] font-medium">{MACRO_LABELS[macro]}</span>
         <span className="text-[13px] tabular-nums text-muted">
-          target {target} {unit}
+          target {formatMacro(target, macro)} {unit}
         </span>
       </figcaption>
 
@@ -83,7 +83,7 @@ export function MacroHistoryChart({
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         className="h-auto w-full overflow-visible"
         role="img"
-        aria-label={`${MACRO_LABELS[macro]} per giorno, target ${target} ${unit}`}
+        aria-label={`${MACRO_LABELS[macro]} per giorno, target ${formatMacro(target, macro)} ${unit}`}
       >
         {/* baseline: hairline solida, un passo sopra la superficie */}
         <line

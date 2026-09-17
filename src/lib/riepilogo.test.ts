@@ -135,6 +135,30 @@ describe("riepilogoTesto", () => {
     assert.match(testo, /peso di un manubrio, non il totale/);
   });
 
+  it("i numeri li scrive come li scrive lo schermo, virgola compresa", () => {
+    // Regola 11: lo stesso numero si scrive uguale dovunque esca. Il testo si
+    // incolla in una chat dove chi legge non ha l'app davanti, quindi un
+    // punto decimale qui e una virgola a schermo sono due numeri diversi per
+    // chi guarda.
+    const conDecimali = riepilogoTesto(
+      costruisciRiepilogo(
+        [{ day: "2026-09-07", kcal: 1845, carbs: 230.6, protein: 155.5, fat: 62.5 }],
+        [],
+        "2026-09-08",
+        "2026-09-08",
+      ),
+      { kcal: 1905, carbs: 220.5, protein: 155, fat: 45 },
+    );
+    assert.match(conDecimali, /C 230,6/);
+    assert.match(conDecimali, /G 62,5/);
+    assert.match(conDecimali, /Target: 1905 kcal · C 220,5/);
+    assert.doesNotMatch(
+      conDecimali,
+      /\d\.\d/,
+      "un punto fra due cifre vuol dire che un numero è uscito alla maniera inglese",
+    );
+  });
+
   it("senza dati non finge: lo scrive", () => {
     const vuoto = riepilogoTesto(costruisciRiepilogo([], [], "2026-09-07", "2026-09-07"));
     assert.match(vuoto, /non c'è una media da fare/);

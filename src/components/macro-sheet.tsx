@@ -71,8 +71,8 @@ export function MacroSheet({
           </h2>
           <p className={`mt-0.5 text-[15px] ${progress.isOver ? "text-over" : "text-muted"}`}>
             {progress.isOver
-              ? `${formatMacro(progress.over, key)} ${unit} oltre il target di ${progress.target}`
-              : `Restano ${formatMacro(progress.remaining, key)} ${unit} su ${progress.target}`}
+              ? `${formatMacro(progress.over, key)} ${unit} oltre il target di ${formatMacro(progress.target, key)}`
+              : `Restano ${formatMacro(progress.remaining, key)} ${unit} su ${formatMacro(progress.target, key)}`}
           </p>
         </header>
 

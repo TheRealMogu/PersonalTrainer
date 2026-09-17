@@ -32,10 +32,29 @@ export function sumMacros(items: MacroSource[]): MacroTotals {
   );
 }
 
-/** Arrotonda per la UI: i grammi a una cifra decimale, le kcal a intero. */
+/**
+ * Arrotonda e scrive per la UI: i grammi a una cifra decimale, le kcal a
+ * intero.
+ *
+ * Il separatore decimale e' la virgola, come ovunque nell'app. Prima qui
+ * usciva il punto -- `toString()` scrive alla maniera inglese -- e nella
+ * stessa schermata si leggeva "12,5 kg" accanto a "C 230.6": due convenzioni
+ * in tre centimetri.
+ *
+ * La virgola si mette a mano invece di passare da `toLocaleString`, che senza
+ * opzioni esplicite non da' lo stesso risultato sul server e nel browser.
+ * Trappola gia' pagata in questo repo, con un errore di idratazione a ogni
+ * apertura.
+ *
+ * Le migliaia restano senza punto: "1845 kcal", non "1.845". Il volume in
+ * palestra invece le raggruppa (`formatVolume`), ed e' una differenza voluta
+ * -- li' i numeri arrivano a cinque cifre, qui si fermano a quattro, dove il
+ * punto costa un carattere nell'anello e non fa guadagnare niente in
+ * leggibilita'.
+ */
 export function formatMacro(value: number, key: MacroKey): string {
-  if (key === "kcal") return Math.round(value).toString();
-  return (Math.round(value * 10) / 10).toString();
+  const arrotondato = key === "kcal" ? Math.round(value) : Math.round(value * 10) / 10;
+  return String(arrotondato).replace(".", ",");
 }
 
 export type MacroProgress = {
