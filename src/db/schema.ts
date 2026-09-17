@@ -1,9 +1,11 @@
 import {
+  boolean,
   date,
   pgEnum,
   index,
   integer,
   pgTable,
+  primaryKey,
   real,
   serial,
   text,
@@ -171,10 +173,57 @@ export const workoutSets = pgTable(
   ],
 );
 
+/**
+ * Gli integratori che prendi: nome, dose come testo, e se li prendi ancora.
+ *
+ * Non sono cibo e non stanno nei pasti. Non hanno macro, non entrano nel
+ * budget calorico, e la domanda a cui rispondono e' un'altra: **"l'ho presa
+ * oggi?"**, non "quanto mi resta". Per questo seguono la forma dell'acqua e
+ * non quella del cibo -- un elenco e una spunta al giorno.
+ *
+ * La dose e' testo libero di proposito: "1 compressa", "2000 UI", "una
+ * misurina". Un campo numerico con un'unita' da scegliere costerebbe piu' di
+ * quanto vale, e quello che costa piu' di quanto vale non lo si segna.
+ */
+export const supplements = pgTable("supplements", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  dose: text("dose"),
+  /**
+   * `false` vuol dire "non lo prendo piu'": sparisce dal diario ma le spunte
+   * dei giorni passati restano. Il cestino fa questo, non una DELETE: le
+   * righe registrate non si riscrivono, e "l'ho preso a marzo?" deve avere
+   * ancora una risposta a settembre.
+   */
+  active: boolean("active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+});
+
+/**
+ * Le spunte, una per integratore per giorno.
+ *
+ * La riga esiste solo se l'hai preso: niente colonna "preso true/false". Un
+ * giorno senza riga e' un giorno senza risposta, non un "no" -- e' la stessa
+ * regola per cui un giorno senza pasti non e' un giorno a zero calorie.
+ */
+export const supplementChecks = pgTable(
+  "supplement_checks",
+  {
+    day: date("day").notNull(),
+    supplementId: integer("supplement_id")
+      .notNull()
+      .references(() => supplements.id, { onDelete: "cascade" }),
+    takenAt: timestamp("taken_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.day, table.supplementId] })],
+);
+
 export type Meal = typeof meals.$inferSelect;
 export type NewMeal = typeof meals.$inferInsert;
 export type QuickFood = typeof quickFoods.$inferSelect;
 export type WaterDay = typeof waterDays.$inferSelect;
+export type Supplement = typeof supplements.$inferSelect;
+export type SupplementCheck = typeof supplementChecks.$inferSelect;
 export type Targets = typeof targets.$inferSelect;
 export type WorkoutDay = typeof workoutDays.$inferSelect;
 export type WorkoutExercise = typeof workoutExercises.$inferSelect;

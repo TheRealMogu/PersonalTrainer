@@ -5,6 +5,8 @@ import type { DailyTotals } from "@/lib/history";
 import {
   meals,
   quickFoods,
+  supplementChecks,
+  supplements,
   targets,
   waterDays,
   workoutDays,
@@ -13,9 +15,11 @@ import {
   workoutSets,
   type Meal,
   type QuickFood,
+  type Supplement,
   type WorkoutExercise,
   type WorkoutSession,
 } from "@/db/schema";
+import { integratoriDelGiorno, type IntegratoreDelGiorno } from "@/lib/integratori";
 import { OBIETTIVI_PREDEFINITI, type Obiettivi } from "@/lib/targets";
 import type { LoggedSet } from "@/lib/workout";
 
@@ -74,6 +78,37 @@ export async function getObiettivi(): Promise<Obiettivi> {
 export async function getWater(day: string): Promise<number> {
   const [riga] = await db.select().from(waterDays).where(eq(waterDays.day, day));
   return riga?.glasses ?? 0;
+}
+
+/**
+ * Gli integratori di una giornata, gia' con la spunta applicata.
+ *
+ * Solo quelli attivi: uno messo da parte non deve ricomparire nel diario di
+ * ieri. Le spunte dei giorni in cui lo prendevi restano nel database, ma la
+ * riga del diario e' la domanda "cosa devo prendere *oggi*".
+ */
+export async function getIntegratoriDelGiorno(day: string): Promise<IntegratoreDelGiorno[]> {
+  const [attivi, spunte] = await Promise.all([
+    db
+      .select({ id: supplements.id, name: supplements.name, dose: supplements.dose })
+      .from(supplements)
+      .where(eq(supplements.active, true))
+      .orderBy(asc(supplements.sortOrder), asc(supplements.id)),
+    db
+      .select({ id: supplementChecks.supplementId })
+      .from(supplementChecks)
+      .where(eq(supplementChecks.day, day)),
+  ]);
+
+  return integratoriDelGiorno(attivi, spunte.map((riga) => riga.id));
+}
+
+/** Tutti gli integratori, attivi e messi da parte, per la schermata di gestione. */
+export async function getIntegratori(): Promise<Supplement[]> {
+  return db
+    .select()
+    .from(supplements)
+    .orderBy(asc(supplements.sortOrder), asc(supplements.id));
 }
 
 export async function getQuickFoods(): Promise<QuickFood[]> {

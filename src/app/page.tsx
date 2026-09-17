@@ -7,11 +7,13 @@ import { buildDateRange, fillMissingDays, type DailyTotals } from "@/lib/history
 import { slotForHour } from "@/lib/meal-slots";
 import {
   getDailyTotals,
+  getIntegratoriDelGiorno,
   getMealsByDay,
   getObiettivi,
   getQuickFoods,
   getWater,
 } from "@/lib/queries";
+import type { IntegratoreDelGiorno } from "@/lib/integratori";
 import type { Obiettivi } from "@/lib/targets";
 import type { Meal, QuickFood } from "@/db/schema";
 
@@ -36,13 +38,15 @@ export default async function DiarioPage({
   let totaliSettimana: DailyTotals[];
   let acqua: number;
   let obiettivi: Obiettivi;
+  let integratori: IntegratoreDelGiorno[];
   try {
-    [meals, quickFoods, totaliSettimana, acqua, obiettivi] = await Promise.all([
+    [meals, quickFoods, totaliSettimana, acqua, obiettivi, integratori] = await Promise.all([
       getMealsByDay(day),
       getQuickFoods(),
       getDailyTotals(settimana[0], today),
       getWater(day),
       getObiettivi(),
+      getIntegratoriDelGiorno(day),
     ]);
   } catch (error) {
     // Si registra comunque nei log del server: nascondere l'errore all'utente
@@ -80,6 +84,7 @@ export default async function DiarioPage({
         defaultSlot={slotForHour(hourInRome)}
         acqua={acqua}
         obiettivi={obiettivi}
+        integratori={integratori}
       />
     </main>
   );
