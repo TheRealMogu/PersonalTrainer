@@ -84,8 +84,33 @@ describe("formatMacro", () => {
   });
 
   it("tiene una cifra decimale sui grammi", () => {
-    assert.equal(formatMacro(8.0999999, "fat"), "8.1");
+    assert.equal(formatMacro(8.0999999, "fat"), "8,1");
     assert.equal(formatMacro(20, "protein"), "20");
+  });
+
+  it("scrive i decimali con la virgola, come i chili in palestra", () => {
+    assert.equal(formatMacro(230.6, "carbs"), "230,6");
+    assert.equal(formatMacro(12.5, "fat"), "12,5");
+  });
+
+  it("non lascia mai uscire un punto decimale", () => {
+    for (const valore of [0.1, 1.05, 99.94, 230.6, 1845.5]) {
+      for (const chiave of ["kcal", "carbs", "protein", "fat"] as const) {
+        assert.ok(
+          !formatMacro(valore, chiave).includes("."),
+          `${valore} come ${chiave} e' uscito con il punto`,
+        );
+      }
+    }
+  });
+
+  it("le migliaia di kcal restano senza punto: e' l'anello, non un volume", () => {
+    assert.equal(formatMacro(1845, "kcal"), "1845");
+  });
+
+  it("un intero non si porta dietro una virgola vuota", () => {
+    assert.equal(formatMacro(45, "fat"), "45");
+    assert.equal(formatMacro(45.0, "fat"), "45");
   });
 });
 

@@ -38,7 +38,7 @@ export function MacroTile({
       aria-label={
         isOver
           ? `${MACRO_LABELS[key]}: oltre il target di ${formatMacro(over, key)} ${unit}. Tocca per il dettaglio.`
-          : `${MACRO_LABELS[key]}: restano ${formatMacro(remaining, key)} ${unit} su ${target}. Tocca per il dettaglio.`
+          : `${MACRO_LABELS[key]}: restano ${formatMacro(remaining, key)} ${unit} su ${formatMacro(target, key)}. Tocca per il dettaglio.`
       }
       className="flex min-h-11 flex-col rounded-xl border border-hairline bg-raised px-2 py-2.5 text-left tocco-riquadro active:bg-surface"
     >
@@ -103,7 +103,7 @@ export function MacroTile({
       </span>
 
       <span className="mt-1.5 text-[11px] tabular-nums text-muted">
-        {formatMacro(consumed, key)} / {target}
+        {formatMacro(consumed, key)} / {formatMacro(target, key)}
       </span>
     </button>
   );

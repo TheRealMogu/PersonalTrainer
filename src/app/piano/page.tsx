@@ -4,6 +4,7 @@ import { LogoutButton } from "@/components/logout-button";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 import { PLAN_SECTIONS } from "@/lib/plan";
+import { formatMacro } from "@/lib/nutrition";
 import { MACRO_LABELS, MACRO_ORDER, MACRO_UNITS, type Obiettivi } from "@/lib/targets";
 import { getObiettivi } from "@/lib/queries";
 import { OBIETTIVI_PREDEFINITI } from "@/lib/targets";
@@ -35,7 +36,7 @@ export default async function PianoPage() {
               >
                 <dt className="text-[15px]">{MACRO_LABELS[key]}</dt>
                 <dd className="text-[15px] font-semibold tabular-nums">
-                  {obiettivi.macro[key]} {MACRO_UNITS[key]}
+                  {formatMacro(obiettivi.macro[key], key)} {MACRO_UNITS[key]}
                 </dd>
               </div>
             ))}

@@ -307,7 +307,11 @@ Valgono per ogni aggiunta futura.
     fatta, a schermo e nel testo che si copia.
 20. **Lo stesso dato si scrive nello stesso modo dovunque esca.** Se la
     scheda mostra `1845` e il testo copiato dice `1.845`, chi legge si chiede
-    quale dei due sia giusto. Un solo formattatore per grandezza, riusato.
+    quale dei due sia giusto. Un solo formattatore per grandezza, riusato —
+    e il separatore decimale è la virgola, `230,6` e mai `230.6`, come in
+    qualunque altro numero italiano dell'app. Vale anche per i numeri dentro
+    ai campi modificabili: leggere `62.5` dove lo schermo scrive `62,5` fa
+    sembrare che siano due numeri diversi.
 21. **Un carico senza unità di misura non è un dato.** "12 kg" su un curl con
     i manubri possono essere due manubri da 12 o due da 6: due allenamenti
     diversi, e a un mese di distanza non c'è modo di sapere quale. Dove

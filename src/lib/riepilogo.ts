@@ -169,8 +169,10 @@ export function riepilogoTesto(
         ` · G ${formatMacro(r.medie.fat, "fat")}`,
     );
     righe.push(
-      `Target: ${targets.kcal} kcal · C ${targets.carbs}` +
-        ` · P ${targets.protein} · G ${targets.fat}`,
+      `Target: ${formatMacro(targets.kcal, "kcal")} kcal` +
+        ` · C ${formatMacro(targets.carbs, "carbs")}` +
+        ` · P ${formatMacro(targets.protein, "protein")}` +
+        ` · G ${formatMacro(targets.fat, "fat")}`,
     );
   } else {
     righe.push("Nessun giorno concluso e registrato: non c'è una media da fare.");

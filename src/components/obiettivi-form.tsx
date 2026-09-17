@@ -21,6 +21,18 @@ function parseNumero(value: string): number {
   return Number(value.replace(",", "."));
 }
 
+/**
+ * Il numero com'e' scritto dentro al campo.
+ *
+ * Con la virgola, come sulla tastiera italiana dell'iPhone e come ovunque
+ * nell'app. Il punto lo capisce lo stesso (`parseNumero`), ma non e' lui a
+ * dover comparire nel campo: leggere "62.5" dove il resto dell'app scrive
+ * "62,5" fa sembrare che siano due numeri diversi.
+ */
+function scriviNumero(valore: number): string {
+  return String(valore).replace(".", ",");
+}
+
 /** Differenza oltre la quale vale la pena dire che i conti non tornano. */
 const SCARTO_DA_SEGNALARE = 50;
 
@@ -73,7 +85,7 @@ export function ObiettiviForm({ iniziali }: { iniziali: Obiettivi }) {
               <input
                 type="text"
                 inputMode="decimal"
-                defaultValue={String(iniziali.macro[macro])}
+                defaultValue={scriviNumero(iniziali.macro[macro])}
                 onChange={(e) => {
                   const numero = parseNumero(e.target.value);
                   setValori((v) => ({ ...v, macro: { ...v.macro, [macro]: numero } }));
@@ -108,7 +120,7 @@ export function ObiettiviForm({ iniziali }: { iniziali: Obiettivi }) {
           <input
             type="text"
             inputMode="numeric"
-            defaultValue={String(iniziali.bicchieriAcqua)}
+            defaultValue={scriviNumero(iniziali.bicchieriAcqua)}
             onChange={(e) => {
               const numero = parseNumero(e.target.value);
               setValori((v) => ({ ...v, bicchieriAcqua: numero }));
