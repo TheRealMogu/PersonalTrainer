@@ -428,7 +428,7 @@ su sei non si toccano affatto dall'app.
 | Pasto | ✅ | ✅ nome, quantità, momento e tutti i macro | ✅ con annulla |
 | Serie di allenamento | ✅ | ✅ carico e ripetizioni | ✅ con annulla |
 | Seduta | ✅ | ❌ non si cambia data né giornata | ✅ con annulla |
-| **Cibo rapido** | ❌ solo dal seed | ❌ | ❌ |
+| Cibo rapido | ✅ | ✅ | ✅ con annulla |
 | **Esercizio del programma** | ❌ solo dal seed | ❌ | ❌ |
 | **Target giornalieri** | ❌ stanno nel codice | ❌ | ❌ |
 
@@ -445,13 +445,12 @@ che **cancella a cascata lo storico di allenamento**.
       trenta calorie, riscalare la quantità sposta l'errore invece di
       toglierlo. Nome e macro stanno dietro a un tocco, così il caso
       frequente — mezza porzione — resta a portata di pollice.
-- [ ] **Cibi rapidi: aggiungere, correggere, togliere.** Il buco più grosso,
-      e quello già incontrato: *«molte volte non mangio le stesse cose e
-      magari i prodotti variano»*. Se lo yogurt cambia ricetta, oggi i suoi
-      valori restano sbagliati per sempre. Serve anche il verso opposto:
-      **«salva come tasto rapido»** su un pasto appena inserito, che
-      trasforma un incollaggio in un tasto riusabile e riduce il lavoro
-      futuro invece di aggiungerne.
+- [x] **Cibi rapidi: aggiungere, correggere, togliere.** Fatto, in *Piano →
+      I tuoi alimenti*. Con il verso che conta: **«salva fra i tasti rapidi»**
+      su un pasto appena inserito, che trasforma un incollaggio in un tasto
+      riusabile. L'archivio cresce mangiando, non scaricando — ed è per
+      questo che un archivio esterno resta una comodità e non una
+      dipendenza.
 - [ ] **Esercizi del programma: rinominare, cambiare serie e ripetizioni,
       aggiungere, togliere, riordinare.** Quando il personal trainer cambia
       la scheda, oggi l'unica strada è `db:seed`, che rifiuta di partire se
@@ -641,6 +640,75 @@ l'«aggiunta dinamica dei prodotti» arriva senza toccare il guscio iOS.
 2. **La chiamata va fatta dal server**, non dal telefono: così passa dal
    nostro dominio, non espone niente, e in futuro si può mettere in cache un
    prodotto già cercato invece di richiederlo ogni volta.
+
+## 6-septies. Tutto è dato, niente è codice
+
+> «In tutti i processi devo essere pienamente autonomo di modificare kcal,
+> allenamento, acqua, vitamine e cibo nel database: aggiungere, togliere,
+> modificare.»
+
+È il principio che tiene insieme 6-quater, 6-quinquies e 6-sexies, e vale la
+pena scriverlo una volta sola, per esteso:
+
+**Ogni cosa che nella vita può cambiare deve essere una riga di database, non
+una riga di codice.** Se per cambiarla serve un deploy — o peggio un
+`db:seed` — non è configurabile: è cablata. E una cosa cablata, il giorno che
+il PT cambia idea, diventa un motivo per non aggiornare l'app invece che uno
+per aprirla.
+
+### Lo stato, riga per riga
+
+| Cosa | Dove sta oggi | Aggiungere | Correggere | Togliere |
+|---|---|---|---|---|
+| **Cibo** (tasti rapidi) | database | ✅ | ✅ | ✅ con annulla |
+| **Acqua** (bicchieri al giorno) | database | ✅ | ✅ (il "meno") | ✅ (il "meno") |
+| **Obiettivo acqua** | `targets.ts` | ❌ | ❌ | ❌ |
+| **Target kcal e macro** | `targets.ts` | ❌ | ❌ | ❌ |
+| **Allenamento** (giornate ed esercizi) | database, ma solo dal seed | ❌ | ❌ | ❌ |
+| **Vitamine e integratori** | non esistono | ❌ | ❌ | ❌ |
+
+### Le vitamine: cosa sono, qui dentro
+
+Non sono cibo e non vanno nei pasti. Non hanno macro, non entrano nel budget
+calorico, e la domanda a cui rispondono è un'altra: **«l'ho presa oggi?»**,
+non «quanto mi resta».
+
+Quindi seguono la forma dell'acqua, non quella del cibo: un elenco di cose da
+prendere — definito da te, modificabile — e una spunta al giorno per
+ciascuna. Con lo stesso vincolo dell'acqua: **se chiedesse di scegliere
+dosaggi e orari costerebbe più di quanto vale, e non la si segnerebbe.**
+
+Due tabelle: gli integratori (nome, dose come testo libero, attivo sì/no) e
+le spunte per giorno. Una riga in cima al diario, sotto l'acqua, che compare
+solo se hai definito almeno un integratore — chi non li prende non deve
+vedere una riga vuota tutti i giorni.
+
+### In che ordine, dal più economico
+
+Sono ordinati per costo, non per importanza: le prime due sono mezze
+giornate, l'ultima è la più grossa di tutta la roadmap.
+
+- [ ] **Obiettivo acqua modificabile.** Una riga di impostazioni, un numero.
+      Mezz'ora, ed è il banco di prova per la tabella delle impostazioni che
+      serve anche ai target.
+- [ ] **Target kcal e macro modificabili.** Stessa tabella, quattro numeri, e
+      una schermata in Piano. Il PT li cambia a ogni fase; oggi serve un
+      deploy.
+- [ ] **Vitamine e integratori.** Due tabelle nuove, una riga nel diario, una
+      schermata di gestione. Nessuna dipendenza dalle altre voci.
+- [ ] **Allenamento modificabile.** La più cara, e ha un nodo vero descritto
+      in 6-quinquies: `ON DELETE CASCADE` fra serie ed esercizi, quindi
+      cambiare la scheda cancella i carichi. Prima serve `archiviato_il`, poi
+      tutto il resto diventa possibile.
+
+### La regola che vale per tutte
+
+Quando una di queste diventa modificabile, **i dati già registrati non si
+riscrivono.** Un target cambiato a settembre non cambia se a marzo eri in
+target: le statistiche di marzo vanno lette col target di marzo. Vale lo
+stesso per gli esercizi archiviati e per i valori di un alimento corretto —
+ed è già così per i pasti, perché quando aggiungi un cibo rapido al diario i
+numeri vengono **copiati** nella riga del pasto, non riferiti.
 
 ## 7. Cose che restano fuori, di proposito
 
