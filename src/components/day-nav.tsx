@@ -27,7 +27,21 @@ function NavPending() {
   );
 }
 
-export function DayNav({ day }: { day: string }) {
+/**
+ * La barra del giorno, con dentro il salto alla lista dei pasti.
+ *
+ * Quella seconda riga diceva "Diario", che e' informazione zero: sei
+ * nell'app del diario. Adesso dice quanti pasti hai registrato ed e' un
+ * bersaglio: un tocco porta alla lista.
+ *
+ * Serve perche' la lista sta a 1535 px, cioe' quattro gesti di scorrimento.
+ * E' il prezzo della Fase 1 -- i modi per aggiungere stanno sopra la lista,
+ * perche' prima il primo tasto rapido costava 882 px di scorrimento e
+ * peggiorava a ogni pasto registrato. Il prezzo resta giusto, ma pagarlo
+ * quattro volte no: questo tocco lo riporta a uno, senza aggiungere un
+ * pixel di altezza.
+ */
+export function DayNav({ day, pasti }: { day: string; pasti: number }) {
   const today = todayIso();
   const previous = shiftIsoDate(day, -1);
   const next = shiftIsoDate(day, 1);
@@ -51,7 +65,16 @@ export function DayNav({ day }: { day: string }) {
           <Link href="/" className="inline-block py-1 text-[13px] text-accent">
             Torna a oggi
           </Link>
+        ) : pasti > 0 ? (
+          <a
+            href="#pasti"
+            className="inline-block py-1 text-[13px] text-accent"
+          >
+            {pasti === 1 ? "1 pasto" : `${pasti} pasti`} ↓
+          </a>
         ) : (
+          // A diario vuoto non c'e' niente a cui saltare, e "0 pasti" sarebbe
+          // un rimprovero alle otto di mattina.
           <p className="py-1 text-[13px] text-muted">Diario</p>
         )}
       </div>

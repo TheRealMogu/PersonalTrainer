@@ -13,6 +13,7 @@ import {
   sql,
 } from "drizzle-orm";
 import { db } from "@/db";
+import { shiftIsoDate } from "@/lib/date";
 import type { DailyTotals } from "@/lib/history";
 import {
   meals,
@@ -36,6 +37,8 @@ import {
   type IntegratoreDelGiorno,
 } from "@/lib/integratori";
 import { TUTTO, type IntervalloExport } from "@/lib/intervallo-export";
+import type { UltimaVolta, UsoPerMomento } from "@/lib/abitudini";
+import type { MealSlot } from "@/lib/meal-slots";
 import { OBIETTIVI_PREDEFINITI, type Obiettivi } from "@/lib/targets";
 import type { LoggedSet } from "@/lib/workout";
 
@@ -149,6 +152,76 @@ export async function getIntegratori(): Promise<Supplement[]> {
     .select()
     .from(supplements)
     .orderBy(asc(supplements.sortOrder), asc(supplements.id));
+}
+
+/**
+ * Quanto guardiamo indietro per capire le abitudini.
+ *
+ * Novanta giorni e non tutto lo storico: le abitudini cambiano, e una
+ * colazione di marzo non deve decidere l'ordine dei tasti a settembre. E'
+ * anche il motivo per cui non c'e' una colonna "momento preferito" da
+ * compilare: quella andrebbe aggiornata a mano, questo si aggiorna da solo.
+ */
+const GIORNI_ABITUDINI = 90;
+
+/** Quante volte ogni alimento e' finito in ogni momento della giornata. */
+export async function getUsiPerMomento(oggi: string): Promise<UsoPerMomento[]> {
+  const da = shiftIsoDate(oggi, -GIORNI_ABITUDINI);
+  const righe = await db
+    .select({
+      name: meals.name,
+      slot: meals.slot,
+      volte: sql<number>`count(*)::int`,
+    })
+    .from(meals)
+    .where(gte(meals.day, da))
+    .groupBy(meals.name, meals.slot);
+
+  return righe.map((riga) => ({
+    name: riga.name,
+    slot: riga.slot,
+    volte: Number(riga.volte),
+  }));
+}
+
+/**
+ * L'ultima volta che hai registrato qualcosa in questo momento della giornata.
+ *
+ * Serve a ricopiarla in un tocco. "L'ultima volta" e non "ieri": se ieri non
+ * hai segnato la colazione, quella da ripetere e' quella di due giorni fa, e
+ * il tasto lo dira' invece di chiamarla ieri.
+ *
+ * Il giorno che si sta guardando resta fuori: ricopiare la colazione di oggi
+ * dentro oggi vorrebbe dire raddoppiarla.
+ */
+export async function getUltimaVolta(
+  slot: MealSlot,
+  primaDi: string
+): Promise<UltimaVolta | null> {
+  const [ultimo] = await db
+    .select({ day: meals.day })
+    .from(meals)
+    .where(and(eq(meals.slot, slot), lte(meals.day, shiftIsoDate(primaDi, -1))))
+    .orderBy(desc(meals.day))
+    .limit(1);
+
+  if (!ultimo) return null;
+
+  const righe = await db
+    .select({
+      name: meals.name,
+      quantity: meals.quantity,
+      kcal: meals.kcal,
+      carbs: meals.carbs,
+      protein: meals.protein,
+      fat: meals.fat,
+      onlyKcal: meals.onlyKcal,
+    })
+    .from(meals)
+    .where(and(eq(meals.slot, slot), eq(meals.day, ultimo.day)))
+    .orderBy(asc(meals.createdAt), asc(meals.id));
+
+  return { day: ultimo.day, slot, pasti: righe };
 }
 
 export async function getQuickFoods(): Promise<QuickFood[]> {

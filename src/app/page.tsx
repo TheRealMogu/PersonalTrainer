@@ -2,8 +2,12 @@ import { DayNav } from "@/components/day-nav";
 import { DbErrorPanel } from "@/components/db-error-panel";
 import { Diary } from "@/components/diary";
 import { WeekStrip } from "@/components/week-strip";
-import { isIsoDate, todayIso } from "@/lib/date";
-import { buildDateRange, fillMissingDays, type DailyTotals } from "@/lib/history";
+import { isIsoDate, shiftIsoDate, todayIso } from "@/lib/date";
+import {
+  buildDateRange,
+  fillMissingDays,
+  type DailyTotals,
+} from "@/lib/history";
 import { slotForHour } from "@/lib/meal-slots";
 import {
   getDailyTotals,
@@ -11,8 +15,11 @@ import {
   getMealsByDay,
   getObiettivi,
   getQuickFoods,
+  getUltimaVolta,
+  getUsiPerMomento,
   getWater,
 } from "@/lib/queries";
+import type { UltimaVolta, UsoPerMomento } from "@/lib/abitudini";
 import type { IntegratoreDelGiorno } from "@/lib/integratori";
 import type { Obiettivi } from "@/lib/targets";
 import type { Meal, QuickFood } from "@/db/schema";
@@ -33,20 +40,45 @@ export default async function DiarioPage({
   // seguire la navigazione.
   const settimana = buildDateRange(today, 7);
 
+  // Il momento proposto segue l'ora italiana: alle otto si registra
+  // colazione. Si calcola qui e non piu' giu' perche' adesso decide anche
+  // *cosa* leggere -- l'ordine dei tasti e quale pasto proporre di ricopiare.
+  const hourInRome = Number(
+    new Intl.DateTimeFormat("it-IT", {
+      hour: "numeric",
+      hour12: false,
+      timeZone: "Europe/Rome",
+    }).format(new Date())
+  );
+  const momento = slotForHour(hourInRome);
+
   let meals: Meal[];
   let quickFoods: QuickFood[];
   let totaliSettimana: DailyTotals[];
   let acqua: number;
   let obiettivi: Obiettivi;
   let integratori: IntegratoreDelGiorno[];
+  let usi: UsoPerMomento[];
+  let ultimaVolta: UltimaVolta | null;
   try {
-    [meals, quickFoods, totaliSettimana, acqua, obiettivi, integratori] = await Promise.all([
+    [
+      meals,
+      quickFoods,
+      totaliSettimana,
+      acqua,
+      obiettivi,
+      integratori,
+      usi,
+      ultimaVolta,
+    ] = await Promise.all([
       getMealsByDay(day),
       getQuickFoods(),
       getDailyTotals(settimana[0], today),
       getWater(day),
       getObiettivi(),
       getIntegratoriDelGiorno(day),
+      getUsiPerMomento(today),
+      getUltimaVolta(momento, day),
     ]);
   } catch (error) {
     // Si registra comunque nei log del server: nascondere l'errore all'utente
@@ -54,21 +86,15 @@ export default async function DiarioPage({
     console.error("[diario] lettura dei dati fallita:", error);
     return (
       <main>
-        <DayNav day={day} />
+        <DayNav day={day} pasti={0} />
         <DbErrorPanel error={error} />
       </main>
     );
   }
 
-  // Il momento proposto segue l'ora italiana: alle otto si registra colazione.
-  const hourInRome = Number(
-    new Intl.DateTimeFormat("it-IT", { hour: "numeric", hour12: false, timeZone: "Europe/Rome" })
-      .format(new Date()),
-  );
-
   return (
     <main>
-      <DayNav day={day} />
+      <DayNav day={day} pasti={meals.length} />
       <WeekStrip
         days={fillMissingDays(totaliSettimana, settimana)}
         current={day}
@@ -81,10 +107,13 @@ export default async function DiarioPage({
         day={day}
         meals={meals}
         quickFoods={quickFoods}
-        defaultSlot={slotForHour(hourInRome)}
+        defaultSlot={momento}
         acqua={acqua}
         obiettivi={obiettivi}
         integratori={integratori}
+        usi={usi}
+        ultimaVolta={ultimaVolta}
+        ieri={shiftIsoDate(day, -1)}
       />
     </main>
   );

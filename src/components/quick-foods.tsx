@@ -3,8 +3,18 @@
 import { useMemo, useRef, useState } from "react";
 import type { QuickFood } from "@/db/schema";
 import type { MealSlot } from "@/lib/meal-slots";
-import { alreadyOver, fitsInRemaining, formatMacro, type MacroTotals } from "@/lib/nutrition";
+import {
+  alreadyOver,
+  fitsInRemaining,
+  formatMacro,
+  type MacroTotals,
+} from "@/lib/nutrition";
 import { MACRO_LABELS, MACRO_ORDER, type MacroKey } from "@/lib/targets";
+import {
+  ordinaPerMomento,
+  QUANTI_SUBITO,
+  type UsoPerMomento,
+} from "@/lib/abitudini";
 import { QuantitySheet } from "./quantity-sheet";
 
 /** Oltre questa soglia il tocco e' "tenuto premuto" e apre le quantita'. */
@@ -14,22 +24,35 @@ const LONG_PRESS_MS = 400;
  * Tasti rapidi. Un tocco aggiunge una porzione (il caso normale, un gesto
  * solo); tenendo premuto si sceglie quanto e in che momento della giornata,
  * senza passare dal form manuale.
+ *
+ * L'ordine non e' quello dell'archivio ma quello che serve adesso: alle otto
+ * in cima c'e' la colazione. Viene da quello che hai gia' registrato, non da
+ * una configurazione -- vedi `ordinaPerMomento`.
+ *
+ * E se ne mostrano sei, non dodici. La griglia piena e' alta 720 px e
+ * spingeva la lista dei pasti a 1590: misurato, "vedere cosa ho mangiato"
+ * costava tre gesti invece di uno. Gli altri stanno dietro un tocco, e dopo
+ * l'ordinamento in cima c'e' gia' quello che cerchi.
  */
 export function QuickFoods({
   foods,
   defaultSlot,
   totals,
   targets,
+  usi,
   onAdd,
 }: {
   foods: QuickFood[];
   defaultSlot: MealSlot;
   totals: MacroTotals;
   targets: Record<MacroKey, number>;
+  /** Quello che hai gia' registrato, per sapere cosa mettere in cima. */
+  usi: UsoPerMomento[];
   onAdd: (food: QuickFood, quantity: number, slot: MealSlot) => void;
 }) {
   const [sheetFor, setSheetFor] = useState<QuickFood | null>(null);
   const [soloCheCiSta, setSoloCheCiSta] = useState(false);
+  const [tuttiVisibili, setTuttiVisibili] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressed = useRef(false);
 
@@ -49,12 +72,29 @@ export function QuickFoods({
   // Il verdetto si ricalcola a ogni pasto aggiunto: e' la sottrazione che
   // faresti a mente, fatta da chi ha gia' i numeri.
   const verdicts = useMemo(
-    () => new Map(foods.map((food) => [food.id, fitsInRemaining(totals, food, targets)])),
-    [foods, totals, targets],
+    () =>
+      new Map(
+        foods.map((food) => [food.id, fitsInRemaining(totals, food, targets)])
+      ),
+    [foods, totals, targets]
   );
   const quantiCiStanno = [...verdicts.values()].filter((v) => v.fits).length;
-  const giaOltre = useMemo(() => alreadyOver(totals, targets), [totals, targets]);
-  const visible = soloCheCiSta ? foods.filter((food) => verdicts.get(food.id)?.fits) : foods;
+  const giaOltre = useMemo(
+    () => alreadyOver(totals, targets),
+    [totals, targets]
+  );
+  // Prima si ordina per il momento della giornata, poi si filtra: al
+  // contrario il filtro "cosa mi entra" restituirebbe gli stessi alimenti in
+  // ordine di archivio, e in cima finirebbe la cena alle otto di mattina.
+  const ordinati = useMemo(
+    () => ordinaPerMomento(foods, usi, defaultSlot),
+    [foods, usi, defaultSlot]
+  );
+  const filtrati = soloCheCiSta
+    ? ordinati.filter((food) => verdicts.get(food.id)?.fits)
+    : ordinati;
+  const visible = tuttiVisibili ? filtrati : filtrati.slice(0, QUANTI_SUBITO);
+  const nascosti = filtrati.length - visible.length;
 
   if (foods.length === 0) {
     return (
@@ -85,7 +125,9 @@ export function QuickFoods({
         <p className="mb-3 text-[13px] text-muted">
           {giaOltre.length === 1
             ? `${MACRO_LABELS[giaOltre[0]]} già oltre il target`
-            : `Già oltre il target: ${giaOltre.map((key) => MACRO_LABELS[key].toLowerCase()).join(", ")}`}
+            : `Già oltre il target: ${giaOltre
+                .map((key) => MACRO_LABELS[key].toLowerCase())
+                .join(", ")}`}
           . Qui sotto conta solo dove hai ancora margine.
         </p>
       ) : null}
@@ -114,7 +156,9 @@ export function QuickFoods({
               }}
               className="flex min-h-16 w-full flex-col justify-between rounded-xl border border-hairline bg-surface px-3 py-2.5 pr-10 text-left tocco-riquadro active:bg-raised"
             >
-              <span className="text-[15px] font-medium leading-tight">{food.name}</span>
+              <span className="text-[15px] font-medium leading-tight">
+                {food.name}
+              </span>
               {/*
                 Qui c'era, accanto alle calorie, una scritta rossa "sfora
                 carboidrati" su ogni alimento che non ci stava piu'. A fine
@@ -145,7 +189,11 @@ export function QuickFoods({
                     <span
                       aria-hidden="true"
                       className="h-1.5 w-1.5 rounded-full"
-                      style={{ background: `var(--color-${key === "carbs" ? "carbs" : key})` }}
+                      style={{
+                        background: `var(--color-${
+                          key === "carbs" ? "carbs" : key
+                        })`,
+                      }}
                     />
                     {formatMacro(food[key], key)}
                   </span>
@@ -160,7 +208,13 @@ export function QuickFoods({
               aria-label={`Scegli quantità per ${food.name}`}
               className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center rounded-xl tocco active:text-accent"
             >
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                aria-hidden="true"
+              >
                 <path
                   d="M9 4.5v9M4.5 9h9"
                   stroke="currentColor"
@@ -172,6 +226,26 @@ export function QuickFoods({
           </div>
         ))}
       </div>
+
+      {nascosti > 0 ? (
+        <button
+          type="button"
+          onClick={() => setTuttiVisibili(true)}
+          className="mt-2 min-h-11 w-full rounded-xl border border-hairline text-[13px] font-medium text-accent tocco active:bg-raised"
+        >
+          Mostra gli altri {nascosti}
+        </button>
+      ) : null}
+
+      {tuttiVisibili && filtrati.length > QUANTI_SUBITO ? (
+        <button
+          type="button"
+          onClick={() => setTuttiVisibili(false)}
+          className="mt-2 min-h-11 w-full rounded-xl border border-hairline text-[13px] font-medium text-muted tocco active:bg-raised"
+        >
+          Mostrane meno
+        </button>
+      ) : null}
 
       {sheetFor ? (
         <QuantitySheet

@@ -3,7 +3,10 @@
 import { useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { segnaIntegratore } from "@/app/actions";
-import { riassuntoIntegratori, type IntegratoreDelGiorno } from "@/lib/integratori";
+import {
+  riassuntoIntegratori,
+  type IntegratoreDelGiorno,
+} from "@/lib/integratori";
 
 /**
  * Gli integratori della giornata: un tasto per ciascuno, si tocca e basta.
@@ -32,7 +35,7 @@ export function Integratori({
   const [ottimistici, applica] = useOptimistic(
     integratori,
     (stato: IntegratoreDelGiorno[], azione: { id: number; preso: boolean }) =>
-      stato.map((i) => (i.id === azione.id ? { ...i, preso: azione.preso } : i)),
+      stato.map((i) => (i.id === azione.id ? { ...i, preso: azione.preso } : i))
   );
 
   if (ottimistici.length === 0) return null;
@@ -60,15 +63,30 @@ export function Integratori({
         </p>
       </div>
 
-      <ul className="mt-2 space-y-2">
+      {/*
+        Uno accanto all'altro e non uno per riga.
+        
+        Misurato: in colonna due integratori occupavano 124 px, e spingevano
+        la sezione *Aggiungi* -- cioe' il motivo per cui apri l'app -- sotto
+        la piega. In riga ne occupano 44 e ci stanno comunque i nomi: il
+        nome basta a distinguerli, la dose si legge nella schermata di
+        gestione, dove la si decide.
+      */}
+      <ul className="mt-2 flex flex-wrap gap-2">
         {ottimistici.map((integratore) => (
-          <li key={integratore.id}>
+          <li
+            key={integratore.id}
+            className="min-w-0 flex-1 basis-[calc(50%-0.25rem)]"
+          >
             <button
               type="button"
               onClick={() => cambia(integratore)}
               aria-pressed={integratore.preso}
-              className={`flex min-h-11 w-full items-center gap-3 rounded-xl border px-3 text-left tocco-riquadro active:bg-raised ${
-                integratore.preso ? "border-accent/40 bg-accent/10" : "border-hairline"
+              title={integratore.dose ?? undefined}
+              className={`flex min-h-11 w-full items-center gap-2 rounded-xl border px-3 text-left tocco-riquadro active:bg-raised ${
+                integratore.preso
+                  ? "border-accent/40 bg-accent/10"
+                  : "border-hairline"
               }`}
             >
               {/*
@@ -78,7 +96,7 @@ export function Integratori({
               */}
               <span
                 aria-hidden="true"
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[13px] font-semibold transition-colors duration-200 ease-ios ${
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold transition-colors duration-200 ease-ios ${
                   integratore.preso
                     ? "border-accent bg-accent text-on-accent"
                     : "border-hairline text-transparent"
@@ -86,15 +104,13 @@ export function Integratori({
               >
                 ✓
               </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[15px] font-medium">
-                  {integratore.nome}
-                </span>
-                {integratore.dose ? (
-                  <span className="block truncate text-[13px] text-muted">
-                    {integratore.dose}
-                  </span>
-                ) : null}
+              {/*
+                La dose non si mostra qui: sta nel `title` e nella schermata
+                di gestione. Sul tasto di tutti i giorni il nome basta a
+                sapere quale sia, e la riga resta alta 44 px invece di 62.
+              */}
+              <span className="min-w-0 flex-1 truncate text-[15px] font-medium">
+                {integratore.nome}
               </span>
             </button>
           </li>
