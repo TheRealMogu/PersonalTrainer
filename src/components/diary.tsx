@@ -14,6 +14,7 @@ import type { Meal, QuickFood } from "@/db/schema";
 import type { MealSlot } from "@/lib/meal-slots";
 import { buildProgress, sumMacros } from "@/lib/nutrition";
 import type { MacroKey } from "@/lib/targets";
+import { Acqua } from "./acqua";
 import { Card } from "./card";
 import { CalorieRing } from "./calorie-ring";
 import { IncollaPasto } from "./incolla-pasto";
@@ -46,11 +47,13 @@ export function Diary({
   meals,
   quickFoods,
   defaultSlot,
+  acqua,
 }: {
   day: string;
   meals: Meal[];
   quickFoods: QuickFood[];
   defaultSlot: MealSlot;
+  acqua: number;
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -201,6 +204,17 @@ export function Diary({
           {progress.slice(1).map((item) => (
             <MacroTile key={item.key} progress={item} onOpen={setMacroAperto} />
           ))}
+        </div>
+
+        {/*
+          L'acqua sta qui dentro, sotto i macro, e non in una scheda sua: e'
+          la prima schermata, quella che si vede senza scorrere, ed e' l'unico
+          posto in cui "quanti bicchieri ho bevuto" costa zero gesti. Una
+          scheda a parte l'avrebbe spinta sotto la piega, dove le cose non si
+          guardano -- e una cosa che non si guarda non si segna.
+        */}
+        <div className="mt-4 border-t border-hairline pt-4">
+          <Acqua day={day} bicchieri={acqua} />
         </div>
       </Card>
 

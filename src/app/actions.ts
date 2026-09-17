@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { meals } from "@/db/schema";
+import { meals, waterDays } from "@/db/schema";
+import { MAX_BICCHIERI } from "@/lib/acqua";
 import { isIsoDate } from "@/lib/date";
 import { isMealSlot, type MealSlot } from "@/lib/meal-slots";
 
@@ -170,6 +171,42 @@ export async function deleteMeal(id: number, day: string): Promise<ActionResult>
   } catch (cause) {
     console.error("deleteMeal fallita", cause);
     return { ok: false, error: "Eliminazione non riuscita. Riprova." };
+  }
+
+  revalidatePath("/");
+  return { ok: true };
+}
+
+/**
+ * Quanti bicchieri d'acqua hai bevuto oggi.
+ *
+ * Si manda il totale, non "uno in piu'". Sembra un dettaglio e non lo e': su
+ * rete lenta si tocca due volte, e un "aggiungi uno" ripetuto conterebbe due
+ * bicchieri per un tocco solo. Col totale il secondo invio scrive lo stesso
+ * numero del primo, e non succede niente -- la stessa ragione per cui le
+ * serie in palestra portano un identificativo.
+ *
+ * Non serve un annullamento: il "meno" e' gia' l'inverso esatto del "piu'",
+ * a un tocco di distanza. La regola 4 chiede che un errore si possa
+ * disfare, non che ci sia per forza un messaggio che lo propone.
+ */
+export async function setWater(day: string, bicchieri: number): Promise<ActionResult> {
+  if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };
+  if (!Number.isInteger(bicchieri) || bicchieri < 0 || bicchieri > MAX_BICCHIERI) {
+    return { ok: false, error: `I bicchieri devono stare fra 0 e ${MAX_BICCHIERI}.` };
+  }
+
+  try {
+    await db
+      .insert(waterDays)
+      .values({ day, glasses: bicchieri, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: waterDays.day,
+        set: { glasses: bicchieri, updatedAt: new Date() },
+      });
+  } catch (cause) {
+    console.error("setWater fallita", cause);
+    return { ok: false, error: "Non sono riuscito a segnarlo. Riprova." };
   }
 
   revalidatePath("/");

@@ -55,6 +55,22 @@ export const quickFoods = pgTable("quick_foods", {
   sortOrder: integer("sort_order").notNull().default(0),
 });
 
+/**
+ * L'acqua bevuta, un conteggio per giornata.
+ *
+ * Una riga per giorno e non una per bicchiere: un bicchiere non ha niente da
+ * raccontare -- non ha un nome, un orario che serva, dei macro. Conta solo
+ * quanti ne hai bevuti, e "togliere l'ultimo" e' sottrarre uno, non
+ * ripescare una riga. Cosi' la correzione e' lo stesso gesto
+ * dell'inserimento al contrario, senza bisogno di annullamenti.
+ */
+export const waterDays = pgTable("water_days", {
+  /** Chiave primaria: di acqua ce n'e' una quantita' sola al giorno. */
+  day: date("day").primaryKey(),
+  glasses: integer("glasses").notNull().default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 /** Giornate del programma di allenamento (es. "Day 1 — Push"). */
 export const workoutDays = pgTable("workout_days", {
   id: serial("id").primaryKey(),
@@ -135,6 +151,7 @@ export const workoutSets = pgTable(
 export type Meal = typeof meals.$inferSelect;
 export type NewMeal = typeof meals.$inferInsert;
 export type QuickFood = typeof quickFoods.$inferSelect;
+export type WaterDay = typeof waterDays.$inferSelect;
 export type WorkoutDay = typeof workoutDays.$inferSelect;
 export type WorkoutExercise = typeof workoutExercises.$inferSelect;
 export type WorkoutSession = typeof workoutSessions.$inferSelect;

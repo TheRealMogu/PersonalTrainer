@@ -5,6 +5,7 @@ import type { DailyTotals } from "@/lib/history";
 import {
   meals,
   quickFoods,
+  waterDays,
   workoutDays,
   workoutExercises,
   workoutSessions,
@@ -47,6 +48,12 @@ export async function getDailyTotals(from: string, to: string): Promise<DailyTot
     protein: Number(row.protein),
     fat: Number(row.fat),
   }));
+}
+
+/** I bicchieri d'acqua di una giornata. Nessuna riga vuol dire nessun bicchiere. */
+export async function getWater(day: string): Promise<number> {
+  const [riga] = await db.select().from(waterDays).where(eq(waterDays.day, day));
+  return riga?.glasses ?? 0;
 }
 
 export async function getQuickFoods(): Promise<QuickFood[]> {

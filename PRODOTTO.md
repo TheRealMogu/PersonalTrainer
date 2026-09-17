@@ -63,7 +63,8 @@ proprio le schermate che vanno riviste.
 | Aggiungere lo stesso cibo in quantità diversa | 2 gesti | 2 | ok |
 | Registrare qualcosa che non è fra i tasti rapidi | 2 gesti | **3** (*Incolla da Claude* a 1,7 schermate) | **sopra il tetto** |
 | Ripetere un pasto che fai sempre uguale | 1 gesto | — (non esiste) | **manca** |
-| Segnare un bicchiere d'acqua | 1 gesto | — (non esiste) | **manca** |
+| Segnare un bicchiere d'acqua | 1 gesto | 1 (tasto + nella scheda in cima) | ok |
+| Vedere quanta acqua ho bevuto | 0 gesti | 0 (si vede senza scorrere) | ok |
 | Correggere un pasto già inserito | 2 gesti | 2 (tocca la riga → quantità) | ok |
 | Correggere nome o macro di un pasto | 3 gesti | 3 (riga → *Correggi nome e valori* → campo) | ok |
 | Annullare un errore | 1 gesto | 1 | ok |
@@ -160,6 +161,9 @@ e va difesa a ogni aggiunta.
 - **Export dei dati** — Piano → *I tuoi dati*: tutto in JSON, oppure pasti e
   allenamenti in CSV. Un'app che accumula mesi di diario e non ti lascia
   portarlo via te lo tiene in ostaggio.
+- **Acqua** — bicchieri +/− nella scheda in cima al diario, con il totale in
+  litri. Nessun macro, nessuna stima, nessuna scelta da fare: è un contatore.
+  Il "meno" è l'annullamento, a un tocco di distanza.
 - **Dettaglio di un allenamento** — dalla lista *Ultimi allenamenti* si apre
   la seduta: volume, durata, serie per serie con accanto quanto sei andato
   meglio o peggio della stessa serie dell'ultima volta, e l'elenco degli

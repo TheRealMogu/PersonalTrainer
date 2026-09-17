@@ -358,12 +358,17 @@ Ogni fase ha un bersaglio misurabile. Se una fase non abbassa il numero, non
 - È la fase che sposta di più: chi mangia quasi sempre le stesse cose non
   dovrebbe ricomporle da capo ogni mattina.
 
-**Fase 3 — L'acqua.** *(mezza giornata)*
-- Bicchieri +/− sul diario, niente macro, niente stime. Un obiettivo
-  giornaliero in `targets.ts`.
-- Va **dopo** la Fase 1, non prima: metterla adesso vorrebbe dire aggiungere
-  roba in fondo a una schermata che non si apre.
+**Fase 3 — L'acqua.** ✅ *fatta*
+- Bicchieri +/− dentro la scheda del riepilogo, sotto i macro: niente macro,
+  niente stime, niente scelta della dimensione del bicchiere. Obiettivo in
+  `targets.ts` (8 bicchieri da 250 ml).
 - Bersaglio: **1 gesto per un bicchiere, 0 per vedere a che punto sei**.
+  **Centrato**: la riga finisce a 631 px su uno schermo da 844, quindi si
+  vede senza scorrere a 320, 390 e 430 px; riscontro al tocco in 5-7 ms.
+- Il "meno" fa da annullamento — è l'inverso esatto del "più", a un tocco —
+  quindi non c'è nessun messaggio che propone di disfare. Si manda il totale
+  e non "uno in più", così un doppio tocco su rete lenta non conta due
+  bicchieri.
 
 **Fase 4 — Aggiunta rapida di sole calorie.** *(mezza giornata)*
 - Un campo «350 kcal» e basta, senza nome né macro, per quando mangi fuori e
@@ -448,10 +453,105 @@ che **cancella a cascata lo storico di allenamento**.
       esistono serie registrate — e con `--forza-allenamento` le cancella. In
       pratica: o perdi lo storico o tieni la scheda vecchia.
 - [ ] **Target giornalieri modificabili.** Stanno in `src/lib/targets.ts`:
-      cambiarli richiede un deploy. Il PT li cambia a ogni fase.
+      cambiarli richiede un deploy. Il PT li cambia a ogni fase. Il disegno
+      per esteso è nella sezione 6-quinquies.
 - [ ] **Seduta: cambiare data e giornata.** Se apri "Day 1" invece di "Day 2"
       puoi solo scartare e rifare; se ti dimentichi di registrare l'altroieri,
       non puoi registrarlo a posteriori.
+
+## 6-quinquies. Cambiare scheda e obiettivi da solo, senza sporcare lo storico
+
+> «Quando cambiano gli obiettivi, o il PT mi manda altri esercizi, voglio
+> essere autonomo. Do a un'AI i documenti nuovi, l'app mi dice in che formato
+> li vuole, si può fare undo, e quando si va avanti non ci devono essere
+> sporcizie dal vecchio al nuovo o dal nuovo al vecchio.»
+
+È lo stesso giro di *Incolla da Claude*, applicato al programma invece che a
+un pasto: l'app dà il formato, tu dai i documenti del PT a una chat, riporti
+indietro la risposta, guardi cosa cambia e confermi. Cambia però la posta in
+gioco — un pasto sbagliato è un pasto, una scheda sbagliata sono mesi di
+carichi.
+
+### Perché oggi non si può, in una riga
+
+`workout_sets` punta a `workout_exercises` con **ON DELETE CASCADE**, e
+`workout_exercises` punta a `workout_days` con lo stesso vincolo. Sostituire
+il programma cancella gli esercizi, e con loro **tutte le serie registrate**.
+Per questo `db:seed` si rifiuta di partire se trovi serie in archivio, e
+`--forza-allenamento` le cancella: non è prudenza, è l'unica cosa che poteva
+fare senza uno schema diverso.
+
+### La regola che deve reggere: niente si cancella, si archivia
+
+Un esercizio che ha serie registrate **non si elimina mai**. Esce dal
+programma corrente e resta nell'archivio, così i carichi di marzo si leggono
+anche se a settembre quell'esercizio non lo fai più.
+
+Serve una colonna sola: `workout_exercises.archiviato_il` (nullo = è nel
+programma di adesso). Cambia di conseguenza chi legge:
+
+- la seduta e la scheda mostrano solo i non archiviati;
+- lo storico e il dettaglio di una seduta passata li mostrano tutti, perché
+  raccontano quello che è successo, non quello che si fa adesso;
+- il confronto «meglio dell'ultima volta» continua a funzionare, perché gli
+  identificativi non cambiano.
+
+**È questa la risposta a "niente sporcizie".** Non un'operazione di pulizia
+fatta bene: uno schema in cui la sporcizia non può nascere, perché nessuna
+riga viene riscritta o buttata.
+
+### Come deve andare, passo per passo
+
+1. **L'app dà il formato.** Come per i pasti: un prompt da copiare, che si
+   porta dietro la scheda com'è adesso — così la chat sa cosa sta
+   sostituendo e può dire «questo esercizio resta uguale».
+2. **Si incolla la risposta.** JSON con giornate, esercizi, serie,
+   ripetizioni, e i target giornalieri se cambiano anche quelli.
+3. **Prima di toccare niente, si vede il confronto.** Riga per riga, in tre
+   gruppi: **restano uguali**, **cambiano** (con il valore vecchio accanto al
+   nuovo), **escono dal programma** (e per ognuno: quante serie hai
+   registrato, cioè quanto storico stai mettendo da parte). Più gli
+   **aggiunti**. Niente si scrive finché non hai letto questa schermata: è la
+   stessa ragione per cui i pasti stimati si confermano prima di salvare.
+4. **Si applica tutto insieme o niente.** Una transazione sola: se salta a
+   metà, il programma vecchio è ancora quello buono. Senza, un cambio
+   interrotto lascia una scheda mezza vecchia e mezza nuova, che è
+   esattamente la sporcizia da evitare.
+5. **L'undo riporta indietro tutto il cambio.** Non esercizio per esercizio:
+   un'unica azione che rimette il programma com'era, archiviati compresi.
+   Costa una fotografia del prima da tenere da parte — la stessa cosa che fa
+   già `deleteSession` col suo `SessionBackup`.
+
+### Dove va messo
+
+Una schermata sua, dentro **Piano**: è lì che stanno i target e le regole del
+PT, ed è la schermata che si apre quando qualcosa è cambiato — non il diario,
+che si apre tutti i giorni. Il cambio di scheda capita ogni qualche mese: non
+deve costare niente al gesto quotidiano.
+
+### In che ordine, e cosa si può già fare prima
+
+Il pezzo grosso è il punto 3 (il confronto) e il punto 5 (l'undo del cambio).
+Ma due cose si possono fare subito e valgono da sole:
+
+- [ ] **Target giornalieri modificabili.** Stanno in `src/lib/targets.ts`:
+      oggi cambiarli richiede un deploy, e il PT li cambia a ogni fase. Una
+      tabella `targets` con una riga, un campo per macro, e la schermata in
+      Piano. È il pezzo più piccolo di tutto questo e sblocca metà del
+      problema da solo.
+- [ ] **`archiviato_il` sugli esercizi**, con le letture aggiornate. Senza
+      questa colonna nessun cambio scheda è sicuro; con questa, anche il
+      `db:seed` può smettere di cancellare.
+- [ ] **Prompt + incolla + confronto + applica in transazione.**
+- [ ] **Undo del cambio scheda**, con la fotografia del prima.
+
+### Come si misura che è andata bene
+
+Una prova sola, e deve passare per intero: si registrano delle serie, si
+cambia scheda togliendo l'esercizio che le ha, e **dopo il cambio quelle
+serie si leggono ancora** — nel dettaglio della seduta e nella progressione.
+Poi si fa undo e il programma torna identico a prima, campo per campo.
+Finché questa prova non esiste, la funzione non esiste.
 
 ## 7. Cose che restano fuori, di proposito
 
