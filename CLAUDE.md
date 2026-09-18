@@ -117,7 +117,13 @@ Costate tempo una volta. Non ripaghiamole.
   `DATABASE_URL` che punti a un Postgres normale. I file in `drizzle/*.sql` si
   applicano con `psql`. Contro il database vero ci pensa il workflow
   *Migrazioni*, che gira da solo a ogni push su `main`.
-- **Tailwind v4 scrive i colori in `oklab(...)`** ogni volta che c'e'
+- **Per provare "senza rete" si bloccano le POST, non tutta la rete.** Con
+  `context.setOffline(true)` fallisce anche la navigazione e il browser finisce
+  su `chrome-error://chromewebdata/`, dove il codice dell'app non gira e
+  `localStorage` non si legge nemmeno: si misura il browser, non l'app. Una
+  rete ballerina vera fa fallire la richiesta e lascia la pagina viva --
+  `page.route` che annulla le sole POST.
+- - **Tailwind v4 scrive i colori in `oklab(...)`** ogni volta che c'e'
   un'opacita' (`bg-surface/85`). Leggerne i numeri con una regex, come se
   fossero r/g/b, da' risultati senza senso: un quasi bianco diventa un quasi
   nero. Per misurare un colore lo si fa **disegnare** su una canvas e si legge

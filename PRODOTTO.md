@@ -189,6 +189,13 @@ e va difesa a ogni aggiunta.
 - **Acqua** — bicchieri +/− nella scheda in cima al diario, con il totale in
   litri. Nessun macro, nessuna stima, nessuna scelta da fare: è un contatore.
   Il "meno" è l'annullamento, a un tocco di distanza.
+- **Niente si perde se cade la rete** — un pasto che non riesce a salvarsi
+  resta sul telefono, si vede in lista e conta nei totali, e riparte da solo
+  quando la rete torna o alla prima riapertura. La riga dice «aspetta la
+  rete», non «errore»: non è perso, e chiamarlo guasto farebbe riscriverlo a
+  mano. Lo stesso valeva già per le serie in palestra; il diario invece il
+  pasto lo perdeva davvero.
+
 - **Cambia la scheda** — Piano → *Cambia la scheda*: quando il personal
   trainer ne manda una nuova, copi un prompt, lo mandi a una chat con i suoi
   documenti, riporti indietro la risposta e **vedi cosa cambia prima di

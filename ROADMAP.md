@@ -99,9 +99,23 @@ L'app presuppone che tutto vada bene. Non è vero.
       marcata "da mandare" e riparte da sola quando la rete torna. Il
       riprova è sicuro: ogni serie porta un identificativo generato dal
       telefono, quindi se era già arrivata non se ne scrive una seconda.
-- [ ] **Ritentare le scritture fallite — pasti.** Il diario non ha ancora la
-      stessa rete di sicurezza: se il salvataggio fallisce compare l'errore e
-      il pasto è perso. Stesso meccanismo da portare lì.
+- [x] **Ritentare le scritture fallite — pasti.** Fatto: stesso meccanismo
+      delle serie. Il pasto resta sul telefono, si vede in lista e conta nei
+      totali, e riparte da solo quando la rete torna o alla prima riapertura.
+
+      Vale per tutte e tre le strade: tasto rapido, *Come ieri* e *Incolla da
+      Claude*. Quest'ultima era il buco peggiore — un incolla di quattro
+      alimenti perso è peggio di un pasto solo.
+
+      La riga a schermo dice «aspetta la rete», non «errore»: un pasto in coda
+      non è perso, e chiamarlo guasto farebbe riscriverlo a mano. Allora sì
+      che finirebbe in doppia copia.
+
+      Il doppione vero lo impedisce la colonna `client_id` con indice unico
+      (migrazione `0009`, additiva): se la rete cade *dopo* che il server ha
+      scritto ma prima che la risposta torni, il secondo tentativo arriva con
+      lo stesso identificativo e non scrive niente. Verificato sul database:
+      l'inserimento duplicato viene rifiutato.
 - [ ] **Aprirsi senza rete.** Metà fatta. Se l'app è **già aperta** e il
       segnale cade — il caso normale in palestra, dove entri col segnale e lo
       perdi in sala pesi — ora continua a funzionare e non perde niente. Se

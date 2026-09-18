@@ -21,6 +21,11 @@ export type MealInput = {
   fat: number;
   /** Le calorie si sanno, i macro no. Vedi `meals.onlyKcal` nello schema. */
   onlyKcal?: boolean;
+  /**
+   * Generato dal telefono, per poter riprovare senza scrivere doppioni.
+   * Vedi `meals.clientId` nello schema.
+   */
+  clientId?: string;
 };
 
 function validate(input: MealInput): string | null {
@@ -56,17 +61,34 @@ export async function addMeal(input: MealInput): Promise<ActionResult> {
   if (error) return { ok: false, error };
 
   try {
-    await db.insert(meals).values({
-      day: input.day,
-      slot: input.slot,
-      name: input.name.trim(),
-      quantity: input.quantity,
-      kcal: Math.round(input.kcal),
-      carbs: input.carbs,
-      protein: input.protein,
-      fat: input.fat,
-      onlyKcal: input.onlyKcal ?? false,
-    });
+    /*
+     * `onConflictDoNothing` sull'identificativo del telefono.
+     *
+     * Serve al caso peggiore: la rete cade *dopo* che il server ha scritto ma
+     * prima che la risposta torni indietro. Il telefono crede di aver
+     * fallito, mette il pasto in coda e riprova -- e senza questo il pranzo
+     * finirebbe in doppia copia. La rete di sicurezza creerebbe il problema
+     * che dovrebbe risolvere.
+     *
+     * Senza `clientId` (un salvataggio normale, o una riga di prima che la
+     * colonna esistesse) non c'e' niente su cui il conflitto possa scattare:
+     * Postgres tratta ogni NULL come diverso dagli altri.
+     */
+    await db
+      .insert(meals)
+      .values({
+        day: input.day,
+        slot: input.slot,
+        name: input.name.trim(),
+        quantity: input.quantity,
+        kcal: Math.round(input.kcal),
+        carbs: input.carbs,
+        protein: input.protein,
+        fat: input.fat,
+        onlyKcal: input.onlyKcal ?? false,
+        clientId: input.clientId ?? null,
+      })
+      .onConflictDoNothing({ target: meals.clientId });
   } catch (cause) {
     console.error("addMeal fallita", cause);
     return { ok: false, error: "Salvataggio non riuscito. Riprova." };
@@ -137,7 +159,11 @@ export type MealPatch = {
 };
 
 /** Almeno un macro diverso da zero: il pasto e' stato scomposto. */
-function macroScritti(patch: { carbs: number; protein: number; fat: number }): boolean {
+function macroScritti(patch: {
+  carbs: number;
+  protein: number;
+  fat: number;
+}): boolean {
   return patch.carbs > 0 || patch.protein > 0 || patch.fat > 0;
 }
 
