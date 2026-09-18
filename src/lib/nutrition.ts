@@ -1,4 +1,4 @@
-import { DAILY_TARGETS, MACRO_ORDER, type MacroKey } from "./targets";
+import { DAILY_TARGETS, MACRO_ORDER, MACRO_UNITS, type MacroKey } from "./targets";
 
 /** I target rispetto a cui si misura. Predefiniti: quelli del codice. */
 type Target = Record<MacroKey, number>;
@@ -106,6 +106,21 @@ export function arrotondaMacro(value: number, key: MacroKey): number {
 
 export function formatMacro(value: number, key: MacroKey): string {
   return String(arrotondaMacro(value, key)).replace(".", ",");
+}
+
+/**
+ * Lo scarto dal target, con l'etichetta che dice cosa significa.
+ *
+ * "−217 kcal" da solo si legge come un rimprovero anche quando non lo è:
+ * chi guarda deve indovinare se è sotto o sopra il target. "sotto il
+ * target" descrive il numero, non giudica chi l'ha prodotto (regola 8).
+ */
+export function etichettaScarto(delta: number, key: MacroKey): string {
+  const rounded = arrotondaMacro(Math.abs(delta), key);
+  if (rounded === 0) return "in linea";
+  const segno = delta > 0 ? "+" : "−";
+  const direzione = delta > 0 ? "sopra il target" : "sotto il target";
+  return `${segno}${formatMacro(rounded, key)} ${MACRO_UNITS[key]} · ${direzione}`;
 }
 
 export type MacroProgress = {

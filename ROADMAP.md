@@ -253,8 +253,13 @@ leggibile qualcosa che oggi non lo è.
       visto — "NaN" non ha punti decimali, non è un colore e non è un
       bersaglio. Adesso `npm run e2e` cerca anche `NaN`, `undefined` e
       `[object Object]` su ogni schermata.
-- [ ] **Etichetta qualitativa accanto ai numeri dello storico.** "−217 kcal"
-      diventa "−217 kcal · sotto il target". Descrive, non giudica.
+- [x] **Etichetta qualitativa accanto ai numeri dello storico.** "−217 kcal"
+      diventa "−217 kcal · sotto il target" nella media giornaliera. Logica
+      pura in `etichettaScarto` (`src/lib/nutrition.ts`), testata a parte:
+      sopra/sotto/in linea, e uno scarto che arrotonda a zero resta "in
+      linea" invece di "+0 kcal". Nessuna parola di valore nel testo — solo
+      la direzione, come chiede la regola 8. Verificato nel browser, chiaro
+      e scuro.
 - [ ] **Schede a mezza larghezza affiancate** dove il contenuto è corto
       (giorni entro il target, media giornaliera).
 - [x] **Heatmap del mese** nello storico, tipo calendario, con quanti giorni

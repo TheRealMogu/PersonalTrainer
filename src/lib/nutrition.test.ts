@@ -5,6 +5,7 @@ import {
   arrotondaMacro,
   avvisoNonScomposte,
   buildProgress,
+  etichettaScarto,
   fitsInRemaining,
   formatMacro,
   kcalNonScomposte,
@@ -288,5 +289,32 @@ describe("l'avviso delle calorie non scomposte", () => {
     const testo = avvisoNonScomposte(350);
     assert.doesNotMatch(testo, /!/);
     assert.doesNotMatch(testo, /attenzione|sbagli|dovresti/i);
+  });
+});
+
+describe("l'etichetta dello scarto dal target", () => {
+  it("dice sotto il target quando si è rimasti indietro", () => {
+    assert.equal(etichettaScarto(-217, "kcal"), "−217 kcal · sotto il target");
+  });
+
+  it("dice sopra il target quando si è andati oltre", () => {
+    assert.equal(etichettaScarto(217, "kcal"), "+217 kcal · sopra il target");
+  });
+
+  it("a zero non giudica: 'in linea', senza segno né freccia", () => {
+    assert.equal(etichettaScarto(0, "kcal"), "in linea");
+  });
+
+  it("uno scarto che arrotonda a zero resta 'in linea', non '+0 kcal'", () => {
+    assert.equal(etichettaScarto(0.4, "kcal"), "in linea");
+  });
+
+  it("descrive, non giudica: nessuna parola di valore nel testo", () => {
+    const testo = etichettaScarto(-217, "kcal");
+    assert.doesNotMatch(testo, /bene|male|attenzione|sbagli|dovresti|bravo/i);
+  });
+
+  it("segue il macro: la virgola italiana e l'unità giuste anche sui grammi", () => {
+    assert.equal(etichettaScarto(-12.5, "fat"), "−12,5 g · sotto il target");
   });
 });
