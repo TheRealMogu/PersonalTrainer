@@ -22,6 +22,7 @@ import {
   supplements,
   targets,
   waterDays,
+  weekNotes,
   workoutDays,
   workoutExercises,
   workoutSessions,
@@ -526,6 +527,15 @@ export async function getPrimoGiornoRegistrato(): Promise<string | null> {
     (giorno): giorno is string => giorno != null
   );
   return candidati.length > 0 ? candidati.sort()[0] : null;
+}
+
+/** La nota sulla dieta gia' salvata per una settimana, o null se non c'e'. */
+export async function getNotaDieta(weekStart: string): Promise<string | null> {
+  const [riga] = await db
+    .select({ note: weekNotes.note })
+    .from(weekNotes)
+    .where(eq(weekNotes.weekStart, weekStart));
+  return riga?.note ?? null;
 }
 
 export type ExerciseProgressPoint = {

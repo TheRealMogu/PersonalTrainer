@@ -22,6 +22,7 @@ import {
 import {
   getDailyTotals,
   getExerciseProgress,
+  getNotaDieta,
   getObiettivi,
   getPrimoGiornoRegistrato,
   getSessionsInRange,
@@ -62,19 +63,29 @@ export default async function StoricoPage({
   let obiettivi: Obiettivi;
   let mese: Awaited<ReturnType<typeof getDailyTotals>>;
   let primoGiorno: Awaited<ReturnType<typeof getPrimoGiornoRegistrato>>;
+  let notaDieta: Awaited<ReturnType<typeof getNotaDieta>>;
   try {
-    [rows, exerciseProgress, settimana, sedute, obiettivi, mese, primoGiorno] =
-      await Promise.all([
-        getDailyTotals(dates[0], today),
-        getExerciseProgress(),
-        getDailyTotals(lunedi, domenica),
-        getSessionsInRange(lunedi, domenica),
-        getObiettivi(),
-        // Il mese intero, che il filtro 7/30 giorni non copre: il calendario
-        // deve partire dal primo anche se stai guardando gli ultimi sette.
-        getDailyTotals(`${today.slice(0, 7)}-01`, today),
-        getPrimoGiornoRegistrato(),
-      ]);
+    [
+      rows,
+      exerciseProgress,
+      settimana,
+      sedute,
+      obiettivi,
+      mese,
+      primoGiorno,
+      notaDieta,
+    ] = await Promise.all([
+      getDailyTotals(dates[0], today),
+      getExerciseProgress(),
+      getDailyTotals(lunedi, domenica),
+      getSessionsInRange(lunedi, domenica),
+      getObiettivi(),
+      // Il mese intero, che il filtro 7/30 giorni non copre: il calendario
+      // deve partire dal primo anche se stai guardando gli ultimi sette.
+      getDailyTotals(`${today.slice(0, 7)}-01`, today),
+      getPrimoGiornoRegistrato(),
+      getNotaDieta(lunedi),
+    ]);
   } catch (error) {
     console.error("[storico] lettura dei dati fallita:", error);
     return (
@@ -93,6 +104,7 @@ export default async function StoricoPage({
     today,
     today,
     primoGiorno,
+    notaDieta,
   );
 
   return (

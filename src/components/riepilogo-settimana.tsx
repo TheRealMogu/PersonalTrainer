@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { NotaDieta } from "@/components/nota-dieta";
 import { isLogged } from "@/lib/history";
 import { formatMacro } from "@/lib/nutrition";
 import {
@@ -132,6 +133,8 @@ export function RiepilogoSettimana({
           </p>
         )}
       </div>
+
+      <NotaDieta weekStart={riepilogo.lunedi} nota={riepilogo.notaDieta} />
 
       <p className="mt-4 mb-2 text-[13px] font-semibold uppercase tracking-wide text-muted">
         Allenamento
