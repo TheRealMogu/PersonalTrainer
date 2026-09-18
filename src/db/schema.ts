@@ -52,11 +52,29 @@ export const meals = pgTable(
      * dichiarano quante calorie restano fuori dal conto.
      */
     onlyKcal: boolean("only_kcal").notNull().default(false),
+    /**
+     * Generato dal telefono prima di provare a salvare.
+     *
+     * E' quello che rende sicuro riprovare: se la rete cade dopo che il
+     * server ha scritto ma prima che la risposta torni indietro, il secondo
+     * tentativo arriva con lo stesso id e non scrive un doppione. E' la
+     * stessa cosa che fa gia' `workout_sets.clientId` per le serie in
+     * palestra; il diario non ce l'aveva, e un salvataggio fallito voleva
+     * dire un pasto perso.
+     *
+     * Nullo sulle righe scritte prima che questa colonna esistesse: Postgres
+     * tratta ogni NULL come diverso dagli altri, quindi l'indice unico non si
+     * lamenta.
+     */
+    clientId: text("client_id"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
-  (table) => [index("meals_day_idx").on(table.day)]
+  (table) => [
+    index("meals_day_idx").on(table.day),
+    uniqueIndex("meals_client_id_key").on(table.clientId),
+  ]
 );
 
 /** Cibi ricorrenti mostrati come tasti rapidi nel diario. */
