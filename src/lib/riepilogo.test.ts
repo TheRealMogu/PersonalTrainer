@@ -395,3 +395,43 @@ describe("la nota sulla dieta", () => {
     );
   });
 });
+
+describe("il peso della settimana", () => {
+  const oggi = "2026-09-11"; // dentro la settimana 7-13 settembre
+
+  it("null per entrambe senza righe di peso", () => {
+    const r = costruisciRiepilogo([], [], oggi, oggi);
+    assert.equal(r.pesoSettimana, null);
+    assert.equal(r.pesoSettimanaScorsa, null);
+    assert.doesNotMatch(riepilogoTesto(r), /Peso/);
+  });
+
+  it("prende l'ultima misura di questa settimana e di quella precedente", () => {
+    const pesi = [
+      { day: "2026-08-31", weightKg: 84 }, // settimana precedente (31 ago - 6 set)
+      { day: "2026-09-02", weightKg: 83.2 }, // settimana precedente, piu' recente
+      { day: "2026-09-08", weightKg: 82.7 }, // questa settimana
+      { day: "2026-09-10", weightKg: 82.5 }, // questa settimana, piu' recente
+    ];
+    const r = costruisciRiepilogo([], [], oggi, oggi, null, null, pesi);
+    assert.equal(r.pesoSettimana, 82.5);
+    assert.equal(r.pesoSettimanaScorsa, 83.2);
+    assert.match(riepilogoTesto(r), /Peso: 82,5 kg \(83,2 kg la settimana scorsa\)/);
+  });
+
+  it("solo questa settimana: niente confronto inventato", () => {
+    const pesi = [{ day: "2026-09-09", weightKg: 82 }];
+    const r = costruisciRiepilogo([], [], oggi, oggi, null, null, pesi);
+    assert.equal(r.pesoSettimana, 82);
+    assert.equal(r.pesoSettimanaScorsa, null);
+    assert.match(riepilogoTesto(r), /^Peso: 82 kg$/m);
+  });
+
+  it("solo la settimana scorsa: lo dice, non tace e non inventa quella corrente", () => {
+    const pesi = [{ day: "2026-09-01", weightKg: 84 }];
+    const r = costruisciRiepilogo([], [], oggi, oggi, null, null, pesi);
+    assert.equal(r.pesoSettimana, null);
+    assert.equal(r.pesoSettimanaScorsa, 84);
+    assert.match(riepilogoTesto(r), /Peso la settimana scorsa: 84 kg/);
+  });
+});

@@ -181,10 +181,19 @@ Nessuna è bloccante, tutte sono state pesate col metro dei gesti.
 
 - [ ] **Acqua e passi.** Il PT chiede 3 litri e 10.000 passi al giorno, e
       l'app non li traccia: oggi le regole stanno nel Piano come testo.
-- [ ] **Peso corporeo** con andamento nel tempo. Un numero al giorno,
-      due tocchi. Serve anche al riepilogo della settimana: il PT chiede ogni
-      domenica "peso della settimana scorsa e di questa", e oggi quel
-      confronto non si può fare perché il dato non esiste.
+- [x] **Peso corporeo** con andamento nel tempo. Fatto: un campo nel diario,
+      sotto l'acqua (`weight_days`, una riga al giorno come `water_days`),
+      un grafico a linea nello Storico che segue il filtro 7/30 giorni, e il
+      confronto che chiede il PT ogni domenica -- "peso: 82,5 kg (83,2 kg la
+      settimana scorsa)" -- nel riepilogo, a schermo e nel testo copiato.
+      L'ultima misura di ciascuna settimana, non una media: di solito ci si
+      pesa una volta sola. Nessuna delle due parti del confronto si inventa:
+      se manca una misura non compare, mai uno zero (regola 6). Cancellare
+      il numero cancella la riga, non la svuota. Verificato sul browser
+      vero: peso scritto, salvato, sopravvissuto a un reload vero,
+      cancellato di nuovo -- controllato ogni volta anche sulla tabella, non
+      solo sullo schermo -- e il confronto fra le due settimane calcolato a
+      mano e confrontato col numero mostrato.
 - [x] **Numero della settimana nel riepilogo.** Fatto: *Questa settimana*
       ora scrive "Settimana 3 · 14 settembre – 20 settembre", a schermo e nel
       testo copiato. Contata dal primo giorno mai registrato (diario o

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { NotaDieta } from "@/components/nota-dieta";
 import { isLogged } from "@/lib/history";
 import { formatMacro } from "@/lib/nutrition";
+import { formatPeso } from "@/lib/peso";
 import {
   giornoMese,
   nomeGiorno,
@@ -60,6 +61,21 @@ export function RiepilogoSettimana({
         </p>
         {riepilogo.inCorso ? (
           <p className="mt-0.5 text-[13px] text-muted">Settimana ancora in corso</p>
+        ) : null}
+        {/*
+          "Peso della settimana scorsa e di questa" e' la prima domanda del
+          PT ogni domenica: sta qui, non in fondo, e non compare affatto se
+          manca una delle due misure (regola 6).
+        */}
+        {riepilogo.pesoSettimana !== null || riepilogo.pesoSettimanaScorsa !== null ? (
+          <p className="mt-1 text-[13px] tabular-nums text-muted">
+            {riepilogo.pesoSettimana !== null
+              ? `Peso: ${formatPeso(riepilogo.pesoSettimana)} kg`
+              : "Peso questa settimana: non ancora registrato"}
+            {riepilogo.pesoSettimanaScorsa !== null
+              ? ` (${formatPeso(riepilogo.pesoSettimanaScorsa)} kg la settimana scorsa)`
+              : ""}
+          </p>
         ) : null}
       </header>
 

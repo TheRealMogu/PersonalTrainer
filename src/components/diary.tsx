@@ -37,6 +37,7 @@ import {
 } from "@/lib/nutrition";
 import type { MacroKey, Obiettivi } from "@/lib/targets";
 import { Acqua } from "./acqua";
+import { Peso } from "./peso";
 import { ComeUltimaVolta } from "./come-ultima-volta";
 import { Integratori } from "./integratori";
 import { SoloCalorie } from "./solo-calorie";
@@ -82,6 +83,7 @@ export function Diary({
   quickFoods,
   defaultSlot,
   acqua,
+  peso,
   integratori,
   usi,
   ultimaVolta,
@@ -93,6 +95,7 @@ export function Diary({
   quickFoods: QuickFood[];
   defaultSlot: MealSlot;
   acqua: number;
+  peso: number | null;
   integratori: IntegratoreDelGiorno[];
   /** Quello che hai gia' registrato negli ultimi mesi: decide l'ordine dei tasti. */
   usi: UsoPerMomento[];
@@ -449,6 +452,16 @@ export function Diary({
             bicchieri={acqua}
             obiettivo={obiettivi.bicchieriAcqua}
           />
+        </div>
+
+        {/*
+          Il peso per lo stesso motivo dell'acqua: costa zero gesti in piu'
+          per arrivarci, e senza l'andamento nel tempo non si costruirebbe
+          mai. Un campo e non un contatore, perche' il peso non si aggiusta
+          a incrementi fissi come i bicchieri.
+        */}
+        <div className="mt-3 border-t border-hairline pt-3">
+          <Peso day={day} kg={peso} />
         </div>
 
         {/*

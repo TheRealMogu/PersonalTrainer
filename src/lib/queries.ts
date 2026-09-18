@@ -23,6 +23,7 @@ import {
   targets,
   waterDays,
   weekNotes,
+  weightDays,
   workoutDays,
   workoutExercises,
   workoutSessions,
@@ -40,6 +41,7 @@ import {
 import { TUTTO, type IntervalloExport } from "@/lib/intervallo-export";
 import type { UltimaVolta, UsoPerMomento } from "@/lib/abitudini";
 import type { MealSlot } from "@/lib/meal-slots";
+import type { PesoGiorno } from "@/lib/peso";
 import { OBIETTIVI_PREDEFINITI, type Obiettivi } from "@/lib/targets";
 import type { LoggedSet } from "@/lib/workout";
 
@@ -113,6 +115,27 @@ export async function getWater(day: string): Promise<number> {
     .from(waterDays)
     .where(eq(waterDays.day, day));
   return riga?.glasses ?? 0;
+}
+
+/** Il peso di un giorno, o null se non ti sei pesato. */
+export async function getPeso(day: string): Promise<number | null> {
+  const [riga] = await db
+    .select({ weightKg: weightDays.weightKg })
+    .from(weightDays)
+    .where(eq(weightDays.day, day));
+  return riga?.weightKg ?? null;
+}
+
+/** Le righe di peso in un intervallo, per il grafico e per il riepilogo. */
+export async function getPesiInRange(
+  from: string,
+  to: string
+): Promise<PesoGiorno[]> {
+  return db
+    .select({ day: weightDays.day, weightKg: weightDays.weightKg })
+    .from(weightDays)
+    .where(and(gte(weightDays.day, from), lte(weightDays.day, to)))
+    .orderBy(asc(weightDays.day));
 }
 
 /**

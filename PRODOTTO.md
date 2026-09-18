@@ -163,7 +163,8 @@ e va difesa a ogni aggiunta.
 - **Diario** — anello delle calorie con quanto resta al centro, barre dei
   macro con un colore ciascuno, pasti divisi per momento della giornata col
   totale di ognuno, quantità variabili (½, 1½, 0,75…), eliminazione
-  annullabile, navigazione fra i giorni.
+  annullabile, navigazione fra i giorni. Sotto l'acqua, il peso del giorno:
+  un campo, un tasto.
 - **Piano** — i target e le regole del PT, con la porta per cambiarli.
 - **Allenamento** — il programma T1 e la seduta vera: cronometro, serie con
   carico e ripetizioni, timer di recupero, volume sollevato, e il carico
@@ -174,8 +175,9 @@ e va difesa a ogni aggiunta.
   numero: descrive, non giudica. In cima, **il mese a
   colpo d'occhio**: un calendario con quattro stati per casella (entro,
   oltre, non registrato, futuro) — così un giorno saltato non si confonde
-  mai con uno andato male. In fondo la **progressione in palestra**:
-  massimale stimato per esercizio, seduta dopo seduta.
+  mai con uno andato male. Anche l'**andamento del peso**, quando c'è
+  almeno una misura. In fondo la **progressione in palestra**: massimale
+  stimato per esercizio, seduta dopo seduta.
 - **Tema chiaro e scuro** che segue l'impostazione dell'iPhone.
 - **Striscia della settimana** in cima al diario: gli ultimi sette giorni a
   colpo d'occhio, e un tocco per aprirne uno.
@@ -263,11 +265,12 @@ e va difesa a ogni aggiunta.
 - **Riepilogo della settimana** — in cima allo Storico: i sette giorni da
   lunedì a domenica, le sedute con il volume, e la media che dichiara sempre
   su quanti giorni è fatta. Con il numero della settimana ("Settimana 3"),
-  contato dal primo giorno mai registrato, e una nota libera sulla dieta
-  ("fame giovedì, sgarro sabato sera") — così com'è quando il PT chiede la
-  domenica. Un tocco lo copia come testo, da mandare al personal trainer o
-  da incollare in chat, dove chi legge non ha l'app davanti. I giorni che
-  devono ancora arrivare sono un trattino, non uno zero.
+  contato dal primo giorno mai registrato, il peso di questa settimana e di
+  quella scorsa a confronto, e una nota libera sulla dieta ("fame giovedì,
+  sgarro sabato sera") — così com'è quando il PT chiede la domenica. Un
+  tocco lo copia come testo, da mandare al personal trainer o da incollare
+  in chat, dove chi legge non ha l'app davanti. I giorni che devono ancora
+  arrivare sono un trattino, non uno zero.
 - **Incolla da Claude** — Aggiungi → *Incolla da Claude*: si copia un prompt,
   lo si manda a Claude insieme a cosa si è mangiato (anche con la foto
   dell'etichetta), e si riporta indietro la risposta. L'app la legge e

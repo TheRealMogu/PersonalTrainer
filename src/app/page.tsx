@@ -14,6 +14,7 @@ import {
   getIntegratoriDelGiorno,
   getMealsByDay,
   getObiettivi,
+  getPeso,
   getQuickFoods,
   getUltimaVolta,
   getUsiPerMomento,
@@ -56,6 +57,7 @@ export default async function DiarioPage({
   let quickFoods: QuickFood[];
   let totaliSettimana: DailyTotals[];
   let acqua: number;
+  let peso: number | null;
   let obiettivi: Obiettivi;
   let integratori: IntegratoreDelGiorno[];
   let usi: UsoPerMomento[];
@@ -66,6 +68,7 @@ export default async function DiarioPage({
       quickFoods,
       totaliSettimana,
       acqua,
+      peso,
       obiettivi,
       integratori,
       usi,
@@ -75,6 +78,7 @@ export default async function DiarioPage({
       getQuickFoods(),
       getDailyTotals(settimana[0], today),
       getWater(day),
+      getPeso(day),
       getObiettivi(),
       getIntegratoriDelGiorno(day),
       getUsiPerMomento(today),
@@ -109,6 +113,7 @@ export default async function DiarioPage({
         quickFoods={quickFoods}
         defaultSlot={momento}
         acqua={acqua}
+        peso={peso}
         obiettivi={obiettivi}
         integratori={integratori}
         usi={usi}
