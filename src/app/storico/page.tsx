@@ -130,11 +130,19 @@ export default async function StoricoPage({
         </Card>
       ) : null}
 
+      {/*
+        Due schede, non due sezioni: il contenuto di entrambe e' corto (numeri
+        e etichette, nessun paragrafo lungo), e affiancate si leggono in un
+        colpo solo invece di uno scroll in piu'. La griglia dei macro dentro
+        "Media giornaliera" passa da 2 a 1 colonna qui: a meta' larghezza
+        scheda una griglia 2x2 stringerebbe ogni numero sotto la soglia
+        leggibile.
+      */}
       {stats.loggedDays > 0 ? (
-        <>
-          <Section title="Media giornaliera">
-            <Card>
-              <div className="grid grid-cols-2 gap-2">
+        <Section title="Media e giorni entro il target">
+          <div className="grid grid-cols-2 gap-3">
+            <Card title="Media giornaliera">
+              <div className="flex flex-col gap-2">
                 {MACRO_ORDER.map((macro) => (
                   <MacroStatTile
                     key={macro}
@@ -144,26 +152,21 @@ export default async function StoricoPage({
                   />
                 ))}
               </div>
-              <p className="mt-3 text-[13px] text-muted">
-                {stats.loggedDays === 1
-                  ? `Un solo giorno registrato sui ${stats.totalDays} conclusi`
-                  : `Media su ${stats.loggedDays} giorni registrati sui ${stats.totalDays} conclusi`}
-                ; lo scarto è rispetto al target giornaliero. I giorni non
-                compilati non abbassano la media, e oggi non entra nel conto
-                finché non è finito.
-              </p>
             </Card>
-          </Section>
 
-          <Section title="Giorni entro il target">
-            <Card>
+            <Card title="Giorni entro il target">
+              {/*
+                Etichetta sopra e numero sotto, non affiancati: a meta'
+                larghezza scheda "Carboidrati" e "4 / 4" sulla stessa riga si
+                strizzavano fino a toccarsi ("Carboidrati4"). Misurato a
+                320px, non dedotto.
+              */}
               <dl className="divide-y divide-hairline">
                 {MACRO_ORDER.map((macro) => (
-                  <div
-                    key={macro}
-                    className="flex items-baseline justify-between py-3 first:pt-0 last:pb-0"
-                  >
-                    <dt className="text-[15px]">{MACRO_LABELS[macro]}</dt>
+                  <div key={macro} className="py-2.5 first:pt-0 last:pb-0">
+                    <dt className="text-[13px] text-muted">
+                      {MACRO_LABELS[macro]}
+                    </dt>
                     <dd className="text-[15px] font-semibold tabular-nums">
                       {stats.daysWithinTarget[macro]}
                       <span className="font-normal text-muted">
@@ -175,8 +178,17 @@ export default async function StoricoPage({
                 ))}
               </dl>
             </Card>
-          </Section>
-        </>
+          </div>
+
+          <p className="mt-3 px-1 text-[13px] text-muted">
+            {stats.loggedDays === 1
+              ? `Un solo giorno registrato sui ${stats.totalDays} conclusi`
+              : `Media su ${stats.loggedDays} giorni registrati sui ${stats.totalDays} conclusi`}
+            ; lo scarto è rispetto al target giornaliero. I giorni non compilati
+            non abbassano la media, e oggi non entra nel conto finché non è
+            finito.
+          </p>
+        </Section>
       ) : null}
 
       {/*
