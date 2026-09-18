@@ -841,9 +841,33 @@ l'«aggiunta dinamica dei prodotti» arriva senza toccare il guscio iOS.
       (forma dei campi, quanti prodotti hanno i macro compilati) resta da
       fare con una chiamata reale, fuori da questo ambiente, prima di
       considerarla verificata davvero.
-- [ ] **Salvalo come tasto rapido**, con la porzione che usi tu. È il punto
+- [x] **Salvalo come tasto rapido**, con la porzione che usi tu. È il punto
       in cui l'archivio smette di essere quello del seed e diventa il tuo —
       e si incastra con il punto «cibi rapidi modificabili» di 6-quater.
+      Fatto: nel foglio dei grammi di `CercaProdotto`, lo stesso bottone
+      tratteggiato *Salva fra i tasti rapidi* già usato per un pasto appena
+      corretto (`edit-meal-sheet.tsx`) — stessa `addQuickFood`, nessuna
+      azione nuova. I valori salvati sono quelli già scalati sui grammi
+      scelti, con quella porzione scritta a fianco (`"150 g"`), non "per
+      100 g": un tasto rapido deve dire quanto vale un tocco, non quanto
+      vale un etto. Cambiare i grammi dopo aver salvato riattiva il
+      bottone, perché "salvato" appartiene a quella porzione, non al
+      prodotto in generale.
+
+      Verificato per intero nel browser vero, ma non contro Open Food
+      Facts — irraggiungibile da questo ambiente (v. sopra) — bensì contro
+      un server locale che risponde con la stessa forma documentata: due
+      prodotti, uno con tutti i macro e uno con i grassi mancanti. Provato
+      dal vivo: i risultati compaiono, il secondo si marca *macro
+      incompleti*, i grammi scalano il numero giusto (150 g di un prodotto
+      a 57 kcal/100 g → 86 kcal, arrotondato), il tasto rapido salvato
+      finisce davvero nella tabella `quick_foods` con i valori scalati e la
+      porzione corretta, e *Aggiungi* scrive comunque il pasto nel diario
+      con la quantità scelta in quel momento (200 g, indipendente dai 150 g
+      già salvati come tasto rapido) — controllato riga per riga sul
+      database, non solo a schermo. Resta da confermare, quando la rete lo
+      permetterà, che la vera risposta di Open Food Facts abbia davvero
+      questa forma per i prodotti reali.
 - [ ] **Codice a barre digitato a mano**, per quando il nome non basta a
       distinguere due varianti dello stesso prodotto.
 - [ ] **Scanner con la fotocamera**, solo dopo, e solo se serve davvero.

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { cercaProdotto, type MealInput } from "@/app/actions";
+import { addQuickFood } from "@/app/alimenti/actions";
 import { scalaProdotto, type ProdottoOFF } from "@/lib/openfoodfacts";
 import { MEAL_SLOTS, SLOT_LABELS, type MealSlot } from "@/lib/meal-slots";
 import { formatMacro } from "@/lib/nutrition";
@@ -39,6 +40,8 @@ export function CercaProdotto({
   const [scelto, setScelto] = useState<ProdottoOFF | null>(null);
   const [grammiTesto, setGrammiTesto] = useState("100");
   const [slot, setSlot] = useState<MealSlot>(defaultSlot);
+  const [salvato, setSalvato] = useState<"no" | "fatto" | string>("no");
+  const [salvataggio, startSalvataggio] = useTransition();
   const richiesta = useRef(0);
 
   function chiudi() {
@@ -50,6 +53,21 @@ export function CercaProdotto({
     setScelto(null);
     setGrammiTesto("100");
     setSlot(defaultSlot);
+    setSalvato("no");
+  }
+
+  function scegli(prodotto: ProdottoOFF) {
+    setScelto(prodotto);
+    // Il tasto rapido appartiene alla scelta corrente: passando a un altro
+    // prodotto lo stato "salvato" del precedente non ha più senso qui.
+    setSalvato("no");
+  }
+
+  function impostaGrammi(valore: string) {
+    setGrammiTesto(valore);
+    // "Salvato ✓" vale per i grammi con cui è stato salvato: cambiandoli si
+    // tornerebbe a salvare una porzione diversa da quella segnata come fatta.
+    setSalvato("no");
   }
 
   /*
@@ -204,7 +222,7 @@ export function CercaProdotto({
                   <li key={`${prodotto.nome}-${indice}`}>
                     <button
                       type="button"
-                      onClick={() => setScelto(prodotto)}
+                      onClick={() => scegli(prodotto)}
                       className="flex min-h-12 w-full items-center gap-2 py-2 text-left tocco active:bg-raised"
                     >
                       <span className="min-w-0 flex-1">
@@ -265,7 +283,7 @@ export function CercaProdotto({
                 <button
                   key={valore}
                   type="button"
-                  onClick={() => setGrammiTesto(String(valore))}
+                  onClick={() => impostaGrammi(String(valore))}
                   className={`h-12 flex-1 rounded-xl text-[15px] font-semibold tabular-nums transition-colors duration-200 ease-ios ${
                     grammiTesto === String(valore)
                       ? "bg-accent-solid text-on-accent"
@@ -285,7 +303,7 @@ export function CercaProdotto({
                 type="text"
                 inputMode="decimal"
                 value={grammiTesto}
-                onChange={(event) => setGrammiTesto(event.target.value)}
+                onChange={(event) => impostaGrammi(event.target.value)}
                 className="h-12 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
               />
             </label>
@@ -319,6 +337,51 @@ export function CercaProdotto({
                 {scalato ? formatMacro(scalato.fat, "fat") : "—"}
               </p>
             </div>
+
+            {/*
+              Il verso che fa diventare tuo l'archivio del mondo: senza,
+              ogni volta che rivuoi lo stesso prodotto tocca ricercarlo da
+              capo. I valori salvati sono quelli scalati sui grammi scelti
+              adesso, con quella stessa porzione scritta a fianco -- e' cosi'
+              che un tasto rapido sa quanto vale un tocco.
+            */}
+            <button
+              type="button"
+              disabled={
+                !grammiValidi || salvataggio || salvato === "fatto" || !scalato
+              }
+              onClick={() => {
+                if (!scalato) return;
+                startSalvataggio(async () => {
+                  const esito = await addQuickFood({
+                    name: scelto.marca
+                      ? `${scelto.nome} (${scelto.marca})`
+                      : scelto.nome,
+                    portion: `${grammiTesto.trim()} g`,
+                    kcal: scalato.kcal,
+                    carbs: scalato.carbs,
+                    protein: scalato.protein,
+                    fat: scalato.fat,
+                  });
+                  setSalvato(esito.ok ? "fatto" : esito.error);
+                });
+              }}
+              className="mt-3 min-h-11 w-full rounded-xl border border-dashed border-hairline text-[15px] font-medium text-accent tocco active:bg-raised disabled:opacity-40"
+            >
+              {salvato === "fatto"
+                ? "Salvato fra i tasti rapidi ✓"
+                : salvataggio
+                  ? "Salvo…"
+                  : "Salva fra i tasti rapidi"}
+            </button>
+
+            {typeof salvato === "string" &&
+            salvato !== "no" &&
+            salvato !== "fatto" ? (
+              <p role="alert" className="mt-2 text-[13px] text-muted">
+                {salvato}
+              </p>
+            ) : null}
 
             <div className="sticky bottom-0 -mx-5 mt-4 flex gap-2 bg-surface px-5 pt-3">
               <button
