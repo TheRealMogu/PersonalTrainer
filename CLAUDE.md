@@ -108,6 +108,10 @@ Costate tempo una volta. Non ripaghiamole.
 - **Una costante condivisa fra server e client non puo' stare in un file
   `server-only`.** `next build` si ferma e stampa la catena d'importazione
   completa. Le costanti che servono a tutti e due stanno nel modulo puro.
+  Lo stesso vale, al contrario, per i file `"use server"`: possono esportare
+  **solo funzioni asincrone**. Una costante li' dentro fa fallire la build con
+  "Export X doesn't exist in target module. The module has no exports at all",
+  che sembra un errore di battitura e non lo e'.
 - **In questo ambiente il server di sviluppo si apre solo su `localhost`, non
   su `127.0.0.1`.** Con l'indirizzo numerico Next blocca `/_next/hmr` come
   richiesta cross-origin e la pagina non si idrata: i tasti si vedono e non

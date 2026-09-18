@@ -1,7 +1,10 @@
 import type { WorkoutExercise, WorkoutSet } from "@/db/schema";
 
 /** Una serie come la mostra la UI, senza i campi di servizio del database. */
-export type LoggedSet = Pick<WorkoutSet, "id" | "exerciseId" | "setNumber" | "weight" | "reps"> & {
+export type LoggedSet = Pick<
+  WorkoutSet,
+  "id" | "exerciseId" | "setNumber" | "weight" | "reps"
+> & {
   /** Registrata ma non ancora arrivata al server: e' in coda sul telefono. */
   inAttesa?: boolean;
 };
@@ -15,7 +18,9 @@ export function setVolume(set: Pick<LoggedSet, "weight" | "reps">): number {
   return set.weight * set.reps;
 }
 
-export function totalVolume(sets: Pick<LoggedSet, "weight" | "reps">[]): number {
+export function totalVolume(
+  sets: Pick<LoggedSet, "weight" | "reps">[]
+): number {
   return sets.reduce((sum, set) => sum + setVolume(set), 0);
 }
 
@@ -95,7 +100,7 @@ export type Confronto = { migliore: boolean; testo: string } | null;
 
 export function confrontaSerie(
   serie: Pick<LoggedSet, "setNumber" | "weight" | "reps">,
-  precedenti: Pick<LoggedSet, "setNumber" | "weight" | "reps">[],
+  precedenti: Pick<LoggedSet, "setNumber" | "weight" | "reps">[]
 ): Confronto {
   const prima = precedenti.find((p) => p.setNumber === serie.setNumber);
   if (!prima) return null;
@@ -103,7 +108,10 @@ export function confrontaSerie(
   const diffPeso = serie.weight - prima.weight;
   if (Math.abs(diffPeso) >= 0.05) {
     const segno = diffPeso > 0 ? "+" : "−";
-    return { migliore: diffPeso > 0, testo: `${segno}${formatWeight(Math.abs(diffPeso))} kg` };
+    return {
+      migliore: diffPeso > 0,
+      testo: `${segno}${formatWeight(Math.abs(diffPeso))} kg`,
+    };
   }
 
   // Stesso carico: allora conta quante ripetizioni in piu' hai tirato fuori.
@@ -130,13 +138,16 @@ export type Avanzamento = {
  */
 export function avanzamentoSeduta(
   esercizi: Pick<WorkoutExercise, "id" | "sets">[],
-  serie: Pick<LoggedSet, "exerciseId">[],
+  serie: Pick<LoggedSet, "exerciseId">[]
 ): Avanzamento {
   const perEsercizio = new Map<number, number>();
-  for (const s of serie) perEsercizio.set(s.exerciseId, (perEsercizio.get(s.exerciseId) ?? 0) + 1);
+  for (const s of serie)
+    perEsercizio.set(s.exerciseId, (perEsercizio.get(s.exerciseId) ?? 0) + 1);
 
   return {
-    eserciziFatti: esercizi.filter((e) => (perEsercizio.get(e.id) ?? 0) >= e.sets).length,
+    eserciziFatti: esercizi.filter(
+      (e) => (perEsercizio.get(e.id) ?? 0) >= e.sets
+    ).length,
     eserciziTotali: esercizi.length,
     serieFatte: serie.length,
     serieTotali: esercizi.reduce((somma, e) => somma + e.sets, 0),
@@ -153,7 +164,7 @@ export type SetSuggestion = { weight: number; reps: number };
  */
 export function suggestNextSet(
   setsInSession: Pick<LoggedSet, "weight" | "reps">[],
-  lastTime: Pick<LoggedSet, "weight" | "reps">[],
+  lastTime: Pick<LoggedSet, "weight" | "reps">[]
 ): SetSuggestion | null {
   const source = setsInSession.length > 0 ? setsInSession : lastTime;
   const last = source.at(-1);
@@ -163,7 +174,9 @@ export function suggestNextSet(
 /** Raggruppa le serie per esercizio, mantenendo l'ordine di esecuzione. */
 export function groupByExercise(sets: LoggedSet[]): Map<number, LoggedSet[]> {
   const grouped = new Map<number, LoggedSet[]>();
-  for (const set of [...sets].sort((a, b) => a.setNumber - b.setNumber || a.id - b.id)) {
+  for (const set of [...sets].sort(
+    (a, b) => a.setNumber - b.setNumber || a.id - b.id
+  )) {
     const existing = grouped.get(set.exerciseId);
     if (existing) existing.push(set);
     else grouped.set(set.exerciseId, [set]);
@@ -191,13 +204,17 @@ export function formatElapsed(seconds: number): string {
  * E' una stima, non una misura: serve a confrontare sedute fra loro, non a
  * dirti quanto alzi davvero in singola.
  */
-export function estimatedOneRepMax(set: Pick<LoggedSet, "weight" | "reps">): number {
+export function estimatedOneRepMax(
+  set: Pick<LoggedSet, "weight" | "reps">
+): number {
   if (set.weight <= 0 || set.reps <= 0) return 0;
   return set.weight * (1 + set.reps / 30);
 }
 
 /** Il massimale stimato piu' alto di una seduta: la serie che conta davvero. */
-export function bestOneRepMax(sets: Pick<LoggedSet, "weight" | "reps">[]): number {
+export function bestOneRepMax(
+  sets: Pick<LoggedSet, "weight" | "reps">[]
+): number {
   return sets.reduce((best, set) => Math.max(best, estimatedOneRepMax(set)), 0);
 }
 
@@ -213,11 +230,14 @@ export function bestOneRepMax(sets: Pick<LoggedSet, "weight" | "reps">[]): numbe
  */
 export function suggestNextDayId(
   orderedDayIds: readonly number[],
-  lastCompletedDayId: number | null,
+  lastCompletedDayId: number | null
 ): number | null {
   if (orderedDayIds.length === 0) return null;
 
-  const previous = lastCompletedDayId === null ? -1 : orderedDayIds.indexOf(lastCompletedDayId);
+  const previous =
+    lastCompletedDayId === null
+      ? -1
+      : orderedDayIds.indexOf(lastCompletedDayId);
 
   // Mai allenato, o l'ultima giornata non e' piu' nel programma: si riparte
   // dalla prima invece di indovinare.
@@ -225,3 +245,14 @@ export function suggestNextDayId(
 
   return orderedDayIds[(previous + 1) % orderedDayIds.length];
 }
+
+/**
+ * Quanto puo' essere lunga la nota di una seduta. Largo: e' un appunto, non
+ * un tema.
+ *
+ * Sta qui e non nelle azioni perche' un file `"use server"` puo' esportare
+ * **solo funzioni asincrone**: una costante fa fallire `next build` con
+ * "Export MAX_NOTE doesn't exist in target module". E' la stessa regola per
+ * cui le costanti condivise non stanno nei file `server-only`.
+ */
+export const MAX_NOTE = 500;

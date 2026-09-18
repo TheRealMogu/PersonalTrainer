@@ -71,6 +71,13 @@
       "when": 1789711507592,
       "tag": "0009_overrated_bulldozer",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1789712519830,
+      "tag": "0010_wonderful_pride",
+      "breakpoints": true
     }
   ]
 }

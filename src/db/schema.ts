@@ -198,6 +198,18 @@ export const workoutSessions = pgTable(
       .notNull()
       .defaultNow(),
     endedAt: timestamp("ended_at", { withTimezone: true }),
+    /**
+     * Com'e' andata, a parole.
+     *
+     * "Spalla che tira" vale piu' di tre decimali sul carico: fra un mese e'
+     * l'unica cosa che spiega perche' quel giorno la panca e' scesa. I numeri
+     * dicono cosa hai fatto, questa riga dice perche'.
+     *
+     * Nulla finche' non scrivi niente: una nota vuota e una nota mai scritta
+     * sono la stessa cosa, e un campo vuoto a schermo su ogni seduta sarebbe
+     * un compito in piu' tutte le volte.
+     */
+    note: text("note"),
   },
   (table) => [index("workout_sessions_day_idx").on(table.day)]
 );

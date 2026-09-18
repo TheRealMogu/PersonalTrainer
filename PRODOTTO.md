@@ -104,6 +104,8 @@ proprio le schermate che vanno riviste.
 | Caricare la scheda nuova del personal trainer | 4 gesti | 4 (Piano → *Cambia la scheda* → copia → incolla → guarda → applica) | **sopra il tetto, e va bene** |
 | Rimediare a una scheda caricata sbagliata | 1 gesto | 1 (Annulla) | ok |
 | Rileggere i carichi di un esercizio che non faccio più | 1 gesto | 1 (è ancora nello storico) | ok |
+| Annotare com'è andata una seduta | 3 gesti | 3 (seduta → *Nota* → scrivi → salva) | ok |
+| Registrare una seduta dimenticata | 2 gesti | 2 (seduta → campo data) | ok |
 
 Le righe **sopra il tetto** sono misurate su una giornata vera (10 pasti
 registrati, schermo da 390 px). Le prime due righe dell'aggiunta sono
@@ -189,6 +191,12 @@ e va difesa a ogni aggiunta.
 - **Acqua** — bicchieri +/− nella scheda in cima al diario, con il totale in
   litri. Nessun macro, nessuna stima, nessuna scelta da fare: è un contatore.
   Il "meno" è l'annullamento, a un tocco di distanza.
+- **Nota sulla seduta** — nel dettaglio di un allenamento: «spalla destra che
+  tira sulle spinte». Fra un mese è l'unica cosa che spiega perché quel giorno
+  la panca è scesa — i numeri dicono cosa hai fatto, la nota dice perché. Va
+  anche nel testo che mandi al personal trainer. Da lì si corregge anche la
+  **data**, per le sedute che ti dimentichi di registrare.
+
 - **Niente si perde se cade la rete** — un pasto che non riesce a salvarsi
   resta sul telefono, si vede in lista e conta nei totali, e riparte da solo
   quando la rete torna o alla prima riapertura. La riga dice «aspetta la

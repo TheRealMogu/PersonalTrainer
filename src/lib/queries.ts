@@ -359,6 +359,8 @@ export type SedutaDettaglio = {
   focus: string;
   startedAt: Date;
   endedAt: Date | null;
+  /** Com'e' andata, a parole. Nulla se non hai scritto niente. */
+  note: string | null;
   esercizi: {
     id: number;
     name: string;
@@ -392,6 +394,7 @@ export async function getSessionDetail(
       focus: workoutDays.focus,
       startedAt: workoutSessions.startedAt,
       endedAt: workoutSessions.endedAt,
+      note: workoutSessions.note,
     })
     .from(workoutSessions)
     .innerJoin(workoutDays, eq(workoutSessions.dayId, workoutDays.id))
@@ -431,6 +434,7 @@ export async function getSessionDetail(
     focus: riga.focus,
     startedAt: riga.startedAt,
     endedAt: riga.endedAt,
+    note: riga.note,
     esercizi: esercizi.map((e) => ({
       id: e.id,
       name: e.name,
@@ -481,6 +485,9 @@ export async function getSessionsInRange(from: string, to: string) {
       focus: workoutDays.focus,
       volume: sql<number>`coalesce(sum(${workoutSets.weight} * ${workoutSets.reps}), 0)::float8`,
       setCount: sql<number>`count(${workoutSets.id})::int`,
+      // La nota finisce nel testo che si manda al personal trainer: "spalla
+      // che tira" gli dice piu' del volume della seduta.
+      note: workoutSessions.note,
     })
     .from(workoutSessions)
     .innerJoin(workoutDays, eq(workoutSessions.dayId, workoutDays.id))
@@ -492,7 +499,12 @@ export async function getSessionsInRange(from: string, to: string) {
         lte(workoutSessions.day, to)
       )
     )
-    .groupBy(workoutSessions.id, workoutDays.label, workoutDays.focus)
+    .groupBy(
+      workoutSessions.id,
+      workoutDays.label,
+      workoutDays.focus,
+      workoutSessions.note
+    )
     .orderBy(asc(workoutSessions.day));
 }
 

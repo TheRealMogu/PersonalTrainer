@@ -4,9 +4,12 @@ import { revalidatePath } from "next/cache";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { workoutSessions, workoutSets } from "@/db/schema";
-import { todayIso } from "@/lib/date";
+import { isIsoDate, todayIso } from "@/lib/date";
+import { MAX_NOTE } from "@/lib/workout";
 
-export type SessionResult = { ok: true; sessionId: number } | { ok: false; error: string };
+export type SessionResult =
+  | { ok: true; sessionId: number }
+  | { ok: false; error: string };
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
 /** Limiti larghi ma non assurdi: servono a fermare le dita, non ad allenare. */
@@ -66,12 +69,21 @@ export async function logSet(input: {
   const { sessionId, exerciseId, weight, reps, clientId } = input;
 
   if (!Number.isFinite(weight) || weight < 0 || weight > MAX_WEIGHT_KG) {
-    return { ok: false, error: `Il carico deve stare fra 0 e ${MAX_WEIGHT_KG} kg.` };
+    return {
+      ok: false,
+      error: `Il carico deve stare fra 0 e ${MAX_WEIGHT_KG} kg.`,
+    };
   }
   if (!Number.isInteger(reps) || reps < 1 || reps > MAX_REPS) {
-    return { ok: false, error: `Le ripetizioni devono stare fra 1 e ${MAX_REPS}.` };
+    return {
+      ok: false,
+      error: `Le ripetizioni devono stare fra 1 e ${MAX_REPS}.`,
+    };
   }
-  if (clientId !== undefined && (typeof clientId !== "string" || clientId.length > MAX_CLIENT_ID)) {
+  if (
+    clientId !== undefined &&
+    (typeof clientId !== "string" || clientId.length > MAX_CLIENT_ID)
+  ) {
     return { ok: false, error: "Identificativo della serie non valido." };
   }
 
@@ -80,9 +92,15 @@ export async function logSet(input: {
     const existing = await db
       .select({ setNumber: workoutSets.setNumber })
       .from(workoutSets)
-      .where(and(eq(workoutSets.sessionId, sessionId), eq(workoutSets.exerciseId, exerciseId)));
+      .where(
+        and(
+          eq(workoutSets.sessionId, sessionId),
+          eq(workoutSets.exerciseId, exerciseId)
+        )
+      );
 
-    const next = existing.reduce((max, row) => Math.max(max, row.setNumber), 0) + 1;
+    const next =
+      existing.reduce((max, row) => Math.max(max, row.setNumber), 0) + 1;
 
     await db
       .insert(workoutSets)
@@ -106,7 +124,8 @@ export async function logSet(input: {
 }
 
 export async function deleteSet(id: number): Promise<ActionResult> {
-  if (!Number.isInteger(id) || id <= 0) return { ok: false, error: "Serie non valida." };
+  if (!Number.isInteger(id) || id <= 0)
+    return { ok: false, error: "Serie non valida." };
 
   try {
     await db.delete(workoutSets).where(eq(workoutSets.id, id));
@@ -152,16 +171,26 @@ export async function updateSet(input: {
 }): Promise<ActionResult> {
   const { id, weight, reps } = input;
 
-  if (!Number.isInteger(id) || id <= 0) return { ok: false, error: "Serie non valida." };
+  if (!Number.isInteger(id) || id <= 0)
+    return { ok: false, error: "Serie non valida." };
   if (!Number.isFinite(weight) || weight < 0 || weight > MAX_WEIGHT_KG) {
-    return { ok: false, error: `Il carico deve stare fra 0 e ${MAX_WEIGHT_KG} kg.` };
+    return {
+      ok: false,
+      error: `Il carico deve stare fra 0 e ${MAX_WEIGHT_KG} kg.`,
+    };
   }
   if (!Number.isInteger(reps) || reps < 1 || reps > MAX_REPS) {
-    return { ok: false, error: `Le ripetizioni devono stare fra 1 e ${MAX_REPS}.` };
+    return {
+      ok: false,
+      error: `Le ripetizioni devono stare fra 1 e ${MAX_REPS}.`,
+    };
   }
 
   try {
-    await db.update(workoutSets).set({ weight, reps }).where(eq(workoutSets.id, id));
+    await db
+      .update(workoutSets)
+      .set({ weight, reps })
+      .where(eq(workoutSets.id, id));
   } catch (cause) {
     console.error("updateSet fallita", cause);
     return { ok: false, error: "Modifica non riuscita." };
@@ -187,18 +216,29 @@ export async function restoreSet(input: {
 }): Promise<ActionResult> {
   const { sessionId, exerciseId, setNumber, weight, reps } = input;
 
-  if (!Number.isInteger(sessionId) || sessionId <= 0) return { ok: false, error: "Allenamento non valido." };
-  if (!Number.isInteger(exerciseId) || exerciseId <= 0) return { ok: false, error: "Esercizio non valido." };
-  if (!Number.isInteger(setNumber) || setNumber <= 0) return { ok: false, error: "Serie non valida." };
+  if (!Number.isInteger(sessionId) || sessionId <= 0)
+    return { ok: false, error: "Allenamento non valido." };
+  if (!Number.isInteger(exerciseId) || exerciseId <= 0)
+    return { ok: false, error: "Esercizio non valido." };
+  if (!Number.isInteger(setNumber) || setNumber <= 0)
+    return { ok: false, error: "Serie non valida." };
   if (!Number.isFinite(weight) || weight < 0 || weight > MAX_WEIGHT_KG) {
-    return { ok: false, error: `Il carico deve stare fra 0 e ${MAX_WEIGHT_KG} kg.` };
+    return {
+      ok: false,
+      error: `Il carico deve stare fra 0 e ${MAX_WEIGHT_KG} kg.`,
+    };
   }
   if (!Number.isInteger(reps) || reps < 1 || reps > MAX_REPS) {
-    return { ok: false, error: `Le ripetizioni devono stare fra 1 e ${MAX_REPS}.` };
+    return {
+      ok: false,
+      error: `Le ripetizioni devono stare fra 1 e ${MAX_REPS}.`,
+    };
   }
 
   try {
-    await db.insert(workoutSets).values({ sessionId, exerciseId, setNumber, weight, reps });
+    await db
+      .insert(workoutSets)
+      .values({ sessionId, exerciseId, setNumber, weight, reps });
   } catch (cause) {
     console.error("restoreSet fallita", cause);
     return { ok: false, error: "Non sono riuscito a rimettere la serie." };
@@ -249,7 +289,12 @@ export type SessionBackup = {
   day: string;
   startedAt: string;
   endedAt: string | null;
-  sets: { exerciseId: number; setNumber: number; weight: number; reps: number }[];
+  sets: {
+    exerciseId: number;
+    setNumber: number;
+    weight: number;
+    reps: number;
+  }[];
 };
 
 export type DeleteSessionResult =
@@ -267,7 +312,9 @@ export type DeleteSessionResult =
  * sola azione qui dentro che potrebbe portarsi via un allenamento intero, e
  * proprio per quello non puo' essere l'unica senza ritorno.
  */
-export async function deleteSession(sessionId: number): Promise<DeleteSessionResult> {
+export async function deleteSession(
+  sessionId: number
+): Promise<DeleteSessionResult> {
   if (!Number.isInteger(sessionId) || sessionId <= 0) {
     return { ok: false, error: "Allenamento non valido." };
   }
@@ -316,7 +363,9 @@ export async function deleteSession(sessionId: number): Promise<DeleteSessionRes
  * Gli identificativi sono nuovi -- le righe vecchie non esistono piu' -- ma
  * quello che conta e' identico: giornata, orari, carichi, ordine delle serie.
  */
-export async function restoreSession(backup: SessionBackup): Promise<ActionResult> {
+export async function restoreSession(
+  backup: SessionBackup
+): Promise<ActionResult> {
   if (!Number.isInteger(backup?.dayId) || backup.dayId <= 0) {
     return { ok: false, error: "Allenamento non valido." };
   }
@@ -336,9 +385,11 @@ export async function restoreSession(backup: SessionBackup): Promise<ActionResul
       .returning({ id: workoutSessions.id });
 
     if (backup.sets.length > 0) {
-      await db.insert(workoutSets).values(
-        backup.sets.map((serie) => ({ ...serie, sessionId: creata.id })),
-      );
+      await db
+        .insert(workoutSets)
+        .values(
+          backup.sets.map((serie) => ({ ...serie, sessionId: creata.id }))
+        );
     }
   } catch (cause) {
     console.error("restoreSession fallita", cause);
@@ -346,6 +397,92 @@ export async function restoreSession(backup: SessionBackup): Promise<ActionResul
   }
 
   revalidatePath("/allenamento");
+  revalidatePath("/storico");
+  return { ok: true };
+}
+
+/**
+ * Scrive (o cancella) la nota di una seduta.
+ *
+ * Una stringa vuota diventa `null`: "nota cancellata" e "nota mai scritta"
+ * sono la stessa cosa, e tenere una riga vuota nel database vorrebbe dire
+ * mostrare un campo vuoto anche dove non serve.
+ */
+export async function salvaNotaSeduta(
+  sessionId: number,
+  note: string
+): Promise<ActionResult> {
+  if (!Number.isInteger(sessionId) || sessionId <= 0) {
+    return { ok: false, error: "Seduta non valida." };
+  }
+  const pulita = note.trim();
+  if (pulita.length > MAX_NOTE) {
+    return {
+      ok: false,
+      error: `La nota non può superare ${MAX_NOTE} caratteri.`,
+    };
+  }
+
+  try {
+    const righe = await db
+      .update(workoutSessions)
+      .set({ note: pulita === "" ? null : pulita })
+      .where(eq(workoutSessions.id, sessionId))
+      .returning({ id: workoutSessions.id });
+
+    if (righe.length === 0) return { ok: false, error: "Seduta non trovata." };
+  } catch (cause) {
+    console.error("salvaNotaSeduta fallita", cause);
+    return {
+      ok: false,
+      error: "Non sono riuscito a salvare la nota. Riprova.",
+    };
+  }
+
+  revalidatePath("/allenamento");
+  revalidatePath(`/allenamento/${sessionId}`);
+  revalidatePath("/storico");
+  return { ok: true };
+}
+
+/**
+ * Cambia il giorno a cui una seduta e' attribuita.
+ *
+ * Serve quando ti dimentichi di registrare l'altroieri: prima non c'era modo
+ * di farlo a posteriori, e una seduta vera restava fuori dallo storico.
+ *
+ * Cambia solo la **data**, non la giornata del programma: quella decide quali
+ * esercizi ci sono, e spostarla dopo aver registrato dei carichi lascerebbe
+ * le serie attaccate a esercizi di un'altra giornata. Meglio non poterlo fare
+ * che poterlo fare male.
+ */
+export async function spostaSeduta(
+  sessionId: number,
+  nuovoGiorno: string
+): Promise<ActionResult> {
+  if (!Number.isInteger(sessionId) || sessionId <= 0) {
+    return { ok: false, error: "Seduta non valida." };
+  }
+  if (!isIsoDate(nuovoGiorno)) return { ok: false, error: "Data non valida." };
+  if (nuovoGiorno > todayIso()) {
+    return { ok: false, error: "Non puoi spostare una seduta nel futuro." };
+  }
+
+  try {
+    const righe = await db
+      .update(workoutSessions)
+      .set({ day: nuovoGiorno })
+      .where(eq(workoutSessions.id, sessionId))
+      .returning({ id: workoutSessions.id });
+
+    if (righe.length === 0) return { ok: false, error: "Seduta non trovata." };
+  } catch (cause) {
+    console.error("spostaSeduta fallita", cause);
+    return { ok: false, error: "Non sono riuscito a spostarla. Riprova." };
+  }
+
+  revalidatePath("/allenamento");
+  revalidatePath(`/allenamento/${sessionId}`);
   revalidatePath("/storico");
   return { ok: true };
 }
