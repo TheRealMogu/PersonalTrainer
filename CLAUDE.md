@@ -167,6 +167,14 @@ Costate tempo una volta. Non ripaghiamole.
   (`trailingComma: "es5"` invece di `"all"`) e riformattare con quella
   toglie virgole che il resto del repo tiene. Si fissa sempre con `npx
   --yes prettier@3`.
+- **I controlli automatici (`e2e/regole.mjs`) non vedono un'etichetta
+  incollata al numero.** Misurano dimensioni, contrasto e assenza di NaN,
+  ma un `flex justify-between` troppo stretto può far scrivere
+  "Carboidrati4" invece di "Carboidrati" e "4 / 4" senza che nessun
+  controllo se ne accorga: le dimensioni restano quelle giuste, il testo
+  contiene ancora tutti i caratteri attesi. Prima di dire che un cambio di
+  layout è a posto, uno screenshot vero a 320px -- letto, non solo
+  scattato.
 
 ## Comandi
 

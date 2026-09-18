@@ -260,8 +260,17 @@ leggibile qualcosa che oggi non lo è.
       linea" invece di "+0 kcal". Nessuna parola di valore nel testo — solo
       la direzione, come chiede la regola 8. Verificato nel browser, chiaro
       e scuro.
-- [ ] **Schede a mezza larghezza affiancate** dove il contenuto è corto
-      (giorni entro il target, media giornaliera).
+- [x] **Schede a mezza larghezza affiancate** dove il contenuto è corto:
+      "Media giornaliera" e "Giorni entro il target" nello storico, ora
+      fianco a fianco in una sola sezione. La griglia dei macro dentro
+      "Media giornaliera" è passata da 2x2 a una colonna: a metà larghezza
+      scheda una griglia 2x2 stringeva ogni numero sotto la soglia leggibile.
+      Uno screenshot vero a 320px ha beccato un bug che il contrasto e i
+      bersagli non vedono: "Carboidrati4" incollato, con "/ 4" andato a capo
+      da solo — l'etichetta e il numero affiancati non ci stavano a metà
+      scheda. Corretto mettendo etichetta sopra e numero sotto invece che
+      fianco a fianco. Verificato a 320 e 390px, chiaro e scuro, con
+      screenshot reali, non solo coi controlli automatici.
 - [x] **Heatmap del mese** nello storico, tipo calendario, con quanti giorni
       sei stato in target. Quattro stati, non due: entro, oltre, non
       registrato e futuro restano distinti (regola 6 — un giorno non
