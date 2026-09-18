@@ -205,6 +205,54 @@ Prima di aprire una PR girano tutti e quattro i controlli, come in CI
 (`.github/workflows/ci.yml`). L'IPA si compila a mano da Actions →
 *Compila IPA per iPhone*.
 
+## Se una migration fallisce a metà
+
+`drizzle-kit` non genera un rollback automatico: non c'è un `db:rollback`,
+e non ce n'è uno neanche dopo questa voce -- scriverne uno finto sarebbe
+peggio di non averlo. Quello che c'è è un modo per non lasciare il database
+in uno stato che nessuno capisce più.
+
+**Primo passo, sempre: guardare cosa è successo davvero, non dedurlo.**
+
+```bash
+psql "$DATABASE_URL" -c "select * from drizzle.__drizzle_migrations order by id;"
+```
+
+Questa tabella dice quali migration Drizzle crede applicate. Il tag di ognuna
+(quale file `drizzle/NNNN_nome.sql` corrisponde) si legge in
+`drizzle/meta/_journal.json`. Se la migration che è fallita **non compare**
+in quella tabella, per la documentazione di Drizzle non ha toccato niente --
+un file di migration su Postgres gira dentro una transazione unica, quindi un
+errore su una riga annulla anche le righe già eseguite prima nello stesso
+file. Questo però è il comportamento *dichiarato* da Drizzle, non qualcosa
+misurato contro Neon da questo repo: prima di fidarsene alla cieca,
+controllare a mano che le tabelle o colonne di quella migration non esistano
+già (`\d nome_tabella` in psql) invece di assumerlo.
+
+**Se non ha toccato niente** (il caso atteso): si corregge l'SQL nel file di
+migration e si rilancia `npm run db:migrate`. Drizzle salta le migration già
+registrate e riprova solo quella fallita.
+
+**Se ha lasciato qualcosa a metà** (tabelle o colonne create ma la migration
+non risulta nella tabella di tracciamento): si finisce il lavoro a mano con
+`psql`, eseguendo l'SQL rimasto della migration originale, e **poi** si
+corregge il file per il futuro.
+
+**Una regola che non cambia in nessuno dei due casi**: se la migration
+rotta è già stata unita su `main` -- quindi il workflow *Migrazioni* può
+già averla applicata a Neon, o Vercel può già girare su un codice che la
+presuppone -- il file **non si modifica più**. Si scrive una migration
+nuova che corregge in avanti, con lo stesso principio delle migration
+additive: una colonna sbagliata si sostituisce in due passaggi, non si
+riscrive la storia. Modificare un file di migration già applicato altrove
+non lo rifarebbe girare su chi l'ha già eseguito (l'hash è già registrato),
+quindi il database che l'ha già vista resterebbe con la versione vecchia,
+diversa da quella nel file -- una divergenza silenziosa, e delle peggiori.
+
+Se invece la migration è ancora solo locale, mai pushata, si può correggere
+il file e rigenerare senza problemi: non la sta aspettando nessun altro
+database.
+
 ## Se ci sono altre skill installate
 
 In `.claude/skills/` possono esserci skill di design installate da strumenti
