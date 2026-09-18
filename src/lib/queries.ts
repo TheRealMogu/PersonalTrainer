@@ -508,6 +508,26 @@ export async function getSessionsInRange(from: string, to: string) {
     .orderBy(asc(workoutSessions.day));
 }
 
+/**
+ * Il primo giorno mai registrato, diario o allenamento, quale viene prima.
+ *
+ * Serve a numerare le settimane nel riepilogo: "settimana 3" del PT si conta
+ * da qui, non da una data scelta a caso. `null` se non c'e' ancora niente.
+ */
+export async function getPrimoGiornoRegistrato(): Promise<string | null> {
+  const [pasti] = await db
+    .select({ min: sql<string | null>`min(${meals.day})` })
+    .from(meals);
+  const [allenamenti] = await db
+    .select({ min: sql<string | null>`min(${workoutSessions.day})` })
+    .from(workoutSessions);
+
+  const candidati = [pasti?.min, allenamenti?.min].filter(
+    (giorno): giorno is string => giorno != null
+  );
+  return candidati.length > 0 ? candidati.sort()[0] : null;
+}
+
 export type ExerciseProgressPoint = {
   day: string;
   bestOneRepMax: number;

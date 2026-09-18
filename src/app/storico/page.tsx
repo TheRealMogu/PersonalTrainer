@@ -23,6 +23,7 @@ import {
   getDailyTotals,
   getExerciseProgress,
   getObiettivi,
+  getPrimoGiornoRegistrato,
   getSessionsInRange,
 } from "@/lib/queries";
 import { costruisciRiepilogo } from "@/lib/riepilogo";
@@ -60,8 +61,9 @@ export default async function StoricoPage({
   let sedute: Awaited<ReturnType<typeof getSessionsInRange>>;
   let obiettivi: Obiettivi;
   let mese: Awaited<ReturnType<typeof getDailyTotals>>;
+  let primoGiorno: Awaited<ReturnType<typeof getPrimoGiornoRegistrato>>;
   try {
-    [rows, exerciseProgress, settimana, sedute, obiettivi, mese] =
+    [rows, exerciseProgress, settimana, sedute, obiettivi, mese, primoGiorno] =
       await Promise.all([
         getDailyTotals(dates[0], today),
         getExerciseProgress(),
@@ -71,6 +73,7 @@ export default async function StoricoPage({
         // Il mese intero, che il filtro 7/30 giorni non copre: il calendario
         // deve partire dal primo anche se stai guardando gli ultimi sette.
         getDailyTotals(`${today.slice(0, 7)}-01`, today),
+        getPrimoGiornoRegistrato(),
       ]);
   } catch (error) {
     console.error("[storico] lettura dei dati fallita:", error);
@@ -84,7 +87,13 @@ export default async function StoricoPage({
 
   const days = fillMissingDays(rows, dates);
   const stats = buildHistoryStats(days, today, obiettivi.macro);
-  const riepilogo = costruisciRiepilogo(settimana, sedute, today, today);
+  const riepilogo = costruisciRiepilogo(
+    settimana,
+    sedute,
+    today,
+    today,
+    primoGiorno,
+  );
 
   return (
     <main>
