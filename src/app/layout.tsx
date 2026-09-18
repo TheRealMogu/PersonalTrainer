@@ -1,5 +1,6 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
+import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import { TabBar } from "@/components/tab-bar";
 import "./globals.css";
 
@@ -41,6 +42,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <div className="mx-auto w-full max-w-md px-5">{children}</div>
         <TabBar />
+        <ServiceWorkerRegister />
         {/*
           Conteggio delle visite di Vercel. Va acceso anche dal pannello del
           progetto (Analytics -> Enable), altrimenti lo script non raccoglie

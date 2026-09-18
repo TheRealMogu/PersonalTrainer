@@ -116,12 +116,24 @@ L'app presuppone che tutto vada bene. Non è vero.
       scritto ma prima che la risposta torni, il secondo tentativo arriva con
       lo stesso identificativo e non scrive niente. Verificato sul database:
       l'inserimento duplicato viene rifiutato.
-- [ ] **Aprirsi senza rete.** Metà fatta. Se l'app è **già aperta** e il
-      segnale cade — il caso normale in palestra, dove entri col segnale e lo
-      perdi in sala pesi — ora continua a funzionare e non perde niente. Se
-      invece la apri da chiusa senza rete, non parte affatto: per quello
-      serve un service worker che tenga in cache il guscio dell'app. È il
-      prossimo passo di questa voce.
+- [ ] **Aprirsi senza rete.** Il service worker che mancava c'è
+      (`public/sw.js`): tiene in cache solo una pagina statica ("Sei
+      offline", `/offline`), mai le pagine vere -- mostrare numeri vecchi
+      come se fossero di oggi violerebbe la regola 6. Intercetta solo le
+      navigazioni (`mode: "navigate"`), mai le Server Action: toccarle
+      rischierebbe di far sembrare riuscita una scrittura mai arrivata al
+      server, e quel caso lo gestisce già `pasti-in-attesa.ts` per conto suo.
+
+      **Non è stato possibile verificarlo davvero nel browser di questo
+      ambiente.** La sua logica interna è confermata -- con la console del
+      service worker strumentata si vede che intercetta la richiesta, la
+      rete fallisce, e recupera la pagina giusta dalla cache con stato 200
+      -- ma sia spegnendo il server vero sia con `context.setOffline(true)`
+      di Playwright, la navigazione del browser (Chromium headless in
+      sandbox) finisce comunque in `net::ERR_FAILED` invece di mostrare
+      quella risposta: un limite di questo ambiente di prova, non un difetto
+      del codice confermato, ma nemmeno una prova che manca. Resta da
+      provare su un telefono vero prima di segnarla fatta.
 
 ## 4. Qualità che non si vede ma si sente
 
