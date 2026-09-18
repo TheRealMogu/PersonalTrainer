@@ -91,8 +91,14 @@ export const config = {
    * `_vercel` e' lo script del conteggio visite: passando dal controllo
    * verrebbe rimandato al login e riceverebbe una pagina HTML al posto del
    * Javascript.
+   *
+   * `sw.js` per lo stesso motivo, ma con una conseguenza diversa se si
+   * dimentica: il browser installerebbe come service worker la pagina HTML
+   * di login invece dello script vero, e da quel momento ogni apertura
+   * dell'app passerebbe da un service worker rotto finche' qualcuno non lo
+   * disinstalla a mano dal telefono.
    */
   matcher: [
-    "/((?!_next/static|_next/image|_vercel|favicon.ico|icon.svg|apple-icon|manifest.webmanifest).*)",
+    "/((?!_next/static|_next/image|_vercel|favicon.ico|icon.svg|apple-icon|manifest.webmanifest|sw.js).*)",
   ],
 };

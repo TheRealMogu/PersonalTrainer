@@ -175,6 +175,17 @@ Costate tempo una volta. Non ripaghiamole.
   contiene ancora tutti i caratteri attesi. Prima di dire che un cambio di
   layout è a posto, uno screenshot vero a 320px -- letto, non solo
   scattato.
+- **In questo ambiente non si riesce a provare nel browser un service
+  worker che risponde a una navigazione fallita.** Sia spegnendo il server
+  vero sia con `context.setOffline(true)` di Playwright, la richiesta del
+  service worker verso la cache riesce -- si vede dalla sua console,
+  strumentata con `context.on("serviceworker", ...)` -- ma Chromium
+  headless in questa sandbox fa comunque fallire la navigazione con
+  `net::ERR_FAILED` invece di mostrare quella risposta. Non è un
+  `context.setOffline` che rompe la navigazione come nella trappola sopra
+  (quella non aveva un service worker): qui il service worker c'è, risponde
+  giusto, e la pagina non lo mostra lo stesso. Per verificare una pagina di
+  fallback offline serve un telefono vero, non questo ambiente.
 
 ## Comandi
 
