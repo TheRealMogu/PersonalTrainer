@@ -121,7 +121,17 @@ Costate tempo una volta. Non ripaghiamole.
   `DATABASE_URL` che punti a un Postgres normale. I file in `drizzle/*.sql` si
   applicano con `psql`. Contro il database vero ci pensa il workflow
   *Migrazioni*, che gira da solo a ogni push su `main`.
-- **Per provare "senza rete" si bloccano le POST, non tutta la rete.** Con
+- **Un numero formattato e' testo, e non si rilegge come numero.**
+  `Number(formatMacro(10.6, "carbs"))` e' `NaN` da quando il formattatore
+  scrive la virgola, e a schermo compariva "+NaN g" nella media dello storico.
+  Se serve il valore arrotondato c'e' `arrotondaMacro`, che e' la stessa
+  funzione senza il passaggio da stringa.
+- **Prima di misurare qualcosa nel browser, controllare che il server in
+  ascolto sia quello nuovo.** `npm start` su una porta occupata fallisce con
+  `EADDRINUSE` in mezzo al log e lascia in piedi la build precedente: si
+  misura il codice di prima e si conclude il contrario del vero. Costato due
+  volte in un giorno.
+- - **Per provare "senza rete" si bloccano le POST, non tutta la rete.** Con
   `context.setOffline(true)` fallisce anche la navigazione e il browser finisce
   su `chrome-error://chromewebdata/`, dove il codice dell'app non gira e
   `localStorage` non si legge nemmeno: si misura il browser, non l'app. Una
