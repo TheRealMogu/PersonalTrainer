@@ -225,6 +225,25 @@ for (const { larghezza, scuro } of MISURE) {
       `${dovunque}: contrasto del testo${scarsi.length ? ` — ${JSON.stringify(scarsi.slice(0, 3))}` : ""}`,
     );
 
+    // --- niente NaN, mai ---
+    const naN = await page.evaluate(() =>
+      [...document.querySelectorAll("p, span, h1, h2, h3, li, button, dd")]
+        .map((el) => el.textContent ?? "")
+        .filter((t) => /\bNaN\b|\bundefined\b|\[object Object\]/.test(t))
+        .slice(0, 3),
+    );
+    /*
+     * Sembra ovvio, e invece e' servito: il giorno in cui il formattatore ha
+     * cominciato a scrivere la virgola, un `Number("10,6")` e' diventato NaN
+     * e la media dello storico mostrava "+NaN g". Nessun altro controllo lo
+     * avrebbe visto -- "NaN" non ha punti decimali, non e' un colore e non e'
+     * un bersaglio.
+     */
+    controlla(
+      naN.length === 0,
+      `${dovunque}: niente NaN a schermo${naN.length ? ` — ${JSON.stringify(naN)}` : ""}`,
+    );
+
     // --- niente scorrimento orizzontale ---
     const trabocca = await page.evaluate(
       () => document.documentElement.scrollWidth > window.innerWidth + 1,

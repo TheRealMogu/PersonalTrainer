@@ -87,10 +87,25 @@ export function avvisoNonScomposte(kcal: number): string {
  * punto costa un carattere nell'anello e non fa guadagnare niente in
  * leggibilita'.
  */
+/**
+ * Lo stesso arrotondamento che fa `formatMacro`, ma come numero.
+ *
+ * Serve a chi deve *decidere* qualcosa sul valore arrotondato -- per esempio
+ * se lo scarto dal target e' zero e va scritto "in linea". Prima quel
+ * confronto si faceva con `Number(formatMacro(...))`, che ha smesso di
+ * funzionare il giorno in cui il formattatore ha cominciato a scrivere la
+ * virgola: `Number("10,6")` e' `NaN`, e a schermo compariva "+NaN g".
+ *
+ * La lezione, piu' che la riga: un numero formattato e' testo per le
+ * persone, e rileggerlo come numero e' sempre un giro sbagliato. Se serve il
+ * valore, si arrotonda e basta.
+ */
+export function arrotondaMacro(value: number, key: MacroKey): number {
+  return key === "kcal" ? Math.round(value) : Math.round(value * 10) / 10;
+}
+
 export function formatMacro(value: number, key: MacroKey): string {
-  const arrotondato =
-    key === "kcal" ? Math.round(value) : Math.round(value * 10) / 10;
-  return String(arrotondato).replace(".", ",");
+  return String(arrotondaMacro(value, key)).replace(".", ",");
 }
 
 export type MacroProgress = {

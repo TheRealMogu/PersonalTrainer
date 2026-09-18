@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   alreadyOver,
+  arrotondaMacro,
   avvisoNonScomposte,
   buildProgress,
   fitsInRemaining,
@@ -201,6 +202,34 @@ describe("alreadyOver", () => {
 
   it("il target esatto non e' oltre", () => {
     assert.deepEqual(alreadyOver({ ...DAILY_TARGETS }), []);
+  });
+});
+
+describe("arrotondare un macro come numero", () => {
+  it("dà lo stesso valore che formatMacro scrive", () => {
+    for (const valore of [10.64, 0.5, 1845.4, 230.55, 0]) {
+      for (const chiave of ["kcal", "carbs", "protein", "fat"] as const) {
+        assert.equal(
+          formatMacro(valore, chiave),
+          String(arrotondaMacro(valore, chiave)).replace(".", ","),
+          `${valore} come ${chiave}`,
+        );
+      }
+    }
+  });
+
+  it("restituisce un numero, non un NaN: è il bug che ha reso necessaria questa funzione", () => {
+    // `Number(formatMacro(10.6, "carbs"))` era NaN da quando il formattatore
+    // scrive la virgola, e a schermo compariva "+NaN g".
+    for (const valore of [10.6, 0.5, 105]) {
+      const arrotondato = arrotondaMacro(valore, "carbs");
+      assert.ok(Number.isFinite(arrotondato), `${valore} ha prodotto ${arrotondato}`);
+    }
+  });
+
+  it("uno scarto che si arrotonda a zero è zero, non 0,04", () => {
+    assert.equal(arrotondaMacro(0.04, "carbs"), 0);
+    assert.equal(arrotondaMacro(0.4, "kcal"), 0);
   });
 });
 

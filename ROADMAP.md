@@ -246,6 +246,13 @@ leggibile qualcosa che oggi non lo è.
       legge i numeri al posto tuo: "ti restano 1.390 kcal e 86 g di proteine —
       un petto di pollo e una colazione ci stanno". Oggi i numeri ci sono ma
       la sintesi la fai a mente. È la cosa che manca di più.
+- [x] **Niente NaN a schermo, controllato in CI.** Non era in programma:
+      `Number(formatMacro(...))` ha smesso di funzionare il giorno in cui il
+      formattatore ha cominciato a scrivere la virgola, e la media dello
+      storico mostrava "−NaN g". Nessuno degli altri controlli lo avrebbe
+      visto — "NaN" non ha punti decimali, non è un colore e non è un
+      bersaglio. Adesso `npm run e2e` cerca anche `NaN`, `undefined` e
+      `[object Object]` su ogni schermata.
 - [ ] **Etichetta qualitativa accanto ai numeri dello storico.** "−217 kcal"
       diventa "−217 kcal · sotto il target". Descrive, non giudica.
 - [ ] **Schede a mezza larghezza affiancate** dove il contenuto è corto
