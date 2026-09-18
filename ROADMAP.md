@@ -77,8 +77,16 @@ storia è la lacuna più grave dopo il punto 1.
       esce con BOM e CRLF, altrimenti Excel rompe le accentate. Provato
       scaricando davvero i tre file. Da verificare dentro l'app iOS: WKWebView
       tratta i download a modo suo.
-- [ ] **Migration di rollback.** Oggi le migration vanno solo avanti: un
-      errore su `db:migrate` si ripara a mano.
+- [x] **Migration di rollback.** Drizzle non genera rollback automatici, e
+      inventarne uno finto sarebbe peggio di non averlo. Scritta invece la
+      procedura per riparare a mano senza indovinare (`CLAUDE.md` → *Se una
+      migration fallisce a metà*): come vedere cosa Drizzle crede applicato,
+      come distinguere una migration che non ha toccato niente da una che
+      ha lasciato qualcosa a metà, e la regola che non cambia mai -- una
+      migration già unita su `main` non si modifica più, si corregge in
+      avanti. Non verificato contro Neon (rete non raggiungibile da questo
+      ambiente): il comportamento transazionale di Drizzle per singolo file
+      è quello dichiarato dalla sua documentazione, non misurato qui.
 
 ## 3. Cosa succede quando qualcosa va storto
 
