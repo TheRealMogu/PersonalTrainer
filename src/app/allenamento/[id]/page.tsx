@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/card";
+import { NotaSeduta } from "@/components/nota-seduta";
 import { DbErrorPanel } from "@/components/db-error-panel";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
@@ -20,7 +21,7 @@ export const dynamic = "force-dynamic";
 function durata(seduta: SedutaDettaglio): string | null {
   if (!seduta.endedAt) return null;
   const minuti = Math.round(
-    (seduta.endedAt.getTime() - seduta.startedAt.getTime()) / 60_000,
+    (seduta.endedAt.getTime() - seduta.startedAt.getTime()) / 60_000
   );
   if (minuti < 1) return "meno di un minuto";
   if (minuti < 60) return `${minuti} min`;
@@ -74,7 +75,13 @@ export default async function SedutaPage({
           href="/allenamento"
           className="inline-flex min-h-11 items-center gap-1.5 -ml-1 pr-2 text-[15px] text-accent tocco active:opacity-60"
         >
-          <svg width="8" height="14" viewBox="0 0 10 16" fill="none" aria-hidden="true">
+          <svg
+            width="8"
+            height="14"
+            viewBox="0 0 10 16"
+            fill="none"
+            aria-hidden="true"
+          >
             <path
               d="M8.5 1 1.5 8l7 7"
               stroke="currentColor"
@@ -94,7 +101,9 @@ export default async function SedutaPage({
         <p className="mt-1 text-[15px] capitalize text-muted">
           {formatDayLabel(seduta.day)}
           {tempo ? <span className="lowercase"> · {tempo}</span> : null}
-          {!seduta.endedAt ? <span className="lowercase"> · ancora aperta</span> : null}
+          {!seduta.endedAt ? (
+            <span className="lowercase"> · ancora aperta</span>
+          ) : null}
         </p>
       </header>
 
@@ -103,14 +112,34 @@ export default async function SedutaPage({
           {[
             { etichetta: "Volume", valore: `${formatVolume(volume)} kg` },
             { etichetta: "Serie", valore: String(tutte.length) },
-            { etichetta: "Esercizi", valore: `${fatti.length}/${seduta.esercizi.length}` },
+            {
+              etichetta: "Esercizi",
+              valore: `${fatti.length}/${seduta.esercizi.length}`,
+            },
           ].map((voce) => (
             <div key={voce.etichetta}>
-              <dd className="text-[20px] font-bold tabular-nums leading-tight">{voce.valore}</dd>
-              <dt className="mt-0.5 text-[13px] text-muted">{voce.etichetta}</dt>
+              <dd className="text-[20px] font-bold tabular-nums leading-tight">
+                {voce.valore}
+              </dd>
+              <dt className="mt-0.5 text-[13px] text-muted">
+                {voce.etichetta}
+              </dt>
             </div>
           ))}
         </dl>
+      </Card>
+
+      {/*
+        Sotto i numeri, non sopra: i numeri sono quello che vieni a vedere, la
+        nota e' quello che ti spiega perche' -- e serve solo quando i numeri
+        non tornano.
+      */}
+      <Card>
+        <NotaSeduta
+          sessionId={seduta.id}
+          nota={seduta.note}
+          giorno={seduta.day}
+        />
       </Card>
 
       {tutte.length === 0 ? (
@@ -127,19 +156,26 @@ export default async function SedutaPage({
           <Section key={esercizio.id} title={esercizio.name}>
             <Card>
               <p className="mb-3 text-[13px] tabular-nums text-muted">
-                {esercizio.serie.length}/{esercizio.sets} serie · {formatVolume(volumeEsercizio)} kg
+                {esercizio.serie.length}/{esercizio.sets} serie ·{" "}
+                {formatVolume(volumeEsercizio)} kg
                 {esercizio.precedenti.length === 0 ? " · prima volta" : null}
               </p>
               <ul className="divide-y divide-hairline">
                 {esercizio.serie.map((serie) => {
                   const confronto = confrontaSerie(serie, esercizio.precedenti);
                   return (
-                    <li key={serie.id} className="flex items-baseline gap-3 py-2 first:pt-0">
+                    <li
+                      key={serie.id}
+                      className="flex items-baseline gap-3 py-2 first:pt-0"
+                    >
                       <span className="w-5 shrink-0 text-[13px] tabular-nums text-muted">
                         {serie.setNumber}
                       </span>
                       <span className="flex-1 text-[15px] tabular-nums">
-                        <strong className="font-semibold">{formatWeight(serie.weight)}</strong> kg ×{" "}
+                        <strong className="font-semibold">
+                          {formatWeight(serie.weight)}
+                        </strong>{" "}
+                        kg ×{" "}
                         <strong className="font-semibold">{serie.reps}</strong>
                       </span>
                       {/*
@@ -181,7 +217,9 @@ export default async function SedutaPage({
                   key={esercizio.id}
                   className="flex items-baseline justify-between gap-3 py-2 first:pt-0"
                 >
-                  <span className="min-w-0 flex-1 text-[15px] text-muted">{esercizio.name}</span>
+                  <span className="min-w-0 flex-1 text-[15px] text-muted">
+                    {esercizio.name}
+                  </span>
                   <span className="shrink-0 text-[13px] tabular-nums text-muted">
                     {esercizio.sets} × {esercizio.reps}
                   </span>

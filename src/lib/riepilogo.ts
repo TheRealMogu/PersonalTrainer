@@ -12,6 +12,8 @@ export type SedutaRiepilogo = {
   focus: string;
   volume: number;
   setCount: number;
+  /** Com'e' andata, a parole. Nulla se non hai scritto niente. */
+  note?: string | null;
 };
 
 export type Riepilogo = {
@@ -233,6 +235,9 @@ export function riepilogoTesto(
         `${etichetta} ${seduta.label} — ${seduta.focus} · ${seduta.setCount} serie` +
           ` · ${formatVolume(seduta.volume)} kg`
       );
+      // La nota sotto la riga dei numeri, rientrata: chi legge vede prima
+      // cosa hai fatto e poi perche', che e' l'ordine in cui serve.
+      if (seduta.note) righe.push(`        ${seduta.note}`);
     }
     righe.push("");
     righe.push(

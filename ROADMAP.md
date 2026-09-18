@@ -188,8 +188,12 @@ Nessuna è bloccante, tutte sono state pesate col metro dei gesti.
       giornata avviata sbagliata si scarta, una seduta si toglie dallo storico
       e torna com'era, e un pasto si sposta di momento. Nessuna azione resta
       senza via d'uscita.
-- [ ] **Note sulla seduta.** "Spalla che tira" vale più di tre decimali sul
-      carico.
+- [x] **Note sulla seduta.** Fatto: una riga nel dettaglio della seduta, e
+      finisce anche nel testo che si manda al personal trainer — dove "spalla
+      che tira" gli dice più del volume. Cancellarla la riporta a *nulla* e
+      non a una riga vuota: "nota cancellata" e "nota mai scritta" sono la
+      stessa cosa, e distinguerle vorrebbe dire mostrare un campo vuoto anche
+      dove non serve.
 - [ ] **Riordinare gli esercizi** della giornata, se in palestra la macchina
       è occupata.
 - [x] **Quale giornata tocca.** Fatto: l'Allenamento apre su *Tocca a te* con
@@ -550,9 +554,15 @@ che **cancella a cascata lo storico di allenamento**.
 - [x] **Target giornalieri modificabili.** Fatto: tabella `targets` e
       schermata *Piano → Cambia gli obiettivi*. Resta aperto il `valido_da`,
       descritto in 6-septies.
-- [ ] **Seduta: cambiare data e giornata.** Se apri "Day 1" invece di "Day 2"
-      puoi solo scartare e rifare; se ti dimentichi di registrare l'altroieri,
-      non puoi registrarlo a posteriori.
+- [~] **Seduta: cambiare data.** Fatto metà: la **data** si corregge dal
+      dettaglio della seduta, quindi una seduta dimenticata si può registrare
+      a posteriori. Il campo non lascia scegliere oltre oggi.
+
+      La **giornata del programma** resta non modificabile, e di proposito:
+      decide quali esercizi ci sono, e spostarla dopo aver registrato dei
+      carichi lascerebbe le serie attaccate a esercizi di un'altra giornata.
+      Meglio non poterlo fare che poterlo fare male. Se apri la giornata
+      sbagliata resta lo *Scarta*, che era già lì.
 
 ## 6-quinquies. Cambiare scheda e obiettivi da solo, senza sporcare lo storico
 

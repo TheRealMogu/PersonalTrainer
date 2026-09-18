@@ -226,6 +226,50 @@ describe("riepilogoTesto", () => {
   });
 });
 
+describe("le note delle sedute nel testo copiabile", () => {
+  const conNota = costruisciRiepilogo(
+    [],
+    [
+      {
+        day: "2026-09-08",
+        label: "Day 1",
+        focus: "Petto",
+        volume: 2400,
+        setCount: 12,
+        note: "Spalla destra che tira sulle spinte",
+      },
+      {
+        day: "2026-09-10",
+        label: "Day 2",
+        focus: "Schiena",
+        volume: 3100,
+        setCount: 14,
+      },
+    ],
+    "2026-09-11",
+    "2026-09-11"
+  );
+
+  it("la nota finisce nel testo che si manda al personal trainer", () => {
+    assert.match(riepilogoTesto(conNota), /Spalla destra che tira/);
+  });
+
+  it("sta sotto la riga dei numeri, non al posto suo", () => {
+    const righe = riepilogoTesto(conNota).split("\n");
+    const indiceSeduta = righe.findIndex((r) => /Day 1/.test(r));
+    assert.ok(indiceSeduta >= 0);
+    assert.match(righe[indiceSeduta], /12 serie/);
+    assert.match(righe[indiceSeduta + 1], /Spalla destra/);
+  });
+
+  it("una seduta senza nota non aggiunge una riga vuota", () => {
+    const righe = riepilogoTesto(conNota).split("\n");
+    const indice = righe.findIndex((r) => /Day 2/.test(r));
+    assert.ok(indice >= 0);
+    assert.doesNotMatch(righe[indice + 1] ?? "", /^\s+\S/);
+  });
+});
+
 describe("le calorie registrate a occhio nel riepilogo", () => {
   const conAOcchio = costruisciRiepilogo(
     [
