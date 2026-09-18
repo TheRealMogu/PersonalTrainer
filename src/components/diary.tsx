@@ -38,6 +38,7 @@ import {
 import type { MacroKey, Obiettivi } from "@/lib/targets";
 import { Acqua } from "./acqua";
 import { Peso } from "./peso";
+import { CercaProdotto } from "./cerca-prodotto";
 import { ComeUltimaVolta } from "./come-ultima-volta";
 import { Integratori } from "./integratori";
 import { SoloCalorie } from "./solo-calorie";
@@ -525,6 +526,7 @@ export function Diary({
               foods={quickFoods}
               onAdd={handleAddMany}
             />
+            <CercaProdotto defaultSlot={defaultSlot} onAdd={handleAdd} />
             <SoloCalorie defaultSlot={defaultSlot} onAdd={handleAdd} />
             <ManualMealForm defaultSlot={defaultSlot} onAdd={handleAdd} />
           </div>

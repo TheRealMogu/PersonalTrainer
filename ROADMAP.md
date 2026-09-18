@@ -815,9 +815,32 @@ l'«aggiunta dinamica dei prodotti» arriva senza toccare il guscio iOS.
 
 ### I passi
 
-- [ ] **Cerca un prodotto per nome** dentro *Aggiungi*: campo, risultati con
-      marca e kcal per 100 g, si tocca e finisce nel diario. Un solo giro di
-      rete, nessuna configurazione.
+- [x] **Cerca un prodotto per nome** dentro *Aggiungi*: campo, risultati con
+      marca e kcal per 100 g, si tocca, si scelgono i grammi e finisce nel
+      diario. Fatto: `CercaProdotto`, fra *Incolla da Claude* e *Solo
+      calorie* — stesso ordine "prima la via che costa meno tocchi".
+
+      La chiamata parte dal server (`cercaProdotto` in `src/app/actions.ts`),
+      con `User-Agent` come richiesto da Open Food Facts. La risposta passa
+      da un'unica porta che valida (`normalizzaProdottiOFF` in
+      `src/lib/openfoodfacts.ts`, coperta da test): un prodotto senza
+      calorie si scarta, uno senza tutti i macro si segna *incompleto*
+      invece di far finta che siano zero (regola 6). I valori restano "per
+      100 g" finché non scegli i grammi — poi si vedono i macro calcolati e
+      si conferma, la stessa regola di "Incolla da Claude" (regola 12).
+
+      **Non è stato possibile provare una ricerca che restituisce
+      risultati veri.** Il proxy di rete di questo ambiente blocca
+      `world.openfoodfacts.org` (lo dice già questo file, qualche riga
+      sopra): ogni chiamata finisce nel ramo d'errore. Quel ramo è stato
+      provato per davvero nel browser, a 320 e 390 px, chiaro e scuro: il
+      messaggio compare in italiano, senza rosso (rgb 110,110,115, contrasto
+      5,07:1 — lo stesso grigio già validato altrove in quest'app), il testo
+      resta nel campo e si può correggere e riprovare, e sotto le tre
+      lettere la ricerca non parte nemmeno. La lettura della risposta vera
+      (forma dei campi, quanti prodotti hanno i macro compilati) resta da
+      fare con una chiamata reale, fuori da questo ambiente, prima di
+      considerarla verificata davvero.
 - [ ] **Salvalo come tasto rapido**, con la porzione che usi tu. È il punto
       in cui l'archivio smette di essere quello del seed e diventa il tuo —
       e si incastra con il punto «cibi rapidi modificabili» di 6-quater.

@@ -7,6 +7,7 @@ import { meals, supplementChecks, waterDays, weightDays } from "@/db/schema";
 import { MAX_BICCHIERI } from "@/lib/acqua";
 import { isIsoDate } from "@/lib/date";
 import { isMealSlot, type MealSlot } from "@/lib/meal-slots";
+import { normalizzaProdottiOFF, type ProdottoOFF } from "@/lib/openfoodfacts";
 import { MAX_PESO_KG, MIN_PESO_KG } from "@/lib/peso";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
@@ -375,4 +376,70 @@ export async function segnaIntegratore(
 
   revalidatePath("/");
   return { ok: true };
+}
+
+const RICERCA_TIMEOUT_MS = 6000;
+const MAX_RICERCA = 60;
+
+export type RicercaProdottiResult =
+  | { ok: true; prodotti: ProdottoOFF[] }
+  | { ok: false; error: string };
+
+/**
+ * Cerca un prodotto per nome su Open Food Facts.
+ *
+ * È la prima chiamata a un servizio esterno di questo repo (vedi
+ * ROADMAP.md, sezione 6-sexies). Parte dal server e non dal telefono: così
+ * non espone niente all'esterno, e in futuro si può mettere in cache una
+ * ricerca già fatta senza toccare il client.
+ *
+ * Quello che torna è un elenco di proposte, non una scrittura: la schermata
+ * fa scegliere il prodotto e i grammi, mostra i macro calcolati e chiede
+ * conferma prima di passarli ad `addMeal` — la stessa porta unica di
+ * `normalizzaStima` per "Incolla da Claude" (regola 12).
+ */
+export async function cercaProdotto(
+  query: string
+): Promise<RicercaProdottiResult> {
+  const pulita = query.trim().slice(0, MAX_RICERCA);
+  if (!pulita) return { ok: false, error: "Scrivi almeno una lettera." };
+
+  const url = new URL("https://world.openfoodfacts.org/cgi/search.pl");
+  url.searchParams.set("search_terms", pulita);
+  url.searchParams.set("search_simple", "1");
+  url.searchParams.set("action", "process");
+  url.searchParams.set("json", "1");
+  url.searchParams.set("page_size", "20");
+  url.searchParams.set("fields", "product_name,brands,nutriments");
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), RICERCA_TIMEOUT_MS);
+
+  try {
+    const risposta = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        // Open Food Facts lo chiede esplicitamente nella sua documentazione:
+        // dice chi sta chiamando, e costa una riga.
+        "User-Agent":
+          "PersonalTrainer/1.0 (app personale; github.com/TheRealMogu/PersonalTrainer)",
+      },
+    });
+    if (!risposta.ok) {
+      return {
+        ok: false,
+        error: "Open Food Facts non risponde. Riprova tra poco.",
+      };
+    }
+    const dati: unknown = await risposta.json();
+    return { ok: true, prodotti: normalizzaProdottiOFF(dati) };
+  } catch (cause) {
+    console.error("cercaProdotto fallita", cause);
+    return {
+      ok: false,
+      error: "Non riesco a cercare adesso: controlla la rete e riprova.",
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
