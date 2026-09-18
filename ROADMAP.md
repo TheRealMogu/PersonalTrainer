@@ -868,8 +868,30 @@ l'«aggiunta dinamica dei prodotti» arriva senza toccare il guscio iOS.
       database, non solo a schermo. Resta da confermare, quando la rete lo
       permetterà, che la vera risposta di Open Food Facts abbia davvero
       questa forma per i prodotti reali.
-- [ ] **Codice a barre digitato a mano**, per quando il nome non basta a
-      distinguere due varianti dello stesso prodotto.
+- [x] **Codice a barre digitato a mano**, per quando il nome non basta a
+      distinguere due varianti dello stesso prodotto. Fatto: dentro
+      `CercaProdotto`, un tocco su *Hai il codice a barre?* apre un campo
+      numerico al posto del nome — dietro un tocco in più apposta, perché
+      serve solo nel caso raro. Valida la lunghezza (8, 12, 13 o 14 cifre:
+      EAN-8/UPC-12/EAN-13/GTIN-14) prima di partire, così un codice a metà
+      non spreca un giro di rete. Trovato un solo prodotto (l'endpoint per
+      codice di Open Food Facts ne restituisce sempre al più uno), si salta
+      dritto al foglio dei grammi — un codice a barre identifica una cosa
+      sola, non serve un elenco. La normalizzazione della risposta riusa la
+      stessa funzione della ricerca per nome (`leggiProdotto`, in
+      `src/lib/openfoodfacts.ts`), così le due strade non possono
+      divergere su cosa vuol dire "prodotto valido".
+
+      Anche qui non è stato possibile provare contro Open Food Facts vero
+      (rete bloccata in questo ambiente), ma il percorso intero è stato
+      provato nel browser contro un secondo server locale che risponde
+      nella forma documentata dell'endpoint per codice (`status: 1` con
+      prodotto, `status: 0` senza): un codice incompleto non cerca, solo le
+      cifre entrano nel campo, un codice valido ma sconosciuto mostra
+      l'errore in italiano, uno valido e trovato salta al prodotto giusto
+      (verificato il nome a schermo), e tornando indietro si resta nella
+      stessa modalità invece di ripartire dal nome. Provato anche a 320px
+      scuro: bersagli e contrasto del link a posto.
 - [ ] **Scanner con la fotocamera**, solo dopo, e solo se serve davvero.
 
 ### Due cose da sapere prima di scriverne una riga

@@ -1,9 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { cercaProdotto, type MealInput } from "@/app/actions";
+import {
+  cercaProdotto,
+  cercaProdottoPerBarcode,
+  type MealInput,
+} from "@/app/actions";
 import { addQuickFood } from "@/app/alimenti/actions";
-import { scalaProdotto, type ProdottoOFF } from "@/lib/openfoodfacts";
+import {
+  barcodeValido,
+  scalaProdotto,
+  type ProdottoOFF,
+} from "@/lib/openfoodfacts";
 import { MEAL_SLOTS, SLOT_LABELS, type MealSlot } from "@/lib/meal-slots";
 import { formatMacro } from "@/lib/nutrition";
 
@@ -42,6 +50,8 @@ export function CercaProdotto({
   const [slot, setSlot] = useState<MealSlot>(defaultSlot);
   const [salvato, setSalvato] = useState<"no" | "fatto" | string>("no");
   const [salvataggio, startSalvataggio] = useTransition();
+  const [modalitaBarcode, setModalitaBarcode] = useState(false);
+  const [barcodeTesto, setBarcodeTesto] = useState("");
   const richiesta = useRef(0);
 
   function chiudi() {
@@ -54,6 +64,24 @@ export function CercaProdotto({
     setGrammiTesto("100");
     setSlot(defaultSlot);
     setSalvato("no");
+    setModalitaBarcode(false);
+    setBarcodeTesto("");
+  }
+
+  /**
+   * Il nome basta quasi sempre; il codice a barre serve solo quando due
+   * varianti dello stesso prodotto si somigliano troppo nel nome (ROADMAP.md,
+   * 6-sexies). Passando da una modalità all'altra si azzera lo stato
+   * dell'altra ricerca, così non resta a schermo un errore o un elenco che
+   * non c'entra più con quello che si sta cercando adesso.
+   */
+  function passaAModalita(barcode: boolean) {
+    setModalitaBarcode(barcode);
+    setQuery("");
+    setBarcodeTesto("");
+    setRisultati(null);
+    setCercando(false);
+    setErrore(null);
   }
 
   function scegli(prodotto: ProdottoOFF) {
@@ -77,7 +105,7 @@ export function CercaProdotto({
    * sparso, e l'ultima digitata deve vincere sempre.
    */
   useEffect(() => {
-    if (scelto) return;
+    if (scelto || modalitaBarcode) return;
     const testo = query.trim();
     // Sotto la soglia non c'e' niente da cercare: si lascia il testo
     // com'e', invece di azzerare stato in un effetto per un cambio di
@@ -109,7 +137,43 @@ export function CercaProdotto({
     }, DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
-  }, [query, scelto]);
+  }, [query, scelto, modalitaBarcode]);
+
+  /*
+   * Stesso debounce, ma per il codice a barre: parte solo quando le cifre
+   * scritte formano una lunghezza vera (EAN-8/12/13/14), non a ogni tasto --
+   * un codice a barre a meta' non e' un codice a barre sbagliato, e' solo
+   * non ancora finito. Trovato un solo prodotto, ci si va dritti al foglio
+   * dei grammi: un codice a barre identifica esattamente una cosa, non serve
+   * un elenco fra cui scegliere.
+   */
+  useEffect(() => {
+    if (scelto || !modalitaBarcode) return;
+    const codice = barcodeTesto.trim();
+    if (!barcodeValido(codice)) return;
+
+    const numero = ++richiesta.current;
+    const timer = setTimeout(async () => {
+      setCercando(true);
+      const esito = await cercaProdottoPerBarcode(codice).catch(
+        () =>
+          ({
+            ok: false,
+            error: "Non riesco a cercare adesso: controlla la rete e riprova.",
+          }) as const,
+      );
+      if (numero !== richiesta.current) return;
+      setCercando(false);
+      if (!esito.ok) {
+        setErrore(esito.error);
+        return;
+      }
+      setErrore(null);
+      scegli(esito.prodotto);
+    }, DEBOUNCE_MS);
+
+    return () => clearTimeout(timer);
+  }, [barcodeTesto, modalitaBarcode, scelto]);
 
   const grammi = Number(grammiTesto.replace(",", "."));
   const grammiValidi =
@@ -178,68 +242,122 @@ export function CercaProdotto({
               </p>
             </header>
 
-            <label className="block">
-              <span className="sr-only">Nome del prodotto</span>
-              <input
-                type="text"
-                inputMode="search"
-                autoFocus
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="es. yogurt greco"
-                className="min-h-12 w-full rounded-xl border border-hairline bg-raised px-3 text-[15px] outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
-              />
-            </label>
+            {!modalitaBarcode ? (
+              <>
+                <label className="block">
+                  <span className="sr-only">Nome del prodotto</span>
+                  <input
+                    type="text"
+                    inputMode="search"
+                    autoFocus
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="es. yogurt greco"
+                    className="min-h-12 w-full rounded-xl border border-hairline bg-raised px-3 text-[15px] outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
+                  />
+                </label>
 
-            {/* Riscontro entro i 100 ms richiesti dalla regola 3: appena parte la ricerca, si vede. */}
-            {testoValido && cercando ? (
-              <p className="mt-3 text-[13px] text-muted">Cerco…</p>
-            ) : null}
+                {/* Riscontro entro i 100 ms richiesti dalla regola 3: appena parte la ricerca, si vede. */}
+                {testoValido && cercando ? (
+                  <p className="mt-3 text-[13px] text-muted">Cerco…</p>
+                ) : null}
 
-            {testoValido && !cercando && errore ? (
-              <p
-                role="alert"
-                className="mt-3 text-[13px] leading-snug text-muted"
-              >
-                {errore}
-              </p>
-            ) : null}
+                {testoValido && !cercando && errore ? (
+                  <p
+                    role="alert"
+                    className="mt-3 text-[13px] leading-snug text-muted"
+                  >
+                    {errore}
+                  </p>
+                ) : null}
 
-            {testoValido &&
-            !cercando &&
-            !errore &&
-            risultati &&
-            risultati.length === 0 ? (
-              <p className="mt-3 text-[13px] leading-snug text-muted">
-                Nessun prodotto trovato per «{query.trim()}». Prova un nome più
-                semplice, o usa <em>Incolla da Claude</em> per una descrizione.
-              </p>
-            ) : null}
+                {testoValido &&
+                !cercando &&
+                !errore &&
+                risultati &&
+                risultati.length === 0 ? (
+                  <p className="mt-3 text-[13px] leading-snug text-muted">
+                    Nessun prodotto trovato per «{query.trim()}». Prova un nome
+                    più semplice, o usa <em>Incolla da Claude</em> per una
+                    descrizione.
+                  </p>
+                ) : null}
 
-            {testoValido && !cercando && risultati && risultati.length > 0 ? (
-              <ul className="mt-3 divide-y divide-hairline">
-                {risultati.map((prodotto, indice) => (
-                  <li key={`${prodotto.nome}-${indice}`}>
-                    <button
-                      type="button"
-                      onClick={() => scegli(prodotto)}
-                      className="flex min-h-12 w-full items-center gap-2 py-2 text-left tocco active:bg-raised"
-                    >
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[15px] font-medium">
-                          {prodotto.nome}
-                        </span>
-                        <span className="block text-[13px] tabular-nums text-muted">
-                          {prodotto.marca ? `${prodotto.marca} · ` : ""}
-                          {formatMacro(prodotto.kcalPer100g, "kcal")} kcal /100
-                          g{!prodotto.completo ? " · macro incompleti" : ""}
-                        </span>
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
+                {testoValido &&
+                !cercando &&
+                risultati &&
+                risultati.length > 0 ? (
+                  <ul className="mt-3 divide-y divide-hairline">
+                    {risultati.map((prodotto, indice) => (
+                      <li key={`${prodotto.nome}-${indice}`}>
+                        <button
+                          type="button"
+                          onClick={() => scegli(prodotto)}
+                          className="flex min-h-12 w-full items-center gap-2 py-2 text-left tocco active:bg-raised"
+                        >
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-[15px] font-medium">
+                              {prodotto.nome}
+                            </span>
+                            <span className="block text-[13px] tabular-nums text-muted">
+                              {prodotto.marca ? `${prodotto.marca} · ` : ""}
+                              {formatMacro(prodotto.kcalPer100g, "kcal")} kcal
+                              /100 g
+                              {!prodotto.completo ? " · macro incompleti" : ""}
+                            </span>
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </>
+            ) : (
+              <>
+                {/*
+                  Serve solo quando il nome non basta a distinguere due
+                  varianti dello stesso prodotto: per questo sta dietro un
+                  tocco in più e non affianco al campo del nome.
+                */}
+                <label className="block">
+                  <span className="sr-only">Codice a barre</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoFocus
+                    value={barcodeTesto}
+                    onChange={(event) =>
+                      setBarcodeTesto(
+                        event.target.value.replace(/\D/g, "").slice(0, 14),
+                      )
+                    }
+                    placeholder="es. 8001505005707"
+                    className="min-h-12 w-full rounded-xl border border-hairline bg-raised px-3 text-[15px] tabular-nums outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
+                  />
+                </label>
+
+                {cercando ? (
+                  <p className="mt-3 text-[13px] text-muted">Cerco…</p>
+                ) : null}
+
+                {!cercando && errore ? (
+                  <p
+                    role="alert"
+                    className="mt-3 text-[13px] leading-snug text-muted"
+                  >
+                    {errore}
+                  </p>
+                ) : null}
+              </>
+            )}
+
+            <button
+              type="button"
+              onClick={() => passaAModalita(!modalitaBarcode)}
+              className="mt-3 min-h-11 text-[13px] font-medium text-accent tocco"
+            >
+              {modalitaBarcode ? "Cerca per nome" : "Hai il codice a barre?"}
+            </button>
 
             <div className="sticky bottom-0 -mx-5 mt-4 bg-surface px-5 pt-3">
               <button
