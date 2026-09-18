@@ -132,6 +132,23 @@ export const waterDays = pgTable("water_days", {
     .defaultNow(),
 });
 
+/**
+ * La nota sulla dieta della settimana: fame, sgarri, quello che i numeri di
+ * kcal e macro non dicono da soli.
+ *
+ * Una riga per settimana (il lunedi' come chiave), non per giorno: e' la
+ * stessa domanda che fa il PT una volta sola alla domenica, non su ogni
+ * pasto. Nessuna riga finche' non scrivi niente -- una nota vuota e una mai
+ * scritta sono la stessa cosa, come per `workout_sessions.note`.
+ */
+export const weekNotes = pgTable("week_notes", {
+  weekStart: date("week_start").primaryKey(),
+  note: text("note").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 /** Giornate del programma di allenamento (es. "Day 1 — Push"). */
 export const workoutDays = pgTable("workout_days", {
   id: serial("id").primaryKey(),

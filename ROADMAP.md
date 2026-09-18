@@ -193,11 +193,16 @@ Nessuna è bloccante, tutte sono state pesate col metro dei gesti.
       registrare, invece di dire "settimana 1" a un diario vuoto (regola 6).
       Verificato: confrontato il numero a schermo con il calcolo a mano sul
       database vero, a 320 e 390px, chiaro e scuro.
-- [ ] **Nota sulla dieta nel riepilogo della settimana**, tipo "fame
-      giovedì, sgarro sabato sera" — oggi il riepilogo misura kcal e macro
-      ma non ha un posto per una riga soggettiva così, che il PT chiede ogni
-      domenica insieme al numero della settimana e al feedback
-      sull'allenamento (quest'ultimo già coperto dalla nota per seduta).
+- [x] **Nota sulla dieta nel riepilogo della settimana**, tipo "fame
+      giovedì, sgarro sabato sera". Fatto: una riga sola per settimana
+      (tabella `week_notes`, migrazione additiva), non su ogni pasto — la
+      stessa domanda che fa il PT una volta alla domenica. Nessuna riga nel
+      database finché non scrivi niente, e cancellarla del tutto la
+      cancella davvero (non una riga vuota lasciata lì). Finisce anche nel
+      testo copiato per il PT, sotto un'etichetta DIETA. Verificato: salvata,
+      sopravvissuta a un reload vero della pagina, cancellata di nuovo, e
+      controllato che la riga sparisse anche dal database — non solo dallo
+      schermo.
 - [x] **Aggiungere un cibo ai tasti rapidi dall'app**, senza passare dal
       file di seed e da un comando. Fatto: *Piano → I tuoi alimenti*, e ogni
       pasto si salva fra i rapidi con un tocco.

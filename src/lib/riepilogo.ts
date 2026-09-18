@@ -5,6 +5,12 @@ import { buildDateRange, isLogged, type DailyTotals } from "./history";
 import type { MacroTotals } from "./nutrition";
 import { DAILY_TARGETS, MACRO_ORDER, type MacroKey } from "./targets";
 
+/**
+ * Quanto puo' essere lunga la nota sulla dieta della settimana. Largo:
+ * "fame giovedi', sgarro sabato sera" e' un appunto, non un tema.
+ */
+export const MAX_NOTA_DIETA = 500;
+
 /** Una seduta conclusa, come serve al riepilogo. */
 export type SedutaRiepilogo = {
   day: string;
@@ -48,6 +54,11 @@ export type Riepilogo = {
    * numeri inventati su un dato che non c'e' (regola 6).
    */
   numeroSettimana: number | null;
+  /**
+   * Fame, sgarri: quello che kcal e macro non dicono da soli. Nulla finche'
+   * non scrivi niente -- la stessa regola della nota di seduta.
+   */
+  notaDieta: string | null;
 };
 
 const NOMI_GIORNI = ["lun", "mar", "mer", "gio", "ven", "sab", "dom"] as const;
@@ -108,14 +119,16 @@ export function numeroSettimana(
  *
  * `primoGiorno` e' il primo giorno mai registrato (diario o allenamento),
  * per calcolare la settimana numerata che chiede il PT; `null` se non ancora
- * calcolato, e il numero semplicemente non compare.
+ * calcolato, e il numero semplicemente non compare. `notaDieta` e' la nota
+ * gia' salvata per questa settimana, o `null` se non ce n'e' una.
  */
 export function costruisciRiepilogo(
   totali: DailyTotals[],
   sedute: SedutaRiepilogo[],
   data: string,
   oggi: string,
-  primoGiorno: string | null = null
+  primoGiorno: string | null = null,
+  notaDieta: string | null = null
 ): Riepilogo {
   const lunedi = lunediDellaSettimana(data);
   const domenica = shiftIsoDate(lunedi, 6);
@@ -169,6 +182,7 @@ export function costruisciRiepilogo(
       lunedi,
       primoGiorno ? lunediDellaSettimana(primoGiorno) : null
     ),
+    notaDieta,
   };
 }
 
@@ -260,6 +274,12 @@ export function riepilogoTesto(
       `Di queste, ${formatMacro(r.kcalNonScomposte, "kcal")} kcal sono state` +
         ` registrate a occhio, senza macro: i grammi qui sopra non le contano.`
     );
+  }
+
+  if (r.notaDieta) {
+    righe.push("");
+    righe.push("DIETA");
+    righe.push(r.notaDieta);
   }
 
   righe.push("");

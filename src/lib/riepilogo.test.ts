@@ -371,3 +371,27 @@ describe("il numero della settimana", () => {
     );
   });
 });
+
+describe("la nota sulla dieta", () => {
+  it("è null quando non c'è una nota salvata", () => {
+    const r = costruisciRiepilogo([], [], "2026-09-07", "2026-09-07");
+    assert.equal(r.notaDieta, null);
+    assert.doesNotMatch(riepilogoTesto(r), /DIETA/);
+  });
+
+  it("finisce nel testo copiato, sotto la sua etichetta", () => {
+    const r = costruisciRiepilogo(
+      [],
+      [],
+      "2026-09-07",
+      "2026-09-07",
+      null,
+      "fame giovedì, sgarro sabato sera"
+    );
+    assert.equal(r.notaDieta, "fame giovedì, sgarro sabato sera");
+    assert.match(
+      riepilogoTesto(r),
+      /DIETA\nfame giovedì, sgarro sabato sera/
+    );
+  });
+});
