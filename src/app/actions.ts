@@ -7,7 +7,12 @@ import { meals, supplementChecks, waterDays, weightDays } from "@/db/schema";
 import { MAX_BICCHIERI } from "@/lib/acqua";
 import { isIsoDate } from "@/lib/date";
 import { isMealSlot, type MealSlot } from "@/lib/meal-slots";
-import { normalizzaProdottiOFF, type ProdottoOFF } from "@/lib/openfoodfacts";
+import {
+  barcodeValido,
+  normalizzaProdottiOFF,
+  normalizzaProdottoDaBarcode,
+  type ProdottoOFF,
+} from "@/lib/openfoodfacts";
 import { MAX_PESO_KG, MIN_PESO_KG } from "@/lib/peso";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
@@ -381,6 +386,10 @@ export async function segnaIntegratore(
 const RICERCA_TIMEOUT_MS = 6000;
 const MAX_RICERCA = 60;
 
+/** Open Food Facts lo chiede esplicitamente nella sua documentazione: dice chi sta chiamando. */
+const OFF_USER_AGENT =
+  "PersonalTrainer/1.0 (app personale; github.com/TheRealMogu/PersonalTrainer)";
+
 export type RicercaProdottiResult =
   | { ok: true; prodotti: ProdottoOFF[] }
   | { ok: false; error: string };
@@ -418,12 +427,7 @@ export async function cercaProdotto(
   try {
     const risposta = await fetch(url, {
       signal: controller.signal,
-      headers: {
-        // Open Food Facts lo chiede esplicitamente nella sua documentazione:
-        // dice chi sta chiamando, e costa una riga.
-        "User-Agent":
-          "PersonalTrainer/1.0 (app personale; github.com/TheRealMogu/PersonalTrainer)",
-      },
+      headers: { "User-Agent": OFF_USER_AGENT },
     });
     if (!risposta.ok) {
       return {
@@ -435,6 +439,73 @@ export async function cercaProdotto(
     return { ok: true, prodotti: normalizzaProdottiOFF(dati) };
   } catch (cause) {
     console.error("cercaProdotto fallita", cause);
+    return {
+      ok: false,
+      error: "Non riesco a cercare adesso: controlla la rete e riprova.",
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+export type CercaBarcodeResult =
+  | { ok: true; prodotto: ProdottoOFF }
+  | { ok: false; error: string };
+
+/**
+ * Cerca un prodotto per codice a barre su Open Food Facts.
+ *
+ * Serve per quando il nome non basta a distinguere due varianti dello
+ * stesso prodotto (ROADMAP.md, sezione 6-sexies). Il codice si valida prima
+ * di partire — otto, dodici, tredici o quattordici cifre — perché un
+ * errore di battitura si vede subito, senza sprecare un giro di rete.
+ *
+ * Open Food Facts risponde sempre con 200 anche quando il codice non
+ * corrisponde a niente (`status: 0`): non è un guasto, è un fatto legittimo,
+ * quindi qui diventa lo stesso canale d'errore in italiano degli altri casi,
+ * non un'eccezione.
+ */
+export async function cercaProdottoPerBarcode(
+  barcode: string
+): Promise<CercaBarcodeResult> {
+  const pulito = barcode.trim();
+  if (!barcodeValido(pulito)) {
+    return {
+      ok: false,
+      error: "Il codice a barre deve avere 8, 12, 13 o 14 cifre.",
+    };
+  }
+
+  const url = new URL(
+    `https://world.openfoodfacts.org/api/v2/product/${pulito}.json`
+  );
+  url.searchParams.set("fields", "product_name,brands,nutriments,status");
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), RICERCA_TIMEOUT_MS);
+
+  try {
+    const risposta = await fetch(url, {
+      signal: controller.signal,
+      headers: { "User-Agent": OFF_USER_AGENT },
+    });
+    if (!risposta.ok) {
+      return {
+        ok: false,
+        error: "Open Food Facts non risponde. Riprova tra poco.",
+      };
+    }
+    const dati: unknown = await risposta.json();
+    const prodotto = normalizzaProdottoDaBarcode(dati);
+    if (!prodotto) {
+      return {
+        ok: false,
+        error: "Nessun prodotto trovato per questo codice a barre.",
+      };
+    }
+    return { ok: true, prodotto };
+  } catch (cause) {
+    console.error("cercaProdottoPerBarcode fallita", cause);
     return {
       ok: false,
       error: "Non riesco a cercare adesso: controlla la rete e riprova.",

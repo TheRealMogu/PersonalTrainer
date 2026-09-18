@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { normalizzaProdottiOFF, scalaProdotto } from "./openfoodfacts";
+import {
+  barcodeValido,
+  normalizzaProdottiOFF,
+  normalizzaProdottoDaBarcode,
+  scalaProdotto,
+} from "./openfoodfacts";
 
 function prodottoGrezzo(patch: Record<string, unknown> = {}) {
   return {
@@ -197,5 +202,80 @@ describe("scalaProdotto", () => {
       protein: 0,
       fat: 0,
     });
+  });
+});
+
+describe("normalizzaProdottoDaBarcode", () => {
+  it("converte una risposta trovata", () => {
+    const prodotto = normalizzaProdottoDaBarcode({
+      status: 1,
+      product: prodottoGrezzo(),
+    });
+    assert.deepEqual(prodotto, {
+      nome: "Pane integrale",
+      marca: "Mulino Bianco",
+      kcalPer100g: 250,
+      carbsPer100g: 45,
+      proteinPer100g: 9,
+      fatPer100g: 2,
+      completo: true,
+    });
+  });
+
+  it("restituisce null quando il codice non corrisponde a niente (status 0)", () => {
+    assert.equal(normalizzaProdottoDaBarcode({ status: 0, product: {} }), null);
+  });
+
+  it("non si fida di uno status diverso da 1, qualunque sia il prodotto", () => {
+    assert.equal(
+      normalizzaProdottoDaBarcode({
+        status: "1",
+        product: prodottoGrezzo(),
+      }),
+      null,
+    );
+  });
+
+  it("scarta un prodotto trovato ma senza calorie, come per la ricerca per nome", () => {
+    const prodotto = normalizzaProdottoDaBarcode({
+      status: 1,
+      product: prodottoGrezzo({ nutriments: { carbohydrates_100g: 45 } }),
+    });
+    assert.equal(prodotto, null);
+  });
+
+  it("regge una risposta che non è quella attesa", () => {
+    for (const raw of [null, undefined, 42, "ciao", [], {}]) {
+      assert.equal(normalizzaProdottoDaBarcode(raw), null);
+    }
+  });
+});
+
+describe("barcodeValido", () => {
+  it("accetta le lunghezze vere: EAN-8, UPC-12, EAN-13, GTIN-14", () => {
+    for (const codice of [
+      "12345678",
+      "123456789012",
+      "1234567890123",
+      "12345678901234",
+    ]) {
+      assert.equal(barcodeValido(codice), true, codice);
+    }
+  });
+
+  it("scarta lunghezze che non corrispondono a nessun formato vero", () => {
+    for (const codice of ["1234567", "123456789", "1234567890", "", "1"]) {
+      assert.equal(barcodeValido(codice), false, codice);
+    }
+  });
+
+  it("scarta tutto quello che non è solo cifre", () => {
+    for (const codice of ["1234567a", "12 345678", "12345678.0", "abcdefgh"]) {
+      assert.equal(barcodeValido(codice), false, codice);
+    }
+  });
+
+  it("ignora gli spazi ai bordi, come chi lo digita a mano potrebbe lasciare", () => {
+    assert.equal(barcodeValido("  12345678  "), true);
   });
 });
