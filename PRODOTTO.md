@@ -169,7 +169,9 @@ e va difesa a ogni aggiunta.
   carico e ripetizioni, timer di recupero, volume sollevato, e il carico
   dell'ultima volta già proposto nei campi.
 - **Storico** — media giornaliera e andamento su 7 o 30 giorni, con i giorni
-  entro il target. Stessi colori del diario. In cima, **il mese a
+  entro il target. Stessi colori del diario. Lo scarto dalla media dichiara
+  la direzione in chiaro ("−217 kcal · sotto il target"), non solo il
+  numero: descrive, non giudica. In cima, **il mese a
   colpo d'occhio**: un calendario con quattro stati per casella (entro,
   oltre, non registrato, futuro) — così un giorno saltato non si confonde
   mai con uno andato male. In fondo la **progressione in palestra**:

@@ -1,4 +1,4 @@
-import { arrotondaMacro, formatMacro } from "@/lib/nutrition";
+import { etichettaScarto, formatMacro } from "@/lib/nutrition";
 import { DAILY_TARGETS, MACRO_LABELS, MACRO_UNITS, type MacroKey } from "@/lib/targets";
 
 const MACRO_COLOR: Record<MacroKey, string> = {
@@ -24,7 +24,6 @@ export function MacroStatTile({
 }) {
   const delta = average - target;
   const isOver = delta > 0;
-  const rounded = arrotondaMacro(Math.abs(delta), macro);
 
   return (
     <div className="rounded-xl border border-hairline px-3 py-2.5">
@@ -41,9 +40,7 @@ export function MacroStatTile({
         <span className="ml-1 text-[13px] font-normal text-muted">{MACRO_UNITS[macro]}</span>
       </p>
       <p className={`mt-0.5 text-[13px] ${isOver ? "text-over" : "text-muted"}`}>
-        {rounded === 0
-          ? "in linea"
-          : `${isOver ? "+" : "−"}${rounded} ${MACRO_UNITS[macro]}`}
+        {etichettaScarto(delta, macro)}
       </p>
     </div>
   );
