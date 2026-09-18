@@ -186,6 +186,17 @@ Costate tempo una volta. Non ripaghiamole.
   (quella non aveva un service worker): qui il service worker c'è, risponde
   giusto, e la pagina non lo mostra lo stesso. Per verificare una pagina di
   fallback offline serve un telefono vero, non questo ambiente.
+- **`page.getByRole("alert")` in Playwright trova anche un elemento di
+  Next.js, non solo i nostri.** Next inserisce da solo un
+  `#__next-route-announcer__` con `role="alert"`, sempre presente e sempre
+  "visibile" secondo Playwright (ha un riquadro di 1×1 px, non
+  `display:none`) anche se è pensato solo per chi usa uno screen reader.
+  Un controllo scritto come `page.getByRole("alert")` lo trova per primo, con
+  `innerText` vuoto, e sembra che il messaggio d'errore dell'app non sia mai
+  comparso -- mentre nel frattempo l'app lo ha scritto giusto. Si scarta
+  cercando dentro il foglio con un locator più stretto, per esempio
+  `page.locator('[role="dialog"] [role="alert"]')`. Costato un giro di prove
+  false verificando la ricerca di un prodotto su Open Food Facts.
 
 ## Comandi
 

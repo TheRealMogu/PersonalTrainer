@@ -106,6 +106,7 @@ proprio le schermate che vanno riviste.
 | Rileggere i carichi di un esercizio che non faccio più | 1 gesto | 1 (è ancora nello storico) | ok |
 | Annotare com'è andata una seduta | 3 gesti | 3 (seduta → *Nota* → scrivi → salva) | ok |
 | Registrare una seduta dimenticata | 2 gesti | 2 (seduta → campo data) | ok |
+| Trovare un prodotto che non ho in archivio | 3 gesti | 3 (*Cerca un prodotto* → tocca il risultato → *Aggiungi*) | ok |
 
 Le righe **sopra il tetto** sono misurate su una giornata vera (10 pasti
 registrati, schermo da 390 px). Le prime due righe dell'aggiunta sono
