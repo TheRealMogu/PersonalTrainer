@@ -9,6 +9,7 @@ import {
 import { MacroStatTile } from "@/components/macro-stat-tile";
 import { PageHeader } from "@/components/page-header";
 import { HeatmapMese } from "@/components/heatmap-mese";
+import { PesoHistoryChart } from "@/components/peso-history-chart";
 import { costruisciMese } from "@/lib/mese";
 import { RangeFilter } from "@/components/range-filter";
 import { RiepilogoSettimana } from "@/components/riepilogo-settimana";
@@ -24,6 +25,7 @@ import {
   getExerciseProgress,
   getNotaDieta,
   getObiettivi,
+  getPesiInRange,
   getPrimoGiornoRegistrato,
   getSessionsInRange,
 } from "@/lib/queries";
@@ -64,6 +66,8 @@ export default async function StoricoPage({
   let mese: Awaited<ReturnType<typeof getDailyTotals>>;
   let primoGiorno: Awaited<ReturnType<typeof getPrimoGiornoRegistrato>>;
   let notaDieta: Awaited<ReturnType<typeof getNotaDieta>>;
+  let pesiFiltro: Awaited<ReturnType<typeof getPesiInRange>>;
+  let pesiSettimane: Awaited<ReturnType<typeof getPesiInRange>>;
   try {
     [
       rows,
@@ -74,6 +78,8 @@ export default async function StoricoPage({
       mese,
       primoGiorno,
       notaDieta,
+      pesiFiltro,
+      pesiSettimane,
     ] = await Promise.all([
       getDailyTotals(dates[0], today),
       getExerciseProgress(),
@@ -85,6 +91,11 @@ export default async function StoricoPage({
       getDailyTotals(`${today.slice(0, 7)}-01`, today),
       getPrimoGiornoRegistrato(),
       getNotaDieta(lunedi),
+      // Il peso segue il filtro 7/30 giorni, come i grafici dei macro.
+      getPesiInRange(dates[0], today),
+      // Il confronto del riepilogo no: gli servono sempre questa settimana e
+      // quella precedente, anche quando sopra si guardano gli ultimi 7 giorni.
+      getPesiInRange(shiftIsoDate(lunedi, -7), domenica),
     ]);
   } catch (error) {
     console.error("[storico] lettura dei dati fallita:", error);
@@ -105,6 +116,7 @@ export default async function StoricoPage({
     today,
     primoGiorno,
     notaDieta,
+    pesiSettimane,
   );
 
   return (
@@ -260,6 +272,15 @@ export default async function StoricoPage({
           {/* Stessa sezione: la tabella è lo stesso dato del grafico, letto come numeri. */}
           <Card>
             <MacroHistoryTable days={days} />
+          </Card>
+        </Section>
+      ) : null}
+
+      {/* Niente da mostrare senza almeno una misura: un grafico vuoto non direbbe niente. */}
+      {pesiFiltro.length > 0 ? (
+        <Section title="Peso">
+          <Card>
+            <PesoHistoryChart pesi={pesiFiltro} />
           </Card>
         </Section>
       ) : null}

@@ -133,6 +133,22 @@ export const waterDays = pgTable("water_days", {
 });
 
 /**
+ * Il peso corporeo, un numero al giorno.
+ *
+ * Una riga per giorno come `water_days`: l'andamento nel tempo e' quello che
+ * serve, non le oscillazioni nella stessa giornata. Nessuna riga finche' non
+ * ti pesi -- un giorno senza peso segnato resta un buco nel grafico, non uno
+ * zero (regola 6).
+ */
+export const weightDays = pgTable("weight_days", {
+  day: date("day").primaryKey(),
+  weightKg: real("weight_kg").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/**
  * La nota sulla dieta della settimana: fame, sgarri, quello che i numeri di
  * kcal e macro non dicono da soli.
  *

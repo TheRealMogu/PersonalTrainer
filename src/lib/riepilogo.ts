@@ -3,6 +3,7 @@ import { formatVolume } from "./workout";
 import { lunediDellaSettimana, shiftIsoDate } from "./date";
 import { buildDateRange, isLogged, type DailyTotals } from "./history";
 import type { MacroTotals } from "./nutrition";
+import { formatPeso, ultimoPeso, type PesoGiorno } from "./peso";
 import { DAILY_TARGETS, MACRO_ORDER, type MacroKey } from "./targets";
 
 /**
@@ -59,6 +60,14 @@ export type Riepilogo = {
    * non scrivi niente -- la stessa regola della nota di seduta.
    */
   notaDieta: string | null;
+  /**
+   * L'ultimo peso registrato in questa settimana e in quella precedente --
+   * "peso della settimana scorsa e di questa" e' cosi' che lo chiede il PT.
+   * Null quando non c'e' una misura in quell'intervallo: un peso non
+   * registrato non e' un peso a zero (regola 6).
+   */
+  pesoSettimana: number | null;
+  pesoSettimanaScorsa: number | null;
 };
 
 const NOMI_GIORNI = ["lun", "mar", "mer", "gio", "ven", "sab", "dom"] as const;
@@ -120,7 +129,9 @@ export function numeroSettimana(
  * `primoGiorno` e' il primo giorno mai registrato (diario o allenamento),
  * per calcolare la settimana numerata che chiede il PT; `null` se non ancora
  * calcolato, e il numero semplicemente non compare. `notaDieta` e' la nota
- * gia' salvata per questa settimana, o `null` se non ce n'e' una.
+ * gia' salvata per questa settimana, o `null` se non ce n'e' una. `pesi` sono
+ * le righe di peso corporeo che coprono almeno questa settimana e la
+ * precedente -- da qui si prende l'ultima di ciascuna.
  */
 export function costruisciRiepilogo(
   totali: DailyTotals[],
@@ -128,7 +139,8 @@ export function costruisciRiepilogo(
   data: string,
   oggi: string,
   primoGiorno: string | null = null,
-  notaDieta: string | null = null
+  notaDieta: string | null = null,
+  pesi: PesoGiorno[] = []
 ): Riepilogo {
   const lunedi = lunediDellaSettimana(data);
   const domenica = shiftIsoDate(lunedi, 6);
@@ -183,6 +195,12 @@ export function costruisciRiepilogo(
       primoGiorno ? lunediDellaSettimana(primoGiorno) : null
     ),
     notaDieta,
+    pesoSettimana: ultimoPeso(pesi, lunedi, domenica),
+    pesoSettimanaScorsa: ultimoPeso(
+      pesi,
+      shiftIsoDate(lunedi, -7),
+      shiftIsoDate(domenica, -7)
+    ),
   };
 }
 
@@ -194,6 +212,29 @@ export function costruisciRiepilogo(
  * sempre su quanti giorni e' fatta la media e quali mancano -- un numero
  * senza il suo denominatore e' un numero che si puo' leggere come si vuole.
  */
+/**
+ * La riga del peso nel testo copiato, o null se non c'e' niente da dire.
+ *
+ * "Peso della settimana scorsa e di questa" e' letterale: il PT confronta
+ * le due misure, quindi quando ci sono entrambe compaiono insieme.
+ */
+function rigaPeso(r: Riepilogo): string | null {
+  if (r.pesoSettimana !== null && r.pesoSettimanaScorsa !== null) {
+    return `Peso: ${formatPeso(r.pesoSettimana)} kg (${formatPeso(
+      r.pesoSettimanaScorsa
+    )} kg la settimana scorsa)`;
+  }
+  if (r.pesoSettimana !== null) {
+    return `Peso: ${formatPeso(r.pesoSettimana)} kg`;
+  }
+  if (r.pesoSettimanaScorsa !== null) {
+    return `Peso la settimana scorsa: ${formatPeso(
+      r.pesoSettimanaScorsa
+    )} kg (questa settimana non ancora registrato)`;
+  }
+  return null;
+}
+
 export function riepilogoTesto(
   r: Riepilogo,
   targets: Record<MacroKey, number> = DAILY_TARGETS
@@ -206,6 +247,8 @@ export function riepilogoTesto(
     `${etichettaSettimana}${giornoMese(r.lunedi)} – ${giornoMese(r.domenica)}`
   );
   if (r.inCorso) righe.push("(settimana ancora in corso)");
+  const peso = rigaPeso(r);
+  if (peso) righe.push(peso);
   righe.push("");
 
   righe.push("ALIMENTAZIONE");

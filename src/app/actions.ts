@@ -3,10 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { meals, supplementChecks, waterDays } from "@/db/schema";
+import { meals, supplementChecks, waterDays, weightDays } from "@/db/schema";
 import { MAX_BICCHIERI } from "@/lib/acqua";
 import { isIsoDate } from "@/lib/date";
 import { isMealSlot, type MealSlot } from "@/lib/meal-slots";
+import { MAX_PESO_KG, MIN_PESO_KG } from "@/lib/peso";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -275,6 +276,56 @@ export async function setWater(
   }
 
   revalidatePath("/");
+  return { ok: true };
+}
+
+/**
+ * Scrive (o cancella) il peso di un giorno.
+ *
+ * `kg` nullo cancella la riga: e' cosi' che si corregge chi si pesa e poi
+ * ripensa il numero, senza lasciare una riga a zero che il grafico
+ * leggerebbe come un peso vero (regola 6).
+ */
+export async function setPeso(
+  day: string,
+  kg: number | null
+): Promise<ActionResult> {
+  if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };
+
+  if (kg === null) {
+    try {
+      await db.delete(weightDays).where(eq(weightDays.day, day));
+    } catch (cause) {
+      console.error("setPeso (cancellazione) fallita", cause);
+      return { ok: false, error: "Non sono riuscito a cancellarlo. Riprova." };
+    }
+    revalidatePath("/");
+    revalidatePath("/storico");
+    return { ok: true };
+  }
+
+  if (!Number.isFinite(kg) || kg < MIN_PESO_KG || kg > MAX_PESO_KG) {
+    return {
+      ok: false,
+      error: `Il peso deve stare fra ${MIN_PESO_KG} e ${MAX_PESO_KG} kg.`,
+    };
+  }
+
+  try {
+    await db
+      .insert(weightDays)
+      .values({ day, weightKg: kg, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: weightDays.day,
+        set: { weightKg: kg, updatedAt: new Date() },
+      });
+  } catch (cause) {
+    console.error("setPeso fallita", cause);
+    return { ok: false, error: "Non sono riuscito a segnarlo. Riprova." };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/storico");
   return { ok: true };
 }
 
