@@ -2,14 +2,23 @@ import Link from "next/link";
 import { Card } from "@/components/card";
 import { DbErrorPanel } from "@/components/db-error-panel";
 import { ExerciseProgressChart } from "@/components/exercise-progress-chart";
-import { MacroHistoryChart, MacroHistoryTable } from "@/components/macro-history-chart";
+import {
+  MacroHistoryChart,
+  MacroHistoryTable,
+} from "@/components/macro-history-chart";
 import { MacroStatTile } from "@/components/macro-stat-tile";
 import { PageHeader } from "@/components/page-header";
+import { HeatmapMese } from "@/components/heatmap-mese";
+import { costruisciMese } from "@/lib/mese";
 import { RangeFilter } from "@/components/range-filter";
 import { RiepilogoSettimana } from "@/components/riepilogo-settimana";
 import { Section } from "@/components/section";
 import { lunediDellaSettimana, shiftIsoDate, todayIso } from "@/lib/date";
-import { buildDateRange, buildHistoryStats, fillMissingDays } from "@/lib/history";
+import {
+  buildDateRange,
+  buildHistoryStats,
+  fillMissingDays,
+} from "@/lib/history";
 import {
   getDailyTotals,
   getExerciseProgress,
@@ -50,14 +59,19 @@ export default async function StoricoPage({
   let settimana: Awaited<ReturnType<typeof getDailyTotals>>;
   let sedute: Awaited<ReturnType<typeof getSessionsInRange>>;
   let obiettivi: Obiettivi;
+  let mese: Awaited<ReturnType<typeof getDailyTotals>>;
   try {
-    [rows, exerciseProgress, settimana, sedute, obiettivi] = await Promise.all([
-      getDailyTotals(dates[0], today),
-      getExerciseProgress(),
-      getDailyTotals(lunedi, domenica),
-      getSessionsInRange(lunedi, domenica),
-      getObiettivi(),
-    ]);
+    [rows, exerciseProgress, settimana, sedute, obiettivi, mese] =
+      await Promise.all([
+        getDailyTotals(dates[0], today),
+        getExerciseProgress(),
+        getDailyTotals(lunedi, domenica),
+        getSessionsInRange(lunedi, domenica),
+        getObiettivi(),
+        // Il mese intero, che il filtro 7/30 giorni non copre: il calendario
+        // deve partire dal primo anche se stai guardando gli ultimi sette.
+        getDailyTotals(`${today.slice(0, 7)}-01`, today),
+      ]);
   } catch (error) {
     console.error("[storico] lettura dei dati fallita:", error);
     return (
@@ -94,8 +108,8 @@ export default async function StoricoPage({
           <div className="py-2 text-center">
             <p className="text-[15px] font-medium">Ancora niente da mostrare</p>
             <p className="mt-1 text-[13px] leading-snug text-muted">
-              Lo storico si riempie da solo man mano che registri i pasti. Bastano
-              due giorni perché le medie comincino a dire qualcosa.
+              Lo storico si riempie da solo man mano che registri i pasti.
+              Bastano due giorni perché le medie comincino a dire qualcosa.
             </p>
             <Link
               href="/"
@@ -152,7 +166,10 @@ export default async function StoricoPage({
                     <dt className="text-[15px]">{MACRO_LABELS[macro]}</dt>
                     <dd className="text-[15px] font-semibold tabular-nums">
                       {stats.daysWithinTarget[macro]}
-                      <span className="font-normal text-muted"> / {stats.loggedDays}</span>
+                      <span className="font-normal text-muted">
+                        {" "}
+                        / {stats.loggedDays}
+                      </span>
                     </dd>
                   </div>
                 ))}
@@ -161,6 +178,30 @@ export default async function StoricoPage({
           </Section>
         </>
       ) : null}
+
+      {/*
+        Il mese prima dell'andamento: risponde a "come sta andando questo
+        mese", che è la domanda che si fa guardando indietro. Le colonne
+        dell'andamento rispondono a "quale giorno", che viene dopo.
+
+        Si mostra anche a mese vuoto, a differenza dei grafici: lì una griglia
+        senza barre non direbbe niente, qui il calendario dice "nessun giorno
+        registrato in questo mese", che è un'informazione.
+      */}
+      <Section title="Il mese">
+        <Card>
+          <HeatmapMese
+            griglia={costruisciMese(
+              mese,
+              today,
+              today,
+              "kcal",
+              obiettivi.macro.kcal,
+            )}
+            macro="kcal"
+          />
+        </Card>
+      </Section>
 
       {/* Con niente registrato il grafico sarebbe una griglia vuota: non si mostra. */}
       {stats.loggedDays > 0 || stats.todayLogged ? (
@@ -195,12 +236,16 @@ export default async function StoricoPage({
           <Card>
             <div className="flex flex-col gap-8">
               {exerciseProgress.map((progress) => (
-                <ExerciseProgressChart key={progress.exerciseId} progress={progress} />
+                <ExerciseProgressChart
+                  key={progress.exerciseId}
+                  progress={progress}
+                />
               ))}
             </div>
             <p className="mt-4 text-[13px] text-muted">
-              Il massimale stimato mette sulla stessa scala serie diverse: 80 kg × 5
-              e 70 kg × 10 valgono quasi uguale. È una stima, non una misura.
+              Il massimale stimato mette sulla stessa scala serie diverse: 80 kg
+              × 5 e 70 kg × 10 valgono quasi uguale. È una stima, non una
+              misura.
             </p>
           </Card>
         </Section>

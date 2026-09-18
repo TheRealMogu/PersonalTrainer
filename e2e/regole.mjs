@@ -9,6 +9,7 @@
  * finestra, i due formati di numero nella stessa app.
  */
 import { chromium } from "playwright";
+import { SORGENTE_COLORI } from "./colori.mjs";
 
 const BASE = process.env.E2E_BASE ?? "http://localhost:3000";
 const PASSWORD = process.env.APP_PASSWORD;
@@ -90,7 +91,9 @@ for (const { larghezza, scuro } of MISURE) {
         if (getComputedStyle(el).visibility === "hidden") continue;
         if (r.height < 44 || r.width < 44) {
           fuoriMisura.push(
-            `${el.tagName.toLowerCase()} "${(el.textContent ?? "").trim().slice(0, 24)}" ${Math.round(r.width)}×${Math.round(r.height)}`,
+            `${el.tagName.toLowerCase()} "${(el.textContent ?? "")
+              .trim()
+              .slice(0, 24)}" ${Math.round(r.width)}×${Math.round(r.height)}`,
           );
         }
       }
@@ -98,79 +101,19 @@ for (const { larghezza, scuro } of MISURE) {
     });
     controlla(
       piccoli.length === 0,
-      `${dovunque}: bersagli ≥ 44px${piccoli.length ? ` — ${JSON.stringify(piccoli.slice(0, 3))}` : ""}`,
+      `${dovunque}: bersagli ≥ 44px${
+        piccoli.length ? ` — ${JSON.stringify(piccoli.slice(0, 3))}` : ""
+      }`,
     );
 
     // --- contrasto del testo ---
-    const scarsi = await page.evaluate(() => {
-      /*
-       * Un colore CSS qualunque, ridotto a r/g/b/alfa.
-       *
-       * La conversione la fa il browser con una canvas, non una regex. Con la
-       * regex questo controllo si e' sbagliato: la barra dei tab ha lo sfondo
-       * in `oklab(0.999994 ... / 0.85)`, cioe' quasi bianco, e leggere i primi
-       * tre numeri come se fossero r/g/b dava quasi nero -- quindi contrasti
-       * finti da 3,04:1 su testo che sta benissimo. Tailwind v4 usa `oklab`
-       * ovunque ci sia una trasparenza, quindi il caso non e' raro: e' la
-       * norma.
-       */
-      const tela = document.createElement("canvas");
-      tela.width = 1;
-      tela.height = 1;
-      const pezzo = tela.getContext("2d", { willReadFrequently: true });
-      const inRgb = (colore) => {
-        // Si DISEGNA il colore e si legge il pixel: `fillStyle` da solo non
-        // converte (restituisce l'oklab tale e quale), disegnare si', perche'
-        // a quel punto il browser deve produrre dei pixel veri.
-        pezzo.clearRect(0, 0, 1, 1);
-        pezzo.fillStyle = colore;
-        pezzo.fillRect(0, 0, 1, 1);
-        const [r, g, b, a] = pezzo.getImageData(0, 0, 1, 1).data;
-        return { r, g, b, a: a / 255 };
-      };
-
-      const luminanza = (colore) => {
-        const c = typeof colore === "string" ? inRgb(colore) : colore;
-        if (!c) return null;
-        const f = (v) => {
-          v /= 255;
-          return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
-        };
-        return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
-      };
-
-      /*
-       * Lo sfondo vero sotto un testo, componendo le trasparenze.
-       *
-       * Prendere il primo sfondo non trasparente e' sbagliato: `bg-accent/10`
-       * ha alfa 0,1 e trattarlo come tinta piena dava contrasti finti da
-       * 1,23:1 su testo che a occhio si legge benissimo. Si risale l'albero
-       * accumulando, come fa il browser.
-       */
-      const sfondoDi = (el) => {
-        const strati = [];
-        let nodo = el;
-        while (nodo) {
-          const c = inRgb(getComputedStyle(nodo).backgroundColor);
-          if (c) {
-            if (c.a > 0) strati.push(c);
-            if (c.a === 1) break;
-          }
-          nodo = nodo.parentElement;
-        }
-        // Dal fondo verso l'alto: l'ultimo strato trovato e' il piu' lontano.
-        let sotto = strati.pop() ?? { r: 255, g: 255, b: 255, a: 1 };
-        while (strati.length > 0) {
-          const sopra = strati.pop();
-          sotto = {
-            r: sopra.r * sopra.a + sotto.r * (1 - sopra.a),
-            g: sopra.g * sopra.a + sotto.g * (1 - sopra.a),
-            b: sopra.b * sopra.a + sotto.b * (1 - sopra.a),
-            a: 1,
-          };
-        }
-        return sotto;
-      };
+    /*
+     * Il preludio dei colori arriva da `colori.mjs`: una copia sola, perche'
+     * riscrivere la conversione a mano ha gia' prodotto due volte lo stesso
+     * errore -- `oklab(...)` letto con una regex da' risultati senza senso.
+     */
+    const scarsi = await page.evaluate(`(() => {
+      ${SORGENTE_COLORI}
 
       const bassi = [];
       for (const el of document.querySelectorAll(
@@ -193,19 +136,22 @@ for (const { larghezza, scuro } of MISURE) {
         if (!colore || colore.a === 0) continue;
         const r = el.getBoundingClientRect();
         if (r.width === 0 || r.height === 0) continue;
+        /*
+         * Il testo per chi non vede (\`.sr-only\`) non e' zero pixel: Tailwind
+         * lo fa con \`width:1px;height:1px;clip:rect(0,0,0,0)\`, non con
+         * display:none. Misurargli il contrasto ha prodotto un falso allarme
+         * sulla heatmap del mese -- il testo descrittivo nascosto dentro ogni
+         * casella, letto come se fosse il numero visibile.
+         */
+        if (r.width <= 1 && r.height <= 1) continue;
 
-        const l1 = luminanza(stile.color);
-        const l2 = luminanza(sfondoDi(el));
-        if (l1 === null || l2 === null) continue;
-        const rapporto =
-          (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        const rapporto = contrasto(colore, sfondoDi(el));
 
         /*
          * 4,5:1 per il testo. 3:1 per il testo grande (lo dice la WCAG) e per
-         * i segni decorativi con `aria-hidden`: una freccia "›" non e' testo
-         * da leggere ma un elemento d'interfaccia, e li' il minimo e' 3:1
-         * (WCAG 1.4.11). Distinguerli serve: senza, il controllo chiedeva a
-         * una freccina lo stesso contrasto di un paragrafo.
+         * i segni decorativi con \`aria-hidden\`: una freccia non e' testo da
+         * leggere ma un elemento d'interfaccia, e li' il minimo e' 3:1
+         * (WCAG 1.4.11).
          */
         const grande =
           parseFloat(stile.fontSize) >= 24 ||
@@ -215,14 +161,17 @@ for (const { larghezza, scuro } of MISURE) {
         const tetto = grande || decorativo ? 3 : 4.5;
 
         if (rapporto < tetto) {
-          bassi.push(`"${testo.slice(0, 24)}" ${rapporto.toFixed(2)}:1`);
+          bassi.push(\`"\${testo.slice(0, 24)}" \${rapporto.toFixed(2)}:1\`);
         }
       }
       return bassi;
-    });
+    })()`);
+
     controlla(
       scarsi.length === 0,
-      `${dovunque}: contrasto del testo${scarsi.length ? ` — ${JSON.stringify(scarsi.slice(0, 3))}` : ""}`,
+      `${dovunque}: contrasto del testo${
+        scarsi.length ? ` — ${JSON.stringify(scarsi.slice(0, 3))}` : ""
+      }`,
     );
 
     // --- niente NaN, mai ---
@@ -241,7 +190,9 @@ for (const { larghezza, scuro } of MISURE) {
      */
     controlla(
       naN.length === 0,
-      `${dovunque}: niente NaN a schermo${naN.length ? ` — ${JSON.stringify(naN)}` : ""}`,
+      `${dovunque}: niente NaN a schermo${
+        naN.length ? ` — ${JSON.stringify(naN)}` : ""
+      }`,
     );
 
     // --- niente scorrimento orizzontale ---
@@ -251,18 +202,17 @@ for (const { larghezza, scuro } of MISURE) {
     controlla(!trabocca, `${dovunque}: niente scorrimento orizzontale`);
 
     // --- i numeri si scrivono all'italiana ---
-    const conPunto = await page.evaluate(
-      (sorgente) => {
-        const punto = new RegExp(sorgente);
-        return [...document.querySelectorAll('[class*="tabular-nums"]')]
-          .map((el) => el.innerText ?? "")
-          .filter((t) => punto.test(t));
-      },
-      PUNTO_DECIMALE.source,
-    );
+    const conPunto = await page.evaluate((sorgente) => {
+      const punto = new RegExp(sorgente);
+      return [...document.querySelectorAll('[class*="tabular-nums"]')]
+        .map((el) => el.innerText ?? "")
+        .filter((t) => punto.test(t));
+    }, PUNTO_DECIMALE.source);
     controlla(
       conPunto.length === 0,
-      `${dovunque}: numeri con la virgola${conPunto.length ? ` — ${JSON.stringify(conPunto.slice(0, 3))}` : ""}`,
+      `${dovunque}: numeri con la virgola${
+        conPunto.length ? ` — ${JSON.stringify(conPunto.slice(0, 3))}` : ""
+      }`,
     );
   }
 

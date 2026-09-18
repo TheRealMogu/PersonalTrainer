@@ -257,9 +257,19 @@ leggibile qualcosa che oggi non lo è.
       diventa "−217 kcal · sotto il target". Descrive, non giudica.
 - [ ] **Schede a mezza larghezza affiancate** dove il contenuto è corto
       (giorni entro il target, media giornaliera).
-- [ ] **Heatmap del mese** nello storico, tipo calendario, con quanti giorni
-      sei stato in target: oggi si vedono sette o trenta colonne, ma non si
-      coglie il mese a colpo d'occhio.
+- [x] **Heatmap del mese** nello storico, tipo calendario, con quanti giorni
+      sei stato in target. Quattro stati, non due: entro, oltre, non
+      registrato e futuro restano distinti (regola 6 — un giorno non
+      registrato non è uno zero, e un giorno che deve ancora arrivare non è un
+      giorno saltato). Il rosso resta solo per il fuori target (regola 9); il
+      giorno non registrato è grigio, non un rosso attenuato. Ogni casella
+      porta un'etichetta per chi non vede i colori (regola 7) oltre al numero
+      visibile. Si vede anche a zero giorni registrati, a differenza dei
+      grafici sopra: il calendario vuoto è già un'informazione. Misurato nel
+      browser a 320/390px, chiaro e scuro; nel farlo, il controllo automatico
+      del contrasto leggeva per errore il testo nascosto (`.sr-only`, che
+      Tailwind fa 1×1px e non zero pixel) invece del numero visibile — corretto
+      nello strumento di prova, non nell'app.
 - [ ] **Data toccabile nell'intestazione** che apre un selettore, invece delle
       sole frecce. La striscia della settimana copre già i sette giorni
       vicini; serve per andare più indietro.

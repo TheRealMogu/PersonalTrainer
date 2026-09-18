@@ -154,6 +154,19 @@ Costate tempo una volta. Non ripaghiamole.
   nessuno dei due; una colonna rinominata o tolta si', e va fatta in due
   passaggi -- prima si aggiunge, poi in un secondo momento si toglie la
   vecchia.
+- **`.sr-only` non e' zero pixel.** Tailwind lo fa con
+  `width:1px;height:1px;clip:rect(0,0,0,0)`, non con `display:none`. Un
+  controllo che scarta gli elementi a `width === 0` non lo scarta, e finisce
+  per misurare il contrasto del testo nascosto per chi non vede (pensato per
+  chi usa uno screen reader) invece di quello a schermo. Successo con la
+  heatmap del mese: tre falsi allarmi sul testo descrittivo dentro ogni
+  casella. Si scarta con `r.width <= 1 && r.height <= 1`.
+- **Prettier non e' fissato come dipendenza in `package.json`.** `npx
+  prettier` puo' risolvere una versione diversa da quella che ha scritto il
+  codice committato -- la 2.8.8 ha uno stile diverso per le virgole finali
+  (`trailingComma: "es5"` invece di `"all"`) e riformattare con quella
+  toglie virgole che il resto del repo tiene. Si fissa sempre con `npx
+  --yes prettier@3`.
 
 ## Comandi
 
