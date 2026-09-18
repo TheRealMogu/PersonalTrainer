@@ -417,3 +417,13 @@ Non basta che la build passi.
 
 Tutte cose già fatte almeno una volta in questo repo, e da rifare a ogni
 aggiunta.
+
+Tre delle quattro adesso girano da sole. `npm run e2e` apre l'app a 320 e
+390 px, in chiaro e in scuro, su otto schermate, e misura: bersagli da 44 px,
+contrasto del testo, scorrimento orizzontale, e che i numeri escano con la
+virgola. In CI gira a ogni push. **Non sostituisce il guardare: sostituisce
+il ricordarsi di guardare** — che è la parte che finora saltava.
+
+I tocchi dei gesti e la latenza vera restano da contare a mano: il primo
+perché il tetto dipende da cosa vuoi fare, non da un elemento; la seconda
+perché ~400 ms li sa simulare solo chi sa cosa sta cercando.

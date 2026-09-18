@@ -77,7 +77,7 @@ export default async function PianoPage() {
                 <li key={item} className="flex gap-3 text-[15px] leading-snug">
                   <span
                     aria-hidden="true"
-                    className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                    className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent-solid"
                   />
                   <span>{item}</span>
                 </li>

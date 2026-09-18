@@ -13,9 +13,9 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
           cache: npm
@@ -39,3 +39,64 @@ jobs:
           APP_PASSWORD: "finta"
           AUTH_SECRET: "finto-segreto-per-la-build"
         run: npm run build
+
+  # Le prove col browser: aprono l'app davvero e misurano quello che
+  # PRODOTTO.md chiede in pixel. Finora si facevano a mano a ogni modifica,
+  # cioe' finche' uno se ne ricordava.
+  #
+  # Contro un Postgres vero e non contro Neon: da una macchina di GitHub il
+  # database di produzione non va toccato, e il driver si sceglie
+  # dall'indirizzo (vedi src/db/index.ts), quindi non serve cambiare niente.
+  prove-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: pt
+          POSTGRES_PASSWORD: pt
+          POSTGRES_DB: pt
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: "postgresql://pt:pt@localhost:5432/pt"
+      APP_PASSWORD: "password-di-prova-non-un-segreto"
+      AUTH_SECRET: "0123456789abcdef0123456789abcdef0123456789abcdef"
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Scarica Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Applica le migration
+        run: |
+          for file in drizzle/0*.sql; do
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$file"
+          done
+
+      - name: Riempi il database
+        run: npm run db:seed
+
+      - name: Costruisci
+        run: npm run build
+
+      - name: Avvia e prova
+        run: |
+          npm start &
+          npx wait-on http://localhost:3000/login --timeout 60000
+          npm run e2e

@@ -68,12 +68,12 @@ export function RiepilogoSettimana({
               key={giorno.day}
               className="flex items-baseline justify-between gap-3 py-2 first:pt-0"
             >
-              <span className={`w-14 shrink-0 text-[13px] ${futuro ? "text-reference" : "text-muted"}`}>
+              <span className="w-14 shrink-0 text-[13px] text-muted">
                 {nomeGiorno(giorno.day)} {Number(giorno.day.slice(8))}
               </span>
 
               {futuro ? (
-                <span aria-label="Giorno non ancora arrivato" className="text-[13px] text-reference">
+                <span aria-label="Giorno non ancora arrivato" className="text-[13px] text-muted">
                   —
                 </span>
               ) : !pieno ? (
