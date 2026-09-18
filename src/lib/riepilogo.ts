@@ -42,6 +42,12 @@ export type Riepilogo = {
   inCorso: boolean;
   /** Serve a distinguere i giorni gia' passati da quelli non ancora arrivati. */
   oggi: string;
+  /**
+   * "Settimana 3", non le date: e' cosi' che la chiede il PT ogni domenica.
+   * Null finche' non esiste una prima settimana da cui contare -- niente
+   * numeri inventati su un dato che non c'e' (regola 6).
+   */
+  numeroSettimana: number | null;
 };
 
 const NOMI_GIORNI = ["lun", "mar", "mer", "gio", "ven", "sab", "dom"] as const;
@@ -71,6 +77,27 @@ export function giornoMese(iso: string): string {
  */
 
 /**
+ * Quante settimane sono passate dalla prima mai registrata.
+ *
+ * Conta le settimane intere fra il lunedi' della prima settimana con
+ * qualcosa dentro (diario o allenamento, quale viene prima) e il lunedi'
+ * della settimana guardata: la settimana 1 e' quella, non "la prima domenica
+ * di gennaio" o un'altra convenzione arbitraria. Null senza una prima
+ * settimana da cui contare.
+ */
+export function numeroSettimana(
+  lunedi: string,
+  primoLunedi: string | null
+): number | null {
+  if (!primoLunedi) return null;
+  const giorni = Math.round(
+    (Date.parse(`${lunedi}T00:00:00Z`) - Date.parse(`${primoLunedi}T00:00:00Z`)) /
+      86_400_000
+  );
+  return Math.floor(giorni / 7) + 1;
+}
+
+/**
  * La settimana di una data, dal lunedi' alla domenica.
  *
  * `oggi` serve a sapere dove ci si e' fermati: i giorni non ancora arrivati
@@ -78,12 +105,17 @@ export function giornoMese(iso: string): string {
  * E' la regola 13 di PRODOTTO.md, la stessa che tiene onesto lo Storico:
  * a mezzogiorno hai registrato un pasto su quattro, e farlo contare fa dire
  * numeri falsi.
+ *
+ * `primoGiorno` e' il primo giorno mai registrato (diario o allenamento),
+ * per calcolare la settimana numerata che chiede il PT; `null` se non ancora
+ * calcolato, e il numero semplicemente non compare.
  */
 export function costruisciRiepilogo(
   totali: DailyTotals[],
   sedute: SedutaRiepilogo[],
   data: string,
-  oggi: string
+  oggi: string,
+  primoGiorno: string | null = null
 ): Riepilogo {
   const lunedi = lunediDellaSettimana(data);
   const domenica = shiftIsoDate(lunedi, 6);
@@ -133,6 +165,10 @@ export function costruisciRiepilogo(
     ),
     inCorso: oggi <= domenica,
     oggi,
+    numeroSettimana: numeroSettimana(
+      lunedi,
+      primoGiorno ? lunediDellaSettimana(primoGiorno) : null
+    ),
   };
 }
 
@@ -150,7 +186,11 @@ export function riepilogoTesto(
 ): string {
   const righe: string[] = [];
 
-  righe.push(`Settimana ${giornoMese(r.lunedi)} – ${giornoMese(r.domenica)}`);
+  const etichettaSettimana =
+    r.numeroSettimana !== null ? `Settimana ${r.numeroSettimana} · ` : "Settimana ";
+  righe.push(
+    `${etichettaSettimana}${giornoMese(r.lunedi)} – ${giornoMese(r.domenica)}`
+  );
   if (r.inCorso) righe.push("(settimana ancora in corso)");
   righe.push("");
 

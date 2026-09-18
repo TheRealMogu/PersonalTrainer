@@ -262,10 +262,11 @@ e va difesa a ogni aggiunta.
   tornavano più fuori.
 - **Riepilogo della settimana** — in cima allo Storico: i sette giorni da
   lunedì a domenica, le sedute con il volume, e la media che dichiara sempre
-  su quanti giorni è fatta. Un tocco lo copia come testo, da mandare al
-  personal trainer o da incollare in chat, dove chi legge non ha l'app
-  davanti. I giorni che devono ancora arrivare sono un trattino, non uno
-  zero.
+  su quanti giorni è fatta. Con il numero della settimana ("Settimana 3"),
+  contato dal primo giorno mai registrato — così com'è quando il PT lo
+  chiede la domenica. Un tocco lo copia come testo, da mandare al personal
+  trainer o da incollare in chat, dove chi legge non ha l'app davanti. I
+  giorni che devono ancora arrivare sono un trattino, non uno zero.
 - **Incolla da Claude** — Aggiungi → *Incolla da Claude*: si copia un prompt,
   lo si manda a Claude insieme a cosa si è mangiato (anche con la foto
   dell'etichetta), e si riporta indietro la risposta. L'app la legge e

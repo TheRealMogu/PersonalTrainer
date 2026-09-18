@@ -50,6 +50,11 @@ export function RiepilogoSettimana({
     <div>
       <header className="mb-3">
         <p className="text-[15px] font-semibold">
+          {riepilogo.numeroSettimana !== null ? (
+            <span className="tabular-nums">
+              Settimana {riepilogo.numeroSettimana} ·{" "}
+            </span>
+          ) : null}
           {giornoMese(riepilogo.lunedi)} – {giornoMese(riepilogo.domenica)}
         </p>
         {riepilogo.inCorso ? (

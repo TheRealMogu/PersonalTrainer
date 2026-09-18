@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   costruisciRiepilogo,
+  numeroSettimana,
   riepilogoTesto,
   type SedutaRiepilogo,
 } from "./riepilogo";
@@ -319,5 +320,54 @@ describe("le calorie registrate a occhio nel riepilogo", () => {
     );
     assert.equal(pulito.kcalNonScomposte, 0);
     assert.doesNotMatch(riepilogoTesto(pulito), /senza macro/);
+  });
+});
+
+describe("il numero della settimana", () => {
+  it("è null senza una prima settimana da cui contare", () => {
+    assert.equal(numeroSettimana("2026-09-07", null), null);
+  });
+
+  it("la prima settimana registrata è la settimana 1", () => {
+    assert.equal(numeroSettimana("2026-09-07", "2026-09-07"), 1);
+  });
+
+  it("conta le settimane intere passate", () => {
+    // 2026-09-07 è lunedì; tre settimane dopo è il 2026-09-28.
+    assert.equal(numeroSettimana("2026-09-28", "2026-09-07"), 4);
+  });
+
+  it("costruisciRiepilogo la calcola dal primo giorno mai registrato", () => {
+    const r = costruisciRiepilogo(
+      [],
+      [],
+      "2026-09-14",
+      "2026-09-14",
+      // primo giorno registrato di mercoledì: la settimana 1 parte comunque
+      // dal lunedì di quella settimana, non dal mercoledì stesso.
+      "2026-09-09"
+    );
+    assert.equal(r.numeroSettimana, 2);
+  });
+
+  it("senza un primo giorno resta null, e riepilogoTesto non lo scrive", () => {
+    const r = costruisciRiepilogo([], [], "2026-09-07", "2026-09-07");
+    assert.equal(r.numeroSettimana, null);
+    assert.match(riepilogoTesto(r), /^Settimana 7 settembre – 13 settembre/);
+  });
+
+  it("con un primo giorno, riepilogoTesto scrive il numero", () => {
+    const r = costruisciRiepilogo(
+      [],
+      [],
+      "2026-09-07",
+      "2026-09-07",
+      "2026-09-07"
+    );
+    assert.equal(r.numeroSettimana, 1);
+    assert.match(
+      riepilogoTesto(r),
+      /^Settimana 1 · 7 settembre – 13 settembre/
+    );
   });
 });

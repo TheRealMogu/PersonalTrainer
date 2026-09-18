@@ -182,7 +182,22 @@ Nessuna è bloccante, tutte sono state pesate col metro dei gesti.
 - [ ] **Acqua e passi.** Il PT chiede 3 litri e 10.000 passi al giorno, e
       l'app non li traccia: oggi le regole stanno nel Piano come testo.
 - [ ] **Peso corporeo** con andamento nel tempo. Un numero al giorno,
-      due tocchi.
+      due tocchi. Serve anche al riepilogo della settimana: il PT chiede ogni
+      domenica "peso della settimana scorsa e di questa", e oggi quel
+      confronto non si può fare perché il dato non esiste.
+- [x] **Numero della settimana nel riepilogo.** Fatto: *Questa settimana*
+      ora scrive "Settimana 3 · 14 settembre – 20 settembre", a schermo e nel
+      testo copiato. Contata dal primo giorno mai registrato (diario o
+      allenamento, quale viene prima) — nessuna data scelta a mano, nessun
+      campo nuovo da compilare. Null finché non c'è ancora niente da
+      registrare, invece di dire "settimana 1" a un diario vuoto (regola 6).
+      Verificato: confrontato il numero a schermo con il calcolo a mano sul
+      database vero, a 320 e 390px, chiaro e scuro.
+- [ ] **Nota sulla dieta nel riepilogo della settimana**, tipo "fame
+      giovedì, sgarro sabato sera" — oggi il riepilogo misura kcal e macro
+      ma non ha un posto per una riga soggettiva così, che il PT chiede ogni
+      domenica insieme al numero della settimana e al feedback
+      sull'allenamento (quest'ultimo già coperto dalla nota per seduta).
 - [x] **Aggiungere un cibo ai tasti rapidi dall'app**, senza passare dal
       file di seed e da un comando. Fatto: *Piano → I tuoi alimenti*, e ogni
       pasto si salva fra i rapidi con un tocco.
