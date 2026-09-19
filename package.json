@@ -17,6 +17,7 @@
     "e2e": "node e2e/regole.mjs"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.1",
     "@capacitor/core": "^8.5.2",
     "@capacitor/ios": "^8.5.2",
     "@neondatabase/serverless": "^1.1.0",
