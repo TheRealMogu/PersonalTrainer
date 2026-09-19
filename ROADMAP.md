@@ -165,8 +165,38 @@ L'app presuppone che tutto vada bene. Non è vero.
 - [x] **Controllo dei bersagli tattili in CI.** Fatto, ed è successo una
       terza volta: il salto *N pasti ↓* aggiunto poche ore prima era 59×28.
       Trovato dalla misura, non guardandolo.
-- [ ] **Numeri di versione**: oggi l'IPA non ha una versione riconoscibile.
-      Serve per sapere quale build hai sul telefono.
+- [x] **Numeri di versione**: oggi l'IPA non ha una versione riconoscibile.
+      Serve per sapere quale build hai sul telefono. Fatto in due parti,
+      perché sono due domande diverse:
+
+      **Il numero.** Il workflow *Compila IPA per iPhone* ora calcola la
+      versione da `package.json` (la scegli tu, quando conta davvero) e il
+      numero di build dal progressivo del workflow stesso (cresce da solo,
+      niente da ricordarsi). Li passa a `xcodebuild` come
+      `MARKETING_VERSION`/`CURRENT_PROJECT_VERSION` — vincono su qualunque
+      valore nel progetto generato da Capacitor, che altrimenti resterebbe
+      sempre "1.0", uguale su ogni IPA.
+
+      **Dove si legge.** Non nel sito: l'app è una webview che carica il
+      deploy remoto (vedi `capacitor.config.ts`), quindi il contenuto è
+      sempre l'ultimo pubblicato a prescindere da quale IPA hai sul
+      telefono — un numero di versione del sito non risponderebbe alla
+      domanda "quale build ho installato". Serve leggerlo dal guscio
+      nativo: nuova dipendenza `@capacitor/app`, e in *Piano → Accesso* una
+      riga "Versione X (build N)" che compare solo dentro l'app vera
+      (`Capacitor.isNativePlatform()`) — nel browser resta assente, perché
+      lì la domanda non ha risposta e mostrare qualcosa sarebbe inventarla.
+
+      **Non verificato end-to-end.** Non è stata rilanciata una compilazione
+      IPA vera per controllare che `MARKETING_VERSION`/
+      `CURRENT_PROJECT_VERSION` finiscano davvero nell'Info.plist del
+      binario: il workflow gira solo su runner macOS, costa circa dieci
+      volte un runner Linux normale ed è manuale apposta — non è il caso di
+      spenderlo per una prova. Verificato invece: la sintassi YAML del
+      workflow, che `@capacitor/app` non rompe la build web (`npm run
+      build`), e che la riga "Versione" resta assente nel browser vero, in
+      chiaro e in scuro, senza errori in console. Resta da confermare la
+      prossima volta che l'IPA viene compilato per davvero.
 - [x] **Aggiornare le azioni di GitHub.** Fatto per `checkout` e
       `setup-node` (v4 → v5) nel workflow dei controlli. `upload-artifact`
       resta da guardare quando si tocca il workflow dell'IPA.

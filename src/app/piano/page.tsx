@@ -3,6 +3,7 @@ import { Card } from "@/components/card";
 import { LogoutButton } from "@/components/logout-button";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { Versione } from "@/components/versione";
 import { PLAN_SECTIONS } from "@/lib/plan";
 import { todayIso } from "@/lib/date";
 import { meseDi, settimanaDi } from "@/lib/intervallo-export";
@@ -212,6 +213,7 @@ export default async function PianoPage() {
       <Section title="Accesso">
         <Card>
           <LogoutButton />
+          <Versione />
         </Card>
       </Section>
     </main>
