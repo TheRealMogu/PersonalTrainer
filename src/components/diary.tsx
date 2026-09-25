@@ -38,6 +38,7 @@ import {
 import type { MacroKey, Obiettivi } from "@/lib/targets";
 import { Acqua } from "./acqua";
 import { Peso } from "./peso";
+import { Passi } from "./passi";
 import { CercaProdotto } from "./cerca-prodotto";
 import { ComeUltimaVolta } from "./come-ultima-volta";
 import { Integratori } from "./integratori";
@@ -85,6 +86,7 @@ export function Diary({
   defaultSlot,
   acqua,
   peso,
+  passi,
   integratori,
   usi,
   ultimaVolta,
@@ -97,6 +99,7 @@ export function Diary({
   defaultSlot: MealSlot;
   acqua: number;
   peso: number | null;
+  passi: number | null;
   integratori: IntegratoreDelGiorno[];
   /** Quello che hai gia' registrato negli ultimi mesi: decide l'ordine dei tasti. */
   usi: UsoPerMomento[];
@@ -463,6 +466,15 @@ export function Diary({
         */}
         <div className="mt-3 border-t border-hairline pt-3">
           <Peso day={day} kg={peso} />
+        </div>
+
+        {/*
+          I passi per lo stesso motivo del peso: un numero letto sul
+          telefono e scritto una volta, non un contatore. Il PT li chiede
+          insieme all'acqua ogni domenica.
+        */}
+        <div className="mt-3 border-t border-hairline pt-3">
+          <Passi day={day} passi={passi} obiettivo={obiettivi.passiGiornalieri} />
         </div>
 
         {/*

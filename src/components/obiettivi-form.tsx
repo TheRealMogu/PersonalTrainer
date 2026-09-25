@@ -139,6 +139,28 @@ export function ObiettiviForm({ iniziali }: { iniziali: Obiettivi }) {
         </p>
       </Card>
 
+      <Card>
+        <label className="block">
+          <span className="mb-1 block text-[13px] text-muted">
+            Passi al giorno
+          </span>
+          <input
+            type="text"
+            inputMode="numeric"
+            defaultValue={scriviNumero(iniziali.passiGiornalieri)}
+            onChange={(e) => {
+              const numero = parseNumero(e.target.value);
+              setValori((v) => ({ ...v, passiGiornalieri: numero }));
+              setSalvato(false);
+            }}
+            className="min-h-11 w-full rounded-xl border border-hairline bg-raised px-3 py-2.5 text-[17px] font-semibold tabular-nums outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
+          />
+        </label>
+        <p className="mt-2 text-[13px] leading-snug text-muted">
+          Da {LIMITI_OBIETTIVI.passi.min} a {LIMITI_OBIETTIVI.passi.max}.
+        </p>
+      </Card>
+
       {problema ? (
         <p role="alert" className="mb-4 px-1 text-[13px] leading-snug text-muted">
           {problema}

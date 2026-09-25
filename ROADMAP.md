@@ -217,8 +217,23 @@ del PT. Non sono credenziali, ma sono tuoi.
 
 Nessuna è bloccante, tutte sono state pesate col metro dei gesti.
 
-- [ ] **Acqua e passi.** Il PT chiede 3 litri e 10.000 passi al giorno, e
+- [x] **Acqua e passi.** Il PT chiede 3 litri e 10.000 passi al giorno, e
       l'app non li traccia: oggi le regole stanno nel Piano come testo.
+      L'acqua era gia' tracciata (vedi 6-ter, Fase 3) -- mancavano solo i
+      passi. Fatto: campo *Passi* nel diario, sotto il peso, con l'obiettivo
+      scelto in *Piano -> Cambia gli obiettivi* mostrato accanto (default
+      10.000, coerente col numero che chiede il PT). Stesso gesto del peso e
+      non dell'acqua -- un numero letto sul telefono e scritto una volta,
+      non un contatore da toccare piu' volte -- perche' qui non c'e' un
+      contapassi nell'app: ci vorrebbe un plugin nativo e un permesso in piu'
+      solo per un numero che il telefono sa gia'. Nessuna riga finche' non
+      lo scrivi, e cancellarlo cancella la riga invece di lasciare uno zero
+      (regola 6). Verificato sul browser vero, 320 e 390px, chiaro e scuro:
+      scritto, salvato, sopravvissuto a un reload vero, cancellato di nuovo
+      -- controllato anche sulla tabella, non solo sullo schermo -- e
+      l'obiettivo cambiato da *Cambia gli obiettivi*, con la validazione che
+      blocca un numero fuori scala (sotto 1.000 o sopra 50.000) mostrando il
+      messaggio invece di correggere di nascosto.
 - [x] **Peso corporeo** con andamento nel tempo. Fatto: un campo nel diario,
       sotto l'acqua (`weight_days`, una riga al giorno come `water_days`),
       un grafico a linea nello Storico che segue il filtro 7/30 giorni, e il
@@ -959,6 +974,8 @@ per aprirla.
 | **Cibo** (tasti rapidi) | database | ✅ | ✅ | ✅ con annulla |
 | **Acqua** (bicchieri al giorno) | database | ✅ | ✅ (il "meno") | ✅ (il "meno") |
 | **Obiettivo acqua** | database (`targets`) | ✅ | ✅ | — (c'è sempre) |
+| **Passi** (al giorno) | database | ✅ | ✅ | ✅ (cancella il campo) |
+| **Obiettivo passi** | database (`targets`) | ✅ | ✅ | — (c'è sempre) |
 | **Target kcal e macro** | database (`targets`) | ✅ | ✅ | — (c'è sempre) |
 | **Allenamento** (giornate ed esercizi) | database | ✅ incollando | ✅ | ✅ archivia, con annulla |
 | **Vitamine e integratori** | database (`supplements`) | ✅ | ✅ | ✅ dal diario, con annulla |

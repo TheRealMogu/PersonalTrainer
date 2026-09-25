@@ -50,6 +50,9 @@ export const OBIETTIVO_ACQUA = {
   mlPerBicchiere: 250,
 } as const;
 
+/** Stessa ragione dell'acqua: i passi non sono un macro, non entrano nelle medie. */
+export const OBIETTIVO_PASSI = 10_000;
+
 /**
  * I numeri modificabili, letti insieme perche' si cambiano insieme.
  *
@@ -60,12 +63,14 @@ export const OBIETTIVO_ACQUA = {
 export type Obiettivi = {
   macro: Record<MacroKey, number>;
   bicchieriAcqua: number;
+  passiGiornalieri: number;
 };
 
 /** Gli obiettivi di partenza, quando non ne sono stati scritti altri. */
 export const OBIETTIVI_PREDEFINITI: Obiettivi = {
   macro: { ...DAILY_TARGETS },
   bicchieriAcqua: OBIETTIVO_ACQUA.bicchieri,
+  passiGiornalieri: OBIETTIVO_PASSI,
 };
 
 /** Tetti larghi: fermano un numero digitato male, non giudicano una dieta. */
@@ -73,6 +78,7 @@ export const LIMITI_OBIETTIVI = {
   kcal: { min: 500, max: 10000 },
   grammi: { min: 0, max: 1000 },
   bicchieri: { min: 1, max: 30 },
+  passi: { min: 1000, max: 50000 },
 } as const;
 
 /**
@@ -84,7 +90,7 @@ export const LIMITI_OBIETTIVI = {
  * impostazioni.
  */
 export function validaObiettivi(o: Obiettivi): string | null {
-  const { kcal, grammi, bicchieri } = LIMITI_OBIETTIVI;
+  const { kcal, grammi, bicchieri, passi } = LIMITI_OBIETTIVI;
 
   if (!Number.isFinite(o.macro.kcal) || o.macro.kcal < kcal.min || o.macro.kcal > kcal.max) {
     return `Le calorie devono stare fra ${kcal.min} e ${kcal.max}.`;
@@ -101,6 +107,13 @@ export function validaObiettivi(o: Obiettivi): string | null {
     o.bicchieriAcqua > bicchieri.max
   ) {
     return `I bicchieri d'acqua devono stare fra ${bicchieri.min} e ${bicchieri.max}.`;
+  }
+  if (
+    !Number.isInteger(o.passiGiornalieri) ||
+    o.passiGiornalieri < passi.min ||
+    o.passiGiornalieri > passi.max
+  ) {
+    return `I passi al giorno devono stare fra ${passi.min} e ${passi.max}.`;
   }
   return null;
 }

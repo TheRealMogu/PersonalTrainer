@@ -109,6 +109,8 @@ export const targets = pgTable("targets", {
   fat: real("fat").notNull(),
   /** Bicchieri d'acqua al giorno. La dimensione del bicchiere resta fissa. */
   waterGlasses: integer("water_glasses").notNull(),
+  /** Passi al giorno. */
+  stepsTarget: integer("steps_target").notNull().default(10000),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -143,6 +145,22 @@ export const waterDays = pgTable("water_days", {
 export const weightDays = pgTable("weight_days", {
   day: date("day").primaryKey(),
   weightKg: real("weight_kg").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/**
+ * I passi, un numero al giorno.
+ *
+ * Stessa forma di `weight_days`: una riga per giorno, nessuna finche' non
+ * scrivi il numero che hai letto sul telefono. Il PT lo chiede insieme
+ * all'acqua, ma il gesto e' quello del peso -- un numero digitato una
+ * volta, non un contatore da toccare piu' volte come i bicchieri.
+ */
+export const stepsDays = pgTable("steps_days", {
+  day: date("day").primaryKey(),
+  steps: integer("steps").notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

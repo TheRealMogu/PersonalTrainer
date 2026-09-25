@@ -29,6 +29,7 @@ export async function salvaObiettivi(obiettivi: Obiettivi): Promise<ActionResult
         protein: obiettivi.macro.protein,
         fat: obiettivi.macro.fat,
         waterGlasses: obiettivi.bicchieriAcqua,
+        stepsTarget: obiettivi.passiGiornalieri,
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
@@ -39,6 +40,7 @@ export async function salvaObiettivi(obiettivi: Obiettivi): Promise<ActionResult
           protein: obiettivi.macro.protein,
           fat: obiettivi.macro.fat,
           waterGlasses: obiettivi.bicchieriAcqua,
+          stepsTarget: obiettivi.passiGiornalieri,
           updatedAt: new Date(),
         },
       });

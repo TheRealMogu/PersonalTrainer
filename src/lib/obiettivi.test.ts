@@ -11,8 +11,16 @@ import { buildProgress, alreadyOver, fitsInRemaining } from "./nutrition";
 import { buildHistoryStats } from "./history";
 import { bicchieriDaMostrare, progressoAcqua } from "./acqua";
 
-function obiettivi(patch: Partial<Obiettivi["macro"]> = {}, bicchieri = 8): Obiettivi {
-  return { macro: { ...OBIETTIVI_PREDEFINITI.macro, ...patch }, bicchieriAcqua: bicchieri };
+function obiettivi(
+  patch: Partial<Obiettivi["macro"]> = {},
+  bicchieri = 8,
+  passi = 10000,
+): Obiettivi {
+  return {
+    macro: { ...OBIETTIVI_PREDEFINITI.macro, ...patch },
+    bicchieriAcqua: bicchieri,
+    passiGiornalieri: passi,
+  };
 }
 
 describe("validazione degli obiettivi", () => {
@@ -35,6 +43,9 @@ describe("validazione degli obiettivi", () => {
     assert.ok(validaObiettivi(obiettivi({}, 0)));
     assert.ok(validaObiettivi(obiettivi({}, 31)));
     assert.ok(validaObiettivi(obiettivi({}, 2.5)));
+    assert.ok(validaObiettivi(obiettivi({}, 8, 999)));
+    assert.ok(validaObiettivi(obiettivi({}, 8, 50001)));
+    assert.ok(validaObiettivi(obiettivi({}, 8, 2500.5)));
   });
 
   it("nomina il macro sbagliato, non un generico 'valore non valido'", () => {
@@ -44,6 +55,15 @@ describe("validazione degli obiettivi", () => {
 
   it("accetta zero grammi di un macro: è una dieta possibile, non un errore", () => {
     assert.equal(validaObiettivi(obiettivi({ carbs: 0 })), null);
+  });
+
+  it("nomina i passi, non un generico 'valore non valido'", () => {
+    assert.match(validaObiettivi(obiettivi({}, 8, 500))!, /passi/i);
+  });
+
+  it("agli estremi del passo sono validi", () => {
+    assert.equal(validaObiettivi(obiettivi({}, 8, LIMITI_OBIETTIVI.passi.min)), null);
+    assert.equal(validaObiettivi(obiettivi({}, 8, LIMITI_OBIETTIVI.passi.max)), null);
   });
 });
 

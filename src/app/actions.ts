@@ -3,10 +3,17 @@
 import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { meals, supplementChecks, waterDays, weightDays } from "@/db/schema";
+import {
+  meals,
+  stepsDays,
+  supplementChecks,
+  waterDays,
+  weightDays,
+} from "@/db/schema";
 import { MAX_BICCHIERI } from "@/lib/acqua";
 import { isIsoDate } from "@/lib/date";
 import { isMealSlot, type MealSlot } from "@/lib/meal-slots";
+import { MAX_PASSI, MIN_PASSI } from "@/lib/passi";
 import {
   barcodeValido,
   normalizzaProdottiOFF,
@@ -327,6 +334,56 @@ export async function setPeso(
       });
   } catch (cause) {
     console.error("setPeso fallita", cause);
+    return { ok: false, error: "Non sono riuscito a segnarlo. Riprova." };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/storico");
+  return { ok: true };
+}
+
+/**
+ * Scrive (o cancella) i passi di un giorno.
+ *
+ * Stessa forma di `setPeso`: `passi` nullo cancella la riga, cosi' un
+ * giorno senza il numero scritto resta un buco e non uno zero inventato
+ * (regola 6).
+ */
+export async function setPassi(
+  day: string,
+  passi: number | null
+): Promise<ActionResult> {
+  if (!isIsoDate(day)) return { ok: false, error: "Data non valida." };
+
+  if (passi === null) {
+    try {
+      await db.delete(stepsDays).where(eq(stepsDays.day, day));
+    } catch (cause) {
+      console.error("setPassi (cancellazione) fallita", cause);
+      return { ok: false, error: "Non sono riuscito a cancellarlo. Riprova." };
+    }
+    revalidatePath("/");
+    revalidatePath("/storico");
+    return { ok: true };
+  }
+
+  if (!Number.isInteger(passi) || passi < MIN_PASSI || passi > MAX_PASSI) {
+    return {
+      ok: false,
+      error: `I passi devono stare fra ${MIN_PASSI} e ${MAX_PASSI}.`,
+    };
+  }
+
+  try {
+    await db
+      .insert(stepsDays)
+      .values({ day, steps: passi, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: stepsDays.day,
+        set: { steps: passi, updatedAt: new Date() },
+      });
+  } catch (cause) {
+    console.error("setPassi fallita", cause);
     return { ok: false, error: "Non sono riuscito a segnarlo. Riprova." };
   }
 
