@@ -1,39 +1,14 @@
+import {
+  Etichetta,
+  Griglia,
+  MACRO_COLOR,
+  Riquadro,
+} from "@/components/riquadro";
 import { Sparkline } from "@/components/sparkline";
 import { isLogged, type DailyTotals, type HistoryStats } from "@/lib/history";
 import { etichettaScarto, formatMacro } from "@/lib/nutrition";
 import { formatPeso, type PesoGiorno } from "@/lib/peso";
 import { MACRO_LABELS, MACRO_UNITS, type MacroKey } from "@/lib/targets";
-
-const MACRO_COLOR: Record<MacroKey, string> = {
-  kcal: "var(--color-kcal)",
-  carbs: "var(--color-carbs)",
-  protein: "var(--color-protein)",
-  fat: "var(--color-fat)",
-};
-
-/** Le card di questa griglia: come `Card`, ma senza il margine sotto, che in una griglia raddoppia lo spazio. */
-const RIQUADRO = "rounded-2xl bg-surface p-4 shadow-[var(--shadow-card)]";
-
-function Etichetta({
-  macro,
-  children,
-}: {
-  macro?: MacroKey;
-  children: React.ReactNode;
-}) {
-  return (
-    <p className="flex items-center gap-1.5 text-[13px] text-muted">
-      {macro ? (
-        <span
-          aria-hidden="true"
-          className="h-2 w-2 shrink-0 rounded-full"
-          style={{ background: MACRO_COLOR[macro] }}
-        />
-      ) : null}
-      {children}
-    </p>
-  );
-}
 
 /**
  * Lo scarto dal target. Rosso solo se si è sopra (regola 9: il rosso è per
@@ -104,10 +79,10 @@ export function StoricoSintesi({
   const conMedie = stats.loggedDays > 0;
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <Griglia>
       {conMedie ? (
         <>
-          <div className={`${RIQUADRO} col-span-2`}>
+          <Riquadro ampio>
             <Etichetta macro="kcal">Calorie, media giornaliera</Etichetta>
             <p className="mt-1 leading-none">
               <span className="text-[48px] font-bold tracking-tight">
@@ -128,17 +103,14 @@ export function StoricoSintesi({
             <p className="mt-2 text-[13px] text-muted">
               {giorniEntro(stats.daysWithinTarget.kcal, stats.loggedDays)}
             </p>
-          </div>
+          </Riquadro>
 
           {macroMinori.map((macro, indice) => {
             // Senza pesate, i grassi prendono tutta la riga invece di lasciare un buco.
             const tuttaLaRiga =
               pesi.length === 0 && indice === macroMinori.length - 1;
             return (
-              <div
-                key={macro}
-                className={`${RIQUADRO} ${tuttaLaRiga ? "col-span-2" : ""}`}
-              >
+              <Riquadro key={macro} ampio={tuttaLaRiga}>
                 <Etichetta macro={macro}>{MACRO_LABELS[macro]}</Etichetta>
                 <p className="mt-1 leading-tight">
                   <span className="text-[22px] font-semibold">
@@ -157,14 +129,14 @@ export function StoricoSintesi({
                 <p className="mt-1.5 text-[13px] leading-snug text-muted">
                   {giorniEntro(stats.daysWithinTarget[macro], stats.loggedDays)}
                 </p>
-              </div>
+              </Riquadro>
             );
           })}
         </>
       ) : null}
 
       {primoPeso && ultimoPeso ? (
-        <div className={`${RIQUADRO} ${conMedie ? "" : "col-span-2"}`}>
+        <Riquadro ampio={!conMedie}>
           <Etichetta>Peso</Etichetta>
           <p className="mt-1 leading-tight">
             <span className="text-[22px] font-semibold">
@@ -192,8 +164,8 @@ export function StoricoSintesi({
             etichetta={`Peso da ${formatPeso(primoPeso.weightKg)} a ${formatPeso(ultimoPeso.weightKg)} kg, su ${pesi.length} ${pesi.length === 1 ? "misura" : "misure"}`}
             className="mt-2 h-8"
           />
-        </div>
+        </Riquadro>
       ) : null}
-    </div>
+    </Griglia>
   );
 }

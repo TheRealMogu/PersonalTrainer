@@ -73,14 +73,18 @@ export function MacroTile({
         </svg>
       </span>
 
-      <span className="mt-1.5 flex items-baseline gap-1">
+      {/*
+        Sotto i 360 px il numero scende di due punti e lo spazio si stringe:
+        a 320 "55,5 g" era piu' largo del riquadro e la "g" ne usciva fuori.
+      */}
+      <span className="mt-1.5 flex items-baseline gap-0.5 min-[360px]:gap-1">
         <span
           aria-hidden="true"
           className="h-2 w-2 shrink-0 self-center rounded-full"
           style={{ background: isOver ? "var(--color-over)" : MACRO_COLOR[key] }}
         />
         <span
-          className={`text-[19px] font-semibold leading-none tabular-nums ${isOver ? "text-over" : ""}`}
+          className={`text-[17px] font-semibold leading-none tabular-nums min-[360px]:text-[19px] ${isOver ? "text-over" : ""}`}
         >
           {formatMacro(isOver ? over : remaining, key)}
         </span>

@@ -419,6 +419,35 @@ leggibile qualcosa che oggi non lo è.
       prova: media calorie 2110 = (2300 + 1900 + 2150 + 1800 + 2400) / 5,
       carboidrati 256 = 1280 / 5, come a schermo. `npm run e2e`: 162
       controlli, tutto a posto.
+
+      **Poi su tutte le schermate**, segnalato ("hai fatto solo una pagina,
+      deve essere globale"). I pezzi stanno in `riquadro.tsx` (`Griglia`,
+      `Riquadro`, `RiquadroLink`, `Etichetta`), riusati ovunque invece di
+      ridisegnarli per pagina.
+      - *Diario*: anello, macro e acqua restano nella stessa scheda; peso e
+        passi diventano due riquadri affiancati, gli integratori uno a tutta
+        riga. L'acqua in un riquadro suo è stata provata e tolta: a 390 px il
+        margine in più portava il "+" per metà sotto la barra in basso.
+        Peso e passi hanno il campo sopra e il tasto sotto; "Sincronizza da
+        Fitbit" diventa un'icona 44×44 accanto a Salva, col nome intero per
+        lo screen reader. A 320 px la riga dei passi era già rotta su `main`
+        ("/ 10.000" a capo, "Salva" tagliato): ora ci sta.
+      - *Piano*: i target come riquadri (calorie a tutta riga), e Scheda,
+        Integratori, Alimenti, Fitbit in una griglia 2×2 di riquadri che si
+        toccano interi, al posto di quattro schede con paragrafo e tasto. La
+        spiegazione lunga c'era già in cima a ogni pagina di destinazione.
+      - *Allenamento*: sotto "Tocca a te" due riquadri, i giorni allenati
+        questa settimana (pallini L–D) e l'ultima seduta, che prima stava
+        nella riga sotto "Tocca a te". Niente volume a confronto: spinta e
+        full body non muovono gli stessi chili.
+      - A 320 px il "g" dei riquadri macro del diario usciva dal bordo (già
+        su `main`): sotto i 360 px il numero scende a 17 px. Le etichette
+        restano troncate ("Carbo…", "Protei…") come prima -- non risolto,
+        a tre colonne in 320 px "Carboidrati" non ci sta.
+
+      Verificato nel browser a 320 e 390 px, chiaro e scuro, anche con
+      Fitbit collegato (riga finta nel database, poi tolta). `npm run e2e`:
+      162 controlli, tutto a posto. Non provato su un iPhone vero.
 - [x] **Titoli di sezione fuori dalle schede.** Fatto su tutte e quattro le
       schermate.
 - [x] **Freccia su quello che si apre.** Fatto sulle tessere dei macro.

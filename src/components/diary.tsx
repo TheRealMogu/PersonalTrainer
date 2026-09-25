@@ -45,6 +45,7 @@ import { ComeUltimaVolta } from "./come-ultima-volta";
 import { Integratori } from "./integratori";
 import { SoloCalorie } from "./solo-calorie";
 import { Card } from "./card";
+import { Griglia, Riquadro } from "./riquadro";
 import { CalorieRing } from "./calorie-ring";
 import { IncollaPasto } from "./incolla-pasto";
 import { EditMealSheet } from "./edit-meal-sheet";
@@ -460,11 +461,11 @@ export function Diary({
         ) : null}
 
         {/*
-          L'acqua sta qui dentro, sotto i macro, e non in una scheda sua: e'
+          L'acqua sta qui dentro, sotto i macro, e non in un riquadro suo: e'
           la prima schermata, quella che si vede senza scorrere, ed e' l'unico
-          posto in cui "quanti bicchieri ho bevuto" costa zero gesti. Una
-          scheda a parte l'avrebbe spinta sotto la piega, dove le cose non si
-          guardano -- e una cosa che non si guarda non si segna.
+          posto in cui "quanti bicchieri ho bevuto" costa zero gesti.
+          Misurato: in un riquadro a parte il margine in piu' portava il "+"
+          a 390 px per meta' sotto la barra in basso.
         */}
         <div className="mt-3 border-t border-hairline pt-3">
           <Acqua
@@ -473,43 +474,37 @@ export function Diary({
             obiettivo={obiettivi.bicchieriAcqua}
           />
         </div>
+      </Card>
 
-        {/*
-          Il peso per lo stesso motivo dell'acqua: costa zero gesti in piu'
-          per arrivarci, e senza l'andamento nel tempo non si costruirebbe
-          mai. Un campo e non un contatore, perche' il peso non si aggiusta
-          a incrementi fissi come i bicchieri.
-        */}
-        <div className="mt-3 border-t border-hairline pt-3">
+      {/*
+        Peso, passi e integratori in riquadri, come nelle altre schermate:
+        anello e macro sono la risposta a "quanto mi resta", questi sono cose
+        da segnare, e nella stessa scheda si leggevano come un blocco solo.
+        Peso e passi affiancati perche' sono lo stesso gesto -- un numero e
+        Salva -- e in riga occupano la meta'.
+      */}
+      <Griglia className="mb-4">
+        <Riquadro>
           <Peso day={day} kg={peso} />
-        </div>
-
-        {/*
-          I passi per lo stesso motivo del peso: un numero letto sul
-          telefono e scritto una volta, non un contatore. Il PT li chiede
-          insieme all'acqua ogni domenica.
-        */}
-        <div className="mt-3 border-t border-hairline pt-3">
+        </Riquadro>
+        <Riquadro>
           <Passi
             day={day}
             passi={passi}
             obiettivo={obiettivi.passiGiornalieri}
             fitbitConnesso={fitbitConnesso}
           />
-        </div>
-
+        </Riquadro>
         {/*
-          Gli integratori sotto l'acqua, e per lo stesso motivo: sono una cosa
-          da fare oggi, e se stessero sotto la piega non si spunterebbero. La
-          riga non c'e' finche' non hai definito almeno un integratore, quindi
-          a chi non li prende questa scheda resta com'era.
+          La riga non c'e' finche' non hai definito almeno un integratore,
+          quindi a chi non li prende questa griglia resta com'era.
         */}
         {integratori.length > 0 ? (
-          <div className="mt-3 border-t border-hairline pt-3">
+          <Riquadro ampio>
             <Integratori day={day} integratori={integratori} />
-          </div>
+          </Riquadro>
         ) : null}
-      </Card>
+      </Griglia>
 
       {/*
         Ricopiare viene prima di ricomporre, e sta *sopra* il titolo

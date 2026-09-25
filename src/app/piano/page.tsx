@@ -3,6 +3,12 @@ import { Card } from "@/components/card";
 import { LogoutButton } from "@/components/logout-button";
 import { PageHeader } from "@/components/page-header";
 import { IconProfilo } from "@/components/nav-icons";
+import {
+  Etichetta,
+  Griglia,
+  Riquadro,
+  RiquadroLink,
+} from "@/components/riquadro";
 import { Section } from "@/components/section";
 import { Versione } from "@/components/versione";
 import { PLAN_SECTIONS } from "@/lib/plan";
@@ -45,34 +51,53 @@ export default async function PianoPage() {
         icon={<IconProfilo />}
       />
 
+      {/*
+        I target come riquadri, con lo stesso pallino di colore del diario:
+        le calorie a tutta riga perché sono il numero su cui si regola tutto
+        il resto, i macro e l'acqua a metà.
+      */}
       <Section title="Target giornaliero">
-        <Card>
-          <dl className="divide-y divide-hairline">
-            {MACRO_ORDER.map((key) => (
-              <div
-                key={key}
-                className="flex items-baseline justify-between py-3 first:pt-0 last:pb-0"
-              >
-                <dt className="text-[15px]">{MACRO_LABELS[key]}</dt>
-                <dd className="text-[15px] font-semibold tabular-nums">
-                  {formatMacro(obiettivi.macro[key], key)} {MACRO_UNITS[key]}
-                </dd>
-              </div>
-            ))}
-            <div className="flex items-baseline justify-between py-3 last:pb-0">
-              <dt className="text-[15px]">Acqua</dt>
-              <dd className="text-[15px] font-semibold tabular-nums">
-                {obiettivi.bicchieriAcqua} bicchieri
-              </dd>
-            </div>
-          </dl>
-          <Link
-            href="/obiettivi"
-            className="mt-4 flex min-h-12 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
-          >
-            Cambia gli obiettivi
-          </Link>
-        </Card>
+        <Griglia>
+          <Riquadro ampio>
+            <Etichetta macro="kcal">{MACRO_LABELS.kcal}</Etichetta>
+            <p className="mt-1 leading-none">
+              <span className="text-[34px] font-bold tracking-tight">
+                {formatMacro(obiettivi.macro.kcal, "kcal")}
+              </span>
+              <span className="ml-1.5 text-[15px] text-muted">
+                {MACRO_UNITS.kcal}
+              </span>
+            </p>
+          </Riquadro>
+          {MACRO_ORDER.filter((key) => key !== "kcal").map((key) => (
+            <Riquadro key={key}>
+              <Etichetta macro={key}>{MACRO_LABELS[key]}</Etichetta>
+              <p className="mt-1 leading-tight">
+                <span className="text-[22px] font-semibold">
+                  {formatMacro(obiettivi.macro[key], key)}
+                </span>
+                <span className="ml-1 text-[13px] text-muted">
+                  {MACRO_UNITS[key]}
+                </span>
+              </p>
+            </Riquadro>
+          ))}
+          <Riquadro>
+            <Etichetta>Acqua</Etichetta>
+            <p className="mt-1 leading-tight">
+              <span className="text-[22px] font-semibold">
+                {obiettivi.bicchieriAcqua}
+              </span>
+              <span className="ml-1 text-[13px] text-muted">bicchieri</span>
+            </p>
+          </Riquadro>
+        </Griglia>
+        <Link
+          href="/obiettivi"
+          className="mt-3 flex min-h-12 w-full items-center justify-center rounded-xl bg-surface text-[15px] font-medium text-accent shadow-[var(--shadow-card)] tocco active:bg-raised"
+        >
+          Cambia gli obiettivi
+        </Link>
       </Section>
 
       {PLAN_SECTIONS.map((section) => (
@@ -93,69 +118,27 @@ export default async function PianoPage() {
         </Section>
       ))}
 
-      <Section title="La tua scheda">
-        <Card>
-          <p className="mb-4 text-[15px] leading-snug text-muted">
-            Quando il personal trainer ne manda una nuova: copi un prompt, lo
-            mandi a una chat con i suoi documenti, riporti indietro la risposta
-            e <strong className="font-medium">guardi cosa cambia</strong> prima
-            di confermare. Niente viene cancellato — quello che esce dal
-            programma resta leggibile con tutti i carichi registrati sopra.
-          </p>
-          <Link
-            href="/scheda"
-            className="flex min-h-12 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
-          >
-            Cambia la scheda
-          </Link>
-        </Card>
-      </Section>
-
-      <Section title="I tuoi integratori">
-        <Card>
-          <p className="mb-4 text-[15px] leading-snug text-muted">
-            Le vitamine e gli integratori che prendi. Diventano una riga di
-            spunte nel diario, sotto l&apos;acqua — e finché l&apos;elenco è
-            vuoto quella riga non c&apos;è.
-          </p>
-          <Link
-            href="/integratori"
-            className="flex min-h-12 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
-          >
-            Apri l&apos;elenco
-          </Link>
-        </Card>
-      </Section>
-
-      <Section title="I tuoi alimenti">
-        <Card>
-          <p className="mb-4 text-[15px] leading-snug text-muted">
-            I tasti rapidi del diario. Si aggiungono, si correggono e si tolgono
-            da qui — e crescono da soli ogni volta che salvi un pasto fra i
-            rapidi.
-          </p>
-          <Link
-            href="/alimenti"
-            className="flex min-h-12 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
-          >
-            Apri l&apos;archivio
-          </Link>
-        </Card>
-      </Section>
-
-      <Section title="Passi da Fitbit">
-        <Card>
-          <p className="mb-4 text-[15px] leading-snug text-muted">
-            Collega Google (che porta anche i dati di Fitbit) per non scrivere i
-            passi a mano ogni giorno — restano comunque modificabili nel diario.
-          </p>
-          <Link
-            href="/fitbit"
-            className="flex min-h-12 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
-          >
-            Gestisci il collegamento
-          </Link>
-        </Card>
+      {/*
+        Quattro posti in cui si va, non quattro cose da leggere: una griglia
+        di riquadri che si toccano interi, invece di quattro schede alte
+        mezzo schermo con un paragrafo e un tasto ciascuna. La spiegazione
+        lunga sta nella pagina che si apre, dove serve.
+      */}
+      <Section title="Da gestire">
+        <Griglia>
+          <RiquadroLink href="/scheda" titolo="Scheda">
+            Quando il PT ne manda una nuova
+          </RiquadroLink>
+          <RiquadroLink href="/integratori" titolo="Integratori">
+            Le spunte nel diario
+          </RiquadroLink>
+          <RiquadroLink href="/alimenti" titolo="Alimenti">
+            I tasti rapidi del diario
+          </RiquadroLink>
+          <RiquadroLink href="/fitbit" titolo="Fitbit">
+            I passi senza scriverli
+          </RiquadroLink>
+        </Griglia>
       </Section>
 
       {/*
