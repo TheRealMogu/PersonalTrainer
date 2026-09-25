@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  confiniGiornoRoma,
   formatDayLabel,
   isIsoDate,
   shiftIsoDate,
@@ -123,5 +124,27 @@ describe("iniziale del giorno della settimana", () => {
   it("regge anche le date prima del 1970", () => {
     // Il 1969-12-31 era un mercoledi': l'indice diventa negativo e non deve rompersi.
     assert.equal(weekdayInitial("1969-12-31"), "M");
+  });
+});
+
+describe("confiniGiornoRoma", () => {
+  it("usa lo scarto dell'ora legale (UTC+2) d'estate", () => {
+    // Mezzanotte del 20 settembre a Roma è le 22:00 UTC del 19.
+    const { inizio, fine } = confiniGiornoRoma("2026-09-20");
+    assert.equal(inizio, "2026-09-19T22:00:00.000Z");
+    assert.equal(fine, "2026-09-20T22:00:00.000Z");
+  });
+
+  it("usa lo scarto dell'ora solare (UTC+1) d'inverno", () => {
+    // Mezzanotte del 20 gennaio a Roma è le 23:00 UTC del 19.
+    const { inizio, fine } = confiniGiornoRoma("2026-01-20");
+    assert.equal(inizio, "2026-01-19T23:00:00.000Z");
+    assert.equal(fine, "2026-01-20T23:00:00.000Z");
+  });
+
+  it("copre esattamente 24 ore", () => {
+    const { inizio, fine } = confiniGiornoRoma("2026-09-20");
+    const durataMs = new Date(fine).getTime() - new Date(inizio).getTime();
+    assert.equal(durataMs, 24 * 60 * 60 * 1000);
   });
 });

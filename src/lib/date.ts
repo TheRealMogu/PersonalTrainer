@@ -72,6 +72,48 @@ export function weekdayInitial(iso: string): string {
 }
 
 /**
+ * Inizio e fine, come istanti UTC, della giornata italiana `iso`.
+ *
+ * Serve solo per chi parla con un servizio esterno che vuole un intervallo
+ * assoluto (Google Health, vedi `src/lib/google-health.ts`): il resto
+ * dell'app lavora su colonne DATE, che non hanno quest'ambiguita'. Mezzanotte
+ * a Roma non e' mezzanotte UTC -- lo scarto e' un'ora o due secondo l'ora
+ * legale -- quindi si calcola lo scarto vero invece di assumerlo.
+ */
+export function confiniGiornoRoma(iso: string): {
+  inizio: string;
+  fine: string;
+} {
+  const stimato = new Date(`${iso}T00:00:00Z`);
+  const formattatore = new Intl.DateTimeFormat("en-US", {
+    timeZone: TIME_ZONE,
+    hourCycle: "h23",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  const parti: Record<string, string> = {};
+  for (const { type, value } of formattatore.formatToParts(stimato)) {
+    if (type !== "literal") parti[type] = value;
+  }
+  const comeSeUtc = Date.UTC(
+    Number(parti.year),
+    Number(parti.month) - 1,
+    Number(parti.day),
+    Number(parti.hour),
+    Number(parti.minute),
+    Number(parti.second),
+  );
+  const scartoMs = comeSeUtc - stimato.getTime();
+  const inizio = new Date(stimato.getTime() - scartoMs);
+  const fine = new Date(inizio.getTime() + 24 * 60 * 60 * 1000);
+  return { inizio: inizio.toISOString(), fine: fine.toISOString() };
+}
+
+/**
  * Il lunedi' della settimana a cui appartiene questa data.
  *
  * La settimana va da lunedi' a domenica, come la striscia in cima al diario

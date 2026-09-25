@@ -34,6 +34,7 @@ const SCHERMATE = [
   { nome: "obiettivi", url: "/obiettivi" },
   { nome: "integratori", url: "/integratori" },
   { nome: "scheda", url: "/scheda" },
+  { nome: "fitbit", url: "/fitbit" },
 ];
 
 const MISURE = [
