@@ -9,7 +9,7 @@ export function LoginForm() {
   const [state, formAction, pending] = useActionState(login, INITIAL);
 
   return (
-    <form action={formAction} className="rounded-2xl bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+    <form action={formAction} className="rounded-2xl bg-surface p-5 shadow-[var(--shadow-card)]">
       <label className="block">
         <span className="mb-1 block text-[13px] text-muted">Password</span>
         <input

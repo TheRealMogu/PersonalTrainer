@@ -16,7 +16,7 @@ export default function Loading() {
       {[0, 1].map((index) => (
         <section
           key={index}
-          className="mb-4 rounded-2xl bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+          className="mb-4 rounded-2xl bg-surface p-5 shadow-[var(--shadow-card)]"
         >
           <div className="h-3 w-24 animate-pulse rounded bg-hairline" />
           <div className="mt-4 space-y-3">

@@ -2,12 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  IconAllenamento,
+  IconDiario,
+  IconProfilo,
+  IconStorico,
+} from "./nav-icons";
 
 const TABS = [
-  { href: "/", label: "Diario" },
-  { href: "/piano", label: "Piano" },
-  { href: "/allenamento", label: "Allenamento" },
-  { href: "/storico", label: "Storico" },
+  { href: "/", label: "Diario", Icon: IconDiario },
+  { href: "/piano", label: "Piano", Icon: IconProfilo },
+  { href: "/allenamento", label: "Allenamento", Icon: IconAllenamento },
+  { href: "/storico", label: "Storico", Icon: IconStorico },
 ];
 
 export function TabBar() {
@@ -22,17 +28,20 @@ export function TabBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="mx-auto flex w-full max-w-md">
-        {TABS.map((tab) => {
-          const active = pathname === tab.href;
+        {TABS.map(({ href, label, Icon }) => {
+          const active = pathname === href;
           return (
-            <li key={tab.href} className="flex-1">
+            <li key={href} className="flex-1">
               <Link
-                href={tab.href}
-                className={`flex h-14 items-center justify-center px-1 text-center text-[12px] font-medium leading-tight transition-colors duration-200 ease-ios ${
+                href={href}
+                className={`flex h-16 flex-col items-center justify-center gap-1 px-1 text-center transition-colors duration-200 ease-ios ${
                   active ? "text-accent" : "text-muted"
                 }`}
               >
-                {tab.label}
+                <Icon />
+                <span className="text-[12px] font-medium leading-none">
+                  {label}
+                </span>
               </Link>
             </li>
           );

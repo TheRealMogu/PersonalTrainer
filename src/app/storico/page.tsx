@@ -7,6 +7,7 @@ import {
   MacroHistoryTable,
 } from "@/components/macro-history-chart";
 import { MacroStatTile } from "@/components/macro-stat-tile";
+import { IconStorico } from "@/components/nav-icons";
 import { PageHeader } from "@/components/page-header";
 import { HeatmapMese } from "@/components/heatmap-mese";
 import { PesoHistoryChart } from "@/components/peso-history-chart";
@@ -101,7 +102,11 @@ export default async function StoricoPage({
     console.error("[storico] lettura dei dati fallita:", error);
     return (
       <main>
-        <PageHeader title="Storico" subtitle={`Ultimi ${range} giorni`} />
+        <PageHeader
+          title="Storico"
+          subtitle={`Ultimi ${range} giorni`}
+          icon={<IconStorico />}
+        />
         <DbErrorPanel error={error} />
       </main>
     );
@@ -121,7 +126,11 @@ export default async function StoricoPage({
 
   return (
     <main>
-      <PageHeader title="Storico" subtitle={`Ultimi ${range} giorni`} />
+      <PageHeader
+        title="Storico"
+        subtitle={`Ultimi ${range} giorni`}
+        icon={<IconStorico />}
+      />
 
       {/*
         Il riepilogo sta in cima e fuori dal filtro: e' la domanda che ci si

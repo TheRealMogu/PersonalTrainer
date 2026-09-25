@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Card } from "@/components/card";
 import { LogoutButton } from "@/components/logout-button";
 import { PageHeader } from "@/components/page-header";
+import { IconProfilo } from "@/components/nav-icons";
 import { Section } from "@/components/section";
 import { Versione } from "@/components/versione";
 import { PLAN_SECTIONS } from "@/lib/plan";
@@ -38,7 +39,11 @@ export default async function PianoPage() {
 
   return (
     <main>
-      <PageHeader title="Piano" subtitle="Linee guida del personal trainer" />
+      <PageHeader
+        title="Piano"
+        subtitle="Linee guida del personal trainer"
+        icon={<IconProfilo />}
+      />
 
       <Section title="Target giornaliero">
         <Card>

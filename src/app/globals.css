@@ -68,6 +68,16 @@
   --color-overlay-track: #4a4a4d;
 
   /*
+   * L'ombra di ogni card, un valore solo invece che ripetuto uguale in dieci
+   * file (`card.tsx`, `login-form.tsx`, `day-nav.tsx`, ...): cambiarlo a mano
+   * dieci volte è come i dieci colori dei macro che non abbiamo -- un posto
+   * solo dove deciderlo. Due strati invece di uno: il primo dà il distacco
+   * dallo sfondo, il secondo la definizione del bordo -- prima c'era solo il
+   * secondo, ed era così tenue da leggersi come "senza ombra".
+   */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  /*
    * Il movimento, tutto deciso qui.
    *
    * Una curva sola per tutta l'app. Non e' una scelta di gusto: quando ogni
@@ -193,8 +203,8 @@ body {
 }
 
 body {
-  /* spazio per la tab bar fissa + safe area iPhone */
-  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  /* spazio per la tab bar fissa (64px, con icona sopra l'etichetta) + safe area iPhone */
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom));
 }
 
 /* Niente zoom automatico di Safari sugli input sotto i 16px. */

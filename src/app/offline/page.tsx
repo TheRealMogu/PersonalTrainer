@@ -21,7 +21,7 @@ export default function OfflinePage() {
         Niente rosso: come per il pannello di errore del database, questo non
         e' una colpa dell'utente e non e' un fuori target (regola 9).
       */}
-      <section className="mb-4 rounded-2xl bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <section className="mb-4 rounded-2xl bg-surface p-5 shadow-[var(--shadow-card)]">
         <p className="text-[15px] leading-relaxed text-muted">
           Il telefono non ha rete in questo momento, e questa schermata non era
           ancora stata aperta: senza rete e senza una copia sul telefono non

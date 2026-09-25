@@ -23,7 +23,7 @@ export default function Error({
 
   return (
     <main className="flex min-h-[60vh] flex-col justify-center">
-      <section className="rounded-2xl bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <section className="rounded-2xl bg-surface p-5 shadow-[var(--shadow-card)]">
         <h1 className="text-[22px] font-semibold">Qualcosa è andato storto</h1>
         <p className="mt-2 text-[15px] leading-relaxed text-muted">
           Non sono riuscito a caricare questa schermata. Quello che hai già
