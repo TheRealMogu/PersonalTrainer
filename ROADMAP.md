@@ -481,8 +481,29 @@ leggibile qualcosa che oggi non lo è.
       il giro è: copia il prompt, apri Claude, incolla, copia la risposta,
       torna, incolla. Sei gesti, di cui quattro sono trasporto. Da valutare
       un collegamento che apra l'app con la risposta già dentro.
-- [ ] **Intestazione che si compatta scorrendo.** Costa poco, guadagna una
+- [x] **Intestazione che si compatta scorrendo.** Costa poco, guadagna una
       riga su schermate lunghe.
+
+      Fatto su `PageHeader` (Piano, Allenamento, Storico — le tre schermate
+      dove sotto c'è davvero una lista lunga): il titolo resta incollato in
+      cima invece di scorrere via, e passa da 34px a 17px — le due misure
+      del titolo grande e del titolo di barra su iOS — appena si superano 24px
+      di scorrimento. Il sottotitolo sparisce insieme: a piccolo non c'è
+      spazio per due righe senza sembrare compresso.
+
+      Le schermate raggiunte da *Piano* (Alimenti, Integratori, Obiettivi,
+      Scheda, il dettaglio di un allenamento) hanno un'intestazione più
+      piccola e un proprio collegamento indietro: restano come sono, non è
+      quello il problema che l'elemento descriveva.
+
+      Niente di nuovo nel movimento: la stessa `--ease-ios` a 200ms già usata
+      altrove, non uno stile a parte per l'intestazione.
+
+      Verificato: browser vero a 320/390px, chiaro/scuro, su Piano
+      (2360px scorribili), Storico (964px) e Allenamento (1574px) —
+      l'intestazione resta a `top: 0px` durante lo scorrimento (misurato,
+      non assunto) e il font passa da 34px a 17px; nessuno scorrimento
+      orizzontale introdotto. `npm run e2e`: 144 controlli, tutto a posto.
 - [ ] **Un "+" che apre i modi di registrare.** Oggi i tasti rapidi sono in
       fondo al diario: da valutare solo se il conteggio dei tocchi migliora,
       altrimenti è decorazione.
