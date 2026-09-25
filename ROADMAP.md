@@ -999,9 +999,12 @@ l'«aggiunta dinamica dei prodotti» arriva senza toccare il guscio iOS.
       scrive lo stesso pasto nel diario — controllato riga per riga sul
       database. Provato anche il ramo d'errore (risposta non-2xx): il
       messaggio "Open Food Facts non risponde. Riprova tra poco." compare
-      invariato. Resta comunque da confermare, con una chiamata vera fuori
-      da questo ambiente, che i campi di Search-a-licious abbiano davvero
-      questa forma per un prodotto reale.
+      invariato.
+
+      **Confermato in produzione, stesso giorno**: la ricerca vera trova
+      prodotti reali con i macro giusti. L'ipotesi sulla forma dei campi
+      di Search-a-licious, fatta senza poterla chiamare da qui, era quella
+      giusta.
 - [x] **Salvalo come tasto rapido**, con la porzione che usi tu. È il punto
       in cui l'archivio smette di essere quello del seed e diventa il tuo —
       e si incastra con il punto «cibi rapidi modificabili» di 6-quater.
