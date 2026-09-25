@@ -352,10 +352,24 @@ leggibile qualcosa che oggi non lo è.
       (titolo + riepilogo, niente campi) e tenere aperto solo quello in
       corso. Cambia il modo di usare la schermata, quindi va deciso guardando
       un prima/dopo, non a parole.
-- [ ] **Card d'insight in linguaggio naturale sul diario.** Una riga che
-      legge i numeri al posto tuo: "ti restano 1.390 kcal e 86 g di proteine —
-      un petto di pollo e una colazione ci stanno". Oggi i numeri ci sono ma
-      la sintesi la fai a mente. È la cosa che manca di più.
+- [x] **Card d'insight in linguaggio naturale sul diario.** Una riga sotto i
+      tre riquadri che legge i numeri al posto tuo: "Ti restano 1905 kcal e
+      155 g di proteine — Petto di pollo e Whey isolate Yamamoto ci stanno."
+      Le proteine e non un macro a caso: è la stessa coppia con cui
+      PRODOTTO.md descrive "quanto mi resta" ("600 kcal e 70 g di proteine
+      ancora da spendere"), perché a differenza di carboidrati e grassi le
+      proteine sono l'unico macro che di solito serve cercare apposta. Gli
+      alimenti proposti sono i tasti rapidi che ci stanno ancora
+      (`fitsInRemaining`, gia' usato da "Cosa mi entra ancora"), ordinati dal
+      piu' proteico: chiudono per primi il divario appena nominato. Sparisce
+      da sola a target raggiunto o superato -- l'anello rosso lo dice gia',
+      ripeterlo sarebbe un rimprovero (regola 8). `buildInsight` in
+      `src/lib/nutrition.ts`, 7 test in `nutrition.test.ts`.
+      Verificato: browser vero a 320 e 390px, chiaro e scuro, con rete a
+      ~400ms; numero a schermo confrontato a mano con la somma dei pasti
+      aggiunti (1905 − 165 − 365 = 1375 kcal, 155 − 46 − 7 = 102 g di
+      proteine); dopo aver eliminato i pasti la frase torna quella del
+      giorno vuoto. `npm run e2e`: 144 controlli, tutto a posto.
 - [x] **Niente NaN a schermo, controllato in CI.** Non era in programma:
       `Number(formatMacro(...))` ha smesso di funzionare il giorno in cui il
       formattatore ha cominciato a scrivere la virgola, e la media dello

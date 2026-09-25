@@ -4,6 +4,7 @@ import {
   alreadyOver,
   arrotondaMacro,
   avvisoNonScomposte,
+  buildInsight,
   buildProgress,
   etichettaScarto,
   fitsInRemaining,
@@ -203,6 +204,82 @@ describe("alreadyOver", () => {
 
   it("il target esatto non e' oltre", () => {
     assert.deepEqual(alreadyOver({ ...DAILY_TARGETS }), []);
+  });
+});
+
+const pettoDiPollo = { ...pollo, name: "petto di pollo" };
+const risoConNome = { ...riso, name: "riso" };
+const colazioneConNome = { ...colazione, name: "colazione" };
+
+describe("buildInsight", () => {
+  it("dice kcal e proteine, come fa PRODOTTO.md a descriverlo", () => {
+    const totals = { kcal: 500, carbs: 200, protein: 55, fat: 5 };
+    const frase = buildInsight(totals, DAILY_TARGETS);
+    assert.equal(
+      frase,
+      `Ti restano ${formatMacro(DAILY_TARGETS.kcal - 500, "kcal")} kcal e ${formatMacro(DAILY_TARGETS.protein - 55, "protein")} g di proteine.`
+    );
+  });
+
+  it("propone gli alimenti che ci stanno ancora, dal piu' proteico", () => {
+    const totals = { kcal: 0, carbs: 0, protein: 0, fat: 0 };
+    const frase = buildInsight(totals, DAILY_TARGETS, [
+      risoConNome,
+      colazioneConNome,
+      pettoDiPollo,
+    ]);
+    // pollo (46 g) e riso (7 g) battono la colazione (6.5 g) per proteine:
+    // la colazione resta fuori dai primi due nonostante sia in mezzo alla lista
+    assert.match(frase, /petto di pollo e riso ci stanno\.$/);
+  });
+
+  it("nomina un solo alimento con il verbo al singolare", () => {
+    // resta solo margine per un alimento piccolo
+    const totals = { kcal: DAILY_TARGETS.kcal - 200, carbs: 0, protein: 0, fat: 0 };
+    const frase = buildInsight(totals, DAILY_TARGETS, [colazioneConNome]);
+    assert.match(frase, /colazione ci sta\.$/);
+  });
+
+  it("senza alimenti che ci stanno, non propone niente", () => {
+    const totals = { kcal: DAILY_TARGETS.kcal - 200, carbs: 0, protein: 0, fat: 0 };
+    const frase = buildInsight(totals, DAILY_TARGETS, [risoConNome]); // 365 kcal, non ci sta in 200
+    assert.ok(!frase.includes("—"));
+    assert.ok(!frase.includes("ci sta"));
+  });
+
+  it("stringa vuota quando le kcal sono gia' a target o oltre", () => {
+    assert.equal(buildInsight({ ...DAILY_TARGETS }, DAILY_TARGETS), "");
+    assert.equal(
+      buildInsight(
+        { ...DAILY_TARGETS, kcal: DAILY_TARGETS.kcal + 50 },
+        DAILY_TARGETS
+      ),
+      ""
+    );
+  });
+
+  it("quando le proteine sono gia' a target, dice solo le kcal", () => {
+    const totals = {
+      kcal: 100,
+      carbs: 0,
+      protein: DAILY_TARGETS.protein + 1,
+      fat: 0,
+    };
+    const frase = buildInsight(totals, DAILY_TARGETS);
+    assert.equal(
+      frase,
+      `Ti restano ${formatMacro(DAILY_TARGETS.kcal - 100, "kcal")} kcal.`
+    );
+  });
+
+  it("non incolpa: nessuna parola di valore nel testo", () => {
+    const frase = buildInsight(
+      { kcal: 500, carbs: 200, protein: 55, fat: 5 },
+      DAILY_TARGETS
+    );
+    for (const parola of ["attenzione", "sforato", "male", "!"]) {
+      assert.ok(!frase.toLowerCase().includes(parola));
+    }
   });
 });
 

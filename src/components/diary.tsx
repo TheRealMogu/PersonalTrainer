@@ -31,6 +31,7 @@ import {
 import * as coda from "@/lib/pasti-store";
 import {
   avvisoNonScomposte,
+  buildInsight,
   buildProgress,
   kcalNonScomposte,
   sumMacros,
@@ -219,6 +220,7 @@ export function Diary({
   const totals = sumMacros(tuttiIPasti);
   const fuoriDalConto = kcalNonScomposte(tuttiIPasti);
   const progress = buildProgress(totals, obiettivi.macro);
+  const insight = buildInsight(totals, obiettivi.macro, quickFoods);
 
   function handleAdd(input: Omit<MealInput, "day">) {
     setError(null);
@@ -419,6 +421,18 @@ export function Diary({
             <MacroTile key={item.key} progress={item} onOpen={setMacroAperto} />
           ))}
         </div>
+
+        {/*
+          La sintesi in una frase sola: quello che oggi facevi a mente
+          sommando l'anello e i tre riquadri. Sparisce da sola a target
+          raggiunto o superato -- l'anello rosso lo dice gia', ripeterlo
+          sarebbe un rimprovero (regola 8), non una sintesi.
+        */}
+        {insight ? (
+          <p className="mt-3 border-t border-hairline pt-3 text-[14px] leading-snug">
+            {insight}
+          </p>
+        ) : null}
 
         {/*
           Una riga sola, sotto i tre riquadri, e non una dentro ognuno: le

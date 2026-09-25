@@ -1,4 +1,10 @@
-import { DAILY_TARGETS, MACRO_ORDER, MACRO_UNITS, type MacroKey } from "./targets";
+import {
+  DAILY_TARGETS,
+  MACRO_LABELS,
+  MACRO_ORDER,
+  MACRO_UNITS,
+  type MacroKey,
+} from "./targets";
 
 /** I target rispetto a cui si misura. Predefiniti: quelli del codice. */
 type Target = Record<MacroKey, number>;
@@ -192,4 +198,64 @@ export function alreadyOver(
   targets: Target = DAILY_TARGETS
 ): MacroKey[] {
   return MACRO_ORDER.filter((key) => totals[key] > targets[key]);
+}
+
+/** Un alimento con un nome, per proporlo dentro la sintesi. */
+export type ArticoloConNome = MacroSource & { name: string };
+
+/**
+ * La riga che legge i numeri al posto tuo: "Ti restano 1390 kcal e 86 g di
+ * proteine — petto di pollo e yogurt greco ci stanno."
+ *
+ * Le proteine e non un macro scelto a caso: è la coppia che PRODOTTO.md
+ * stesso usa per descrivere "quanto mi resta" a cena ("600 kcal e 70 g di
+ * proteine ancora da spendere") -- a differenza di carboidrati e grassi, che
+ * arrivano quasi sempre di striscio dentro altri alimenti, le proteine sono
+ * l'unico macro che di solito serve *cercare* apposta, quindi è l'unico che
+ * vale la pena nominare in una frase e non lasciare alla barra.
+ *
+ * Non e' un consiglio nuovo: e' `buildProgress` e `fitsInRemaining`, che
+ * esistono gia' e si guardano gia' uno alla volta, messi in una frase sola.
+ * La sintesi oggi la fai a mente sommando l'anello e i tre riquadri; qui la
+ * fa l'app.
+ *
+ * Stringa vuota a target gia' raggiunto o superato: a quel punto l'anello
+ * rosso lo dice gia', e ripeterlo in una frase sarebbe un rimprovero
+ * (regola 8), non una sintesi.
+ */
+export function buildInsight(
+  totals: MacroTotals,
+  targets: Target = DAILY_TARGETS,
+  quickFoods: ArticoloConNome[] = []
+): string {
+  const progress = buildProgress(totals, targets);
+  const kcal = progress.find((item) => item.key === "kcal")!;
+  if (kcal.remaining <= 0) return "";
+
+  const protein = progress.find((item) => item.key === "protein")!;
+  const mostraProteine = protein.remaining > 0;
+
+  let frase = `Ti restano ${formatMacro(kcal.remaining, "kcal")} kcal`;
+  if (mostraProteine) {
+    frase += ` e ${formatMacro(protein.remaining, "protein")} ${
+      MACRO_UNITS.protein
+    } di ${MACRO_LABELS.protein.toLowerCase()}`;
+  }
+
+  // Cosa ci sta ancora, dal piu' proteico: e' la stessa domanda a cui
+  // risponde gia' "Cosa mi entra ancora", solo scelta per te invece che da
+  // scorrere -- e sceglierla ordinando per proteine e' quello che chiude per
+  // primo il divario appena nominato.
+  const candidati = quickFoods
+    .filter((food) => fitsInRemaining(totals, food, targets).fits)
+    .sort((a, b) => b.protein - a.protein || a.kcal - b.kcal)
+    .slice(0, 2);
+
+  if (candidati.length === 1) {
+    frase += ` — ${candidati[0].name} ci sta`;
+  } else if (candidati.length === 2) {
+    frase += ` — ${candidati[0].name} e ${candidati[1].name} ci stanno`;
+  }
+
+  return frase + ".";
 }
