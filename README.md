@@ -7,7 +7,7 @@ personale.
 - **Diario** — barre di progresso per kcal / carboidrati / proteine / grassi,
   aggiunta pasti con tasti rapidi o form manuale, navigazione tra i giorni.
 - **Piano** — target giornaliero, regole generali e integrazione.
-- **Allenamento** — programma Team Schiavi, settimana T1 (3 giornate).
+- **Allenamento** — programma di allenamento a giornate, letto dal database.
 - **Storico** — media giornaliera e andamento dei macro su 7 o 30 giorni, con
   linea del target e vista tabellare, più la progressione del massimale
   stimato per ogni esercizio.
@@ -150,8 +150,20 @@ aggiuntive e senza toccare il database.
 
 ### Modificare i dati iniziali
 
-Tasti rapidi e programma di allenamento stanno in `src/lib/seed-data.ts`.
-Dopo una modifica basta rilanciare `npm run db:seed`.
+Il repository è pubblico, quindi i tuoi cibi veri e il nome della tua scheda
+non ci stanno dentro. `npm run db:seed` legge `src/lib/seed-data.local.ts`
+se esiste — non è tracciato da git — e altrimenti `seed-data.example.ts`,
+che è quello pubblico e generico.
+
+Alla prima clonazione crealo così:
+
+```bash
+cp src/lib/seed-data.example.ts src/lib/seed-data.local.ts
+# poi modifica src/lib/seed-data.local.ts con i tuoi cibi e la tua scheda
+npm run db:seed
+```
+
+Dopo una modifica a uno dei due file basta rilanciare `npm run db:seed`.
 
 Le linee guida del Piano stanno in `src/lib/plan.ts` e i target in
 `src/lib/targets.ts` (contenuto statico, non serve il database).

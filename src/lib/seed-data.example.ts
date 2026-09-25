@@ -1,6 +1,11 @@
 /**
- * Dati iniziali caricati da `npm run db:seed`:
- * i tasti rapidi del diario e il programma di allenamento (Team Schiavi, T1).
+ * Dati d'esempio per `npm run db:seed`: tasti rapidi del diario e un
+ * programma di allenamento generico, in tre giornate.
+ *
+ * Questo è l'unico file di semi che sta nel repository — è pubblico, quindi
+ * niente nomi di prodotti o programmi veri. I tuoi dati veri vanno in
+ * `seed-data.local.ts`, che non è tracciato da git (vedi `.gitignore`): lo
+ * script lo usa al posto di questo se lo trova sul disco.
  */
 
 export type QuickFoodSeed = {
@@ -15,36 +20,92 @@ export type QuickFoodSeed = {
 export const QUICK_FOODS_SEED: QuickFoodSeed[] = [
   {
     name: "Colazione",
-    portion: "150 ml latte parz. scremato + caffè + 30 g Coco Pops",
+    portion: "150 ml latte parz. scremato + caffè + 30 g cereali",
     kcal: 185,
     carbs: 32,
     protein: 6.5,
     fat: 3.5,
   },
-  { name: "Yogurt greco Fage 0%", portion: "200 g", kcal: 118, carbs: 8, protein: 20, fat: 0.4 },
-  { name: "Yogurt greco Fage 5%", portion: "150 g", kcal: 140, carbs: 6, protein: 13.5, fat: 7.5 },
-  { name: "Banana", portion: "1 media", kcal: 105, carbs: 27, protein: 1.3, fat: 0.4 },
-  { name: "Barretta fitness", portion: "66 kcal", kcal: 66, carbs: 4, protein: 8, fat: 2 },
   {
-    name: "Whey isolate Yamamoto",
+    name: "Yogurt greco 0%",
+    portion: "200 g",
+    kcal: 118,
+    carbs: 8,
+    protein: 20,
+    fat: 0.4,
+  },
+  {
+    name: "Yogurt greco 5%",
+    portion: "150 g",
+    kcal: 140,
+    carbs: 6,
+    protein: 13.5,
+    fat: 7.5,
+  },
+  {
+    name: "Banana",
+    portion: "1 media",
+    kcal: 105,
+    carbs: 27,
+    protein: 1.3,
+    fat: 0.4,
+  },
+  {
+    name: "Barretta proteica",
+    portion: "1 barretta",
+    kcal: 66,
+    carbs: 4,
+    protein: 8,
+    fat: 2,
+  },
+  {
+    name: "Proteine whey isolate",
     portion: "1 scoop, 30 g",
     kcal: 110,
     carbs: 1,
     protein: 25,
     fat: 0.5,
   },
-  { name: "Bresaola", portion: "50 g", kcal: 84, carbs: 0.3, protein: 21, fat: 0.6 },
   {
-    name: "Salmone affumicato selvaggio",
+    name: "Bresaola",
+    portion: "50 g",
+    kcal: 84,
+    carbs: 0.3,
+    protein: 21,
+    fat: 0.6,
+  },
+  {
+    name: "Salmone affumicato",
     portion: "100 g",
     kcal: 117,
     carbs: 0,
     protein: 18,
     fat: 4,
   },
-  { name: "Riso / pasta", portion: "100 g crudo", kcal: 365, carbs: 78, protein: 7, fat: 1 },
-  { name: "Petto di pollo", portion: "150 g", kcal: 165, carbs: 0, protein: 46, fat: 3.6 },
-  { name: "Uova sode", portion: "2 uova", kcal: 155, carbs: 1, protein: 13, fat: 11 },
+  {
+    name: "Riso / pasta",
+    portion: "100 g crudo",
+    kcal: 365,
+    carbs: 78,
+    protein: 7,
+    fat: 1,
+  },
+  {
+    name: "Petto di pollo",
+    portion: "150 g",
+    kcal: 165,
+    carbs: 0,
+    protein: 46,
+    fat: 3.6,
+  },
+  {
+    name: "Uova sode",
+    portion: "2 uova",
+    kcal: 155,
+    carbs: 1,
+    protein: 13,
+    fat: 11,
+  },
   {
     name: "Tonno sgocciolato",
     portion: "1 scatoletta, 52 g",

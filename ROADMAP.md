@@ -249,10 +249,29 @@ sono credenziali, ma sono tuoi.
       — servono solo come punto di partenza prima che tu apra l'app la prima
       volta, o se la lettura del database fallisce; i tuoi target veri stanno
       già nella tabella `targets` e non cambiano.
-- [ ] **Spostare cibi e scheda del PT nel database**, lasciando nel repo solo
-      un file di esempio (`src/lib/seed-data.ts`). Resta da fare: con la repo
-      privata è meno urgente, ma il file contiene ancora nomi di prodotti
-      reali (Yogurt Fage, Whey Yamamoto) e il programma "Team Schiavi".
+- [x] **Spostare cibi e scheda del PT nel database**, lasciando nel repo solo
+      un file di esempio. Fatto: `src/lib/seed-data.ts` (nomi di prodotti
+      reali, "Team Schiavi") diventa `seed-data.example.ts`, generico e
+      pubblico, e `seed-data.local.ts`, con i dati veri, che non entra nel
+      repository (`.gitignore`) — resta solo sul disco di chi lo esegue.
+      `npm run db:seed` prende il primo che trova sul filesystem (con
+      `existsSync`, non un import provato-e-preso: un errore vero nel file
+      locale deve fermare lo script, non passare per "file assente"),
+      ripiegando sull'esempio quando il locale manca — come in CI, dove i
+      dati veri semplicemente non esistono. La scheda vera resta comunque
+      nel database sin dal primo seed: questo cambia solo cosa sta in git,
+      non cosa legge l'app. Tolto "Team Schiavi" anche dal sottotitolo della
+      schermata Allenamento e dal README, unici altri due posti dove
+      comparivano nomi reali fuori da questo file.
+
+      Provato: `npm run db:seed` con e senza il file locale, in entrambi i
+      casi seguito da `npm run e2e` (162 controlli, tutto a posto) e da
+      typecheck, lint, test, build.
+- [x] **Il volume dovrebbe contare due manubri?** Deciso (25 settembre): no,
+      resta come oggi (un braccio). Raddoppiarlo avrebbe cambiato anche i
+      numeri già registrati — un cambiamento silenzioso di dati passati che
+      la voce sopra segnalava apposta come "da decidere, non da fare di
+      nascosto". Nessun codice cambiato: è una decisione, non un bug.
 
 ## 6. Comodità che mancano ancora
 
@@ -645,6 +664,14 @@ leggibile qualcosa che oggi non lo è.
       di essere letti (`countSum`, un conteggio) e un posto dove finire
       che esisteva già -- il campo *Passi* del diario, aggiunto in questa
       stessa sezione.
+
+      **Deciso (25 settembre): niente budget dinamico, per ora.** Il budget
+      resta fisso. Proprio il bug citato sopra pesa nella scelta: un numero
+      "wildly inflated" che allargasse il budget sarebbe peggio di non
+      averlo (regola 6, al contrario -- non un giorno non registrato preso
+      per zero, ma un giorno gonfiato preso per vero). Se un giorno si
+      riprende in mano, solo le calorie attive, mai quelle totali: quelle
+      raddoppierebbero il metabolismo basale, già dentro il target fisso.
 
       **Come funziona.** *Piano → Passi da Fitbit*: un tasto "Connetti con
       Google" apre il consenso OAuth (`access_type=offline` per il refresh

@@ -31,7 +31,9 @@ async function caricaDati() {
   const [days, open] = await Promise.all([getWorkout(), getOpenSession()]);
 
   // Allenamento in corso: la pagina diventa la schermata di esecuzione.
-  const dayInCorso = open ? days.find((item) => item.id === open.dayId) : undefined;
+  const dayInCorso = open
+    ? days.find((item) => item.id === open.dayId)
+    : undefined;
 
   if (open && dayInCorso) {
     const [sets, previous] = await Promise.all([
@@ -45,7 +47,13 @@ async function caricaDati() {
     const lastTime: Record<number, LoggedSet[]> = {};
     for (const [exerciseId, list] of previous) lastTime[exerciseId] = list;
 
-    return { stato: "in-corso", session: open, day: dayInCorso, sets, lastTime } as const;
+    return {
+      stato: "in-corso",
+      session: open,
+      day: dayInCorso,
+      sets,
+      lastTime,
+    } as const;
   }
 
   const oggi = todayIso();
@@ -81,7 +89,11 @@ export default async function AllenamentoPage() {
     console.error("[allenamento] lettura dei dati fallita:", error);
     return (
       <main>
-        <PageHeader title="Allenamento" subtitle="Team Schiavi · settimana T1" icon={<IconAllenamento />} />
+        <PageHeader
+          title="Allenamento"
+          subtitle="Le tue giornate"
+          icon={<IconAllenamento />}
+        />
         <DbErrorPanel error={error} />
       </main>
     );
@@ -109,7 +121,11 @@ export default async function AllenamentoPage() {
 
   return (
     <main>
-      <PageHeader title="Allenamento" subtitle="Team Schiavi · settimana T1" icon={<IconAllenamento />} />
+      <PageHeader
+        title="Allenamento"
+        subtitle="Le tue giornate"
+        icon={<IconAllenamento />}
+      />
 
       {/*
         Quale giornata tocca: e' la domanda con cui si entra in palestra, e
@@ -166,8 +182,13 @@ export default async function AllenamentoPage() {
               </header>
               <ul className="mb-4 divide-y divide-hairline">
                 {day.exercises.map((exercise) => (
-                  <li key={exercise.id} className="flex items-baseline gap-3 py-2.5 first:pt-0">
-                    <span className="flex-1 text-[15px] leading-snug">{exercise.name}</span>
+                  <li
+                    key={exercise.id}
+                    className="flex items-baseline gap-3 py-2.5 first:pt-0"
+                  >
+                    <span className="flex-1 text-[15px] leading-snug">
+                      {exercise.name}
+                    </span>
                     <span className="shrink-0 text-[15px] font-semibold tabular-nums text-muted">
                       {exercise.sets}×{exercise.reps}
                     </span>
