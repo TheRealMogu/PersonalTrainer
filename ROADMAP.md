@@ -346,12 +346,34 @@ leggibile qualcosa che oggi non lo è.
       dettaglio. Prima c'era solo "Ultima volta: 25×8 · 27,5×8 · 30×7" in
       cima all'esercizio, e il confronto lo facevi a mente con trenta secondi
       di recupero.
-- [ ] **La seduta è un muro di schede uguali.** Otto esercizi, otto
+- [x] **La seduta è un muro di schede uguali.** Otto esercizi, otto
       rettangoli identici: quello che stai facendo adesso ha lo stesso peso
       visivo di quello fra quaranta minuti. L'idea è comprimere i finiti
       (titolo + riepilogo, niente campi) e tenere aperto solo quello in
       corso. Cambia il modo di usare la schermata, quindi va deciso guardando
       un prima/dopo, non a parole.
+
+      Fatto, dopo il prima/dopo: un esercizio con tutte le serie previste
+      registrate (`fatte >= previste`) si comprime in una riga sola — titolo
+      e riepilogo delle serie ("12×10 · 12×10 · 12×8"), niente campi — invece
+      di restare un rettangolo identico a quello in corso. Un tocco lo
+      riapre per correggere una serie, e da lì resta aperto per il resto
+      della seduta: non c'è motivo di richiuderlo da solo.
+
+      Non si è provato a indovinare "quello in corso" oltre a "non ancora
+      finito": con il riordino di seduta già fatto (si può saltare fra
+      esercizi se una macchina è occupata) scegliere un solo esercizio
+      "attivo" sarebbe stato arbitrario per chi lavora fuori ordine. Tutti
+      gli esercizi non ancora completati restano aperti come oggi.
+
+      Verificato: browser vero a 320/390px, chiaro/scuro, con rete a
+      ~400ms — avviata una seduta vera (Day 1 — Push), completate le 3
+      serie previste di un esercizio, il riepilogo compresso ("Curl manubri
+      con rotazione in piedi — 12×10 · 12×10 · 12×8") confrontato a mano con
+      le serie inserite; il secondo esercizio, con una sola serie su tre,
+      resta con i campi visibili; riaperto il primo esercizio, tutte e tre
+      le serie restano modificabili ed eliminabili. `npm run e2e`: 144
+      controlli, tutto a posto.
 - [x] **Card d'insight in linguaggio naturale sul diario.** Una riga sotto i
       tre riquadri che legge i numeri al posto tuo: "Ti restano 1905 kcal e
       155 g di proteine — Petto di pollo e Whey isolate Yamamoto ci stanno."

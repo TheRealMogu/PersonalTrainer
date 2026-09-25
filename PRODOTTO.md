@@ -77,7 +77,7 @@ proprio le schermate che vanno riviste.
 | Sapere cosa mi entra ancora | 0 gesti | 0 (conteggio sempre visibile) | ok |
 | Capire dove sono finite le calorie | 0 gesti | 0 (totale per pasto) | ok |
 | Sapere quale allenamento tocca | 0 gesti | 0 (scheda "Tocca a te") | ok |
-| Correggere una serie sbagliata | 2 gesti | 2 (tocca la riga → salva) | ok |
+| Correggere una serie sbagliata | 2 gesti | 2 (tocca la riga → salva); 3 se l'esercizio è già finito e compresso (riapri → riga → salva) | ok |
 | Rimediare a una serie eliminata | 1 gesto | 1 (Annulla) | ok |
 | Rimediare a "Fine" toccato per sbaglio | 1 gesto | 1 (Annulla) | ok |
 | Uscire da una giornata avviata sbagliata | 1 gesto | 1 (Scarta) | ok |
