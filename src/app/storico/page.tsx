@@ -6,15 +6,14 @@ import {
   MacroHistoryChart,
   MacroHistoryTable,
 } from "@/components/macro-history-chart";
-import { MacroStatTile } from "@/components/macro-stat-tile";
 import { IconStorico } from "@/components/nav-icons";
 import { PageHeader } from "@/components/page-header";
 import { HeatmapMese } from "@/components/heatmap-mese";
-import { PesoHistoryChart } from "@/components/peso-history-chart";
 import { costruisciMese } from "@/lib/mese";
 import { RangeFilter } from "@/components/range-filter";
 import { RiepilogoSettimana } from "@/components/riepilogo-settimana";
 import { Section } from "@/components/section";
+import { StoricoSintesi } from "@/components/storico-sintesi";
 import { lunediDellaSettimana, shiftIsoDate, todayIso } from "@/lib/date";
 import {
   buildDateRange,
@@ -31,7 +30,7 @@ import {
   getSessionsInRange,
 } from "@/lib/queries";
 import { costruisciRiepilogo } from "@/lib/riepilogo";
-import { MACRO_LABELS, MACRO_ORDER, type Obiettivi } from "@/lib/targets";
+import { MACRO_ORDER, type Obiettivi } from "@/lib/targets";
 
 export const dynamic = "force-dynamic";
 
@@ -172,64 +171,26 @@ export default async function StoricoPage({
         </Card>
       ) : null}
 
-      {/*
-        Due schede, non due sezioni: il contenuto di entrambe e' corto (numeri
-        e etichette, nessun paragrafo lungo), e affiancate si leggono in un
-        colpo solo invece di uno scroll in piu'. La griglia dei macro dentro
-        "Media giornaliera" passa da 2 a 1 colonna qui: a meta' larghezza
-        scheda una griglia 2x2 stringerebbe ogni numero sotto la soglia
-        leggibile.
-      */}
-      {stats.loggedDays > 0 ? (
-        <Section title="Media e giorni entro il target">
-          <div className="grid grid-cols-2 gap-3">
-            <Card title="Media giornaliera">
-              <div className="flex flex-col gap-2">
-                {MACRO_ORDER.map((macro) => (
-                  <MacroStatTile
-                    key={macro}
-                    macro={macro}
-                    average={stats.averages[macro]}
-                    target={obiettivi.macro[macro]}
-                  />
-                ))}
-              </div>
-            </Card>
+      {stats.loggedDays > 0 || pesiFiltro.length > 0 ? (
+        <Section title="In sintesi">
+          <StoricoSintesi
+            stats={stats}
+            days={days}
+            today={today}
+            targets={obiettivi.macro}
+            pesi={pesiFiltro}
+          />
 
-            <Card title="Giorni entro il target">
-              {/*
-                Etichetta sopra e numero sotto, non affiancati: a meta'
-                larghezza scheda "Carboidrati" e "4 / 4" sulla stessa riga si
-                strizzavano fino a toccarsi ("Carboidrati4"). Misurato a
-                320px, non dedotto.
-              */}
-              <dl className="divide-y divide-hairline">
-                {MACRO_ORDER.map((macro) => (
-                  <div key={macro} className="py-2.5 first:pt-0 last:pb-0">
-                    <dt className="text-[13px] text-muted">
-                      {MACRO_LABELS[macro]}
-                    </dt>
-                    <dd className="text-[15px] font-semibold tabular-nums">
-                      {stats.daysWithinTarget[macro]}
-                      <span className="font-normal text-muted">
-                        {" "}
-                        / {stats.loggedDays}
-                      </span>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </Card>
-          </div>
-
-          <p className="mt-3 px-1 text-[13px] text-muted">
-            {stats.loggedDays === 1
-              ? `Un solo giorno registrato sui ${stats.totalDays} conclusi`
-              : `Media su ${stats.loggedDays} giorni registrati sui ${stats.totalDays} conclusi`}
-            ; lo scarto è rispetto al target giornaliero. I giorni non compilati
-            non abbassano la media, e oggi non entra nel conto finché non è
-            finito.
-          </p>
+          {stats.loggedDays > 0 ? (
+            <p className="mt-3 px-1 text-[13px] text-muted">
+              {stats.loggedDays === 1
+                ? `Un solo giorno registrato sui ${stats.totalDays} conclusi`
+                : `Media su ${stats.loggedDays} giorni registrati sui ${stats.totalDays} conclusi`}
+              ; lo scarto è rispetto al target giornaliero. I giorni non
+              compilati non abbassano la media, e oggi non entra nel conto
+              finché non è finito.
+            </p>
+          ) : null}
         </Section>
       ) : null}
 
@@ -281,15 +242,6 @@ export default async function StoricoPage({
           {/* Stessa sezione: la tabella è lo stesso dato del grafico, letto come numeri. */}
           <Card>
             <MacroHistoryTable days={days} />
-          </Card>
-        </Section>
-      ) : null}
-
-      {/* Niente da mostrare senza almeno una misura: un grafico vuoto non direbbe niente. */}
-      {pesiFiltro.length > 0 ? (
-        <Section title="Peso">
-          <Card>
-            <PesoHistoryChart pesi={pesiFiltro} />
           </Card>
         </Section>
       ) : null}
