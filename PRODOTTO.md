@@ -67,6 +67,7 @@ proprio le schermate che vanno riviste.
 | Salvare un pasto fra i tasti rapidi | 2 gesti | 2 (tocca la riga → salva) | ok |
 | Correggere un alimento in archivio | 3 gesti | 3 (Piano → archivio → riga) | ok |
 | Trovare un prodotto dal suo codice a barre | 2 gesti | 2 (tocca *Scansiona* → inquadra); 3+ scrivendolo a mano (tredici cifre) | ok con la fotocamera, non provato su un telefono vero |
+| Segnare i passi del giorno, con Fitbit collegato | 2 gesti | 2 (*Sincronizza da Fitbit* → *Salva*) | ok; il collegamento vero (login Google) non è mai stato provato da qui |
 | Vedere quanta acqua ho bevuto | 0 gesti | 0 su schermo alto (finisce a 632 px); **1** su 320×568 | ok sopra i 700 px |
 | Correggere un pasto già inserito | 2 gesti | 2 (tocca la riga → quantità) | ok |
 | Correggere nome o macro di un pasto | 3 gesti | 3 (riga → *Correggi nome e valori* → campo) | ok |

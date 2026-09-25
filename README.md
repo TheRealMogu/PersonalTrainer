@@ -360,6 +360,79 @@ un `.xcodeproj`, non un `.xcworkspace` da CocoaPods) e che lo schema Xcode non
 schemi e target prima di compilare, così al primo errore si vede subito cosa
 manca. Ma il primo giro potrebbe comunque richiedere un aggiustamento.
 
+## 6. Passi da Fitbit (facoltativo)
+
+Con questo collegamento, in *Piano → Passi da Fitbit* e poi nel diario compare
+un tasto "Sincronizza da Fitbit" che scrive i passi al posto tuo — restano
+comunque modificabili come sempre. Senza, l'app funziona esattamente come
+prima: è tutto facoltativo, tre variabili in più e basta.
+
+> **La vecchia Fitbit Web API non si usa più.** Google l'ha dismessa: le
+> nuove registrazioni sono chiuse e a fine settembre 2026 smette di
+> rispondere del tutto. Il collegamento passa dalla sua sostituta, la
+> **Google Health API**, che aggrega Fitbit e altre fonti dietro un login
+> Google.
+
+### Creare le chiavi
+
+1. Su [console.cloud.google.com](https://console.cloud.google.com/) crea un
+   progetto (o usane uno che hai già).
+2. **API e servizi → Libreria** → cerca "Google Health API" → **Abilita**.
+3. **API e servizi → Schermata di consenso OAuth**:
+   - Tipo di utente: **Esterno** (va bene anche con un solo utente).
+   - Nome app, email di contatto: quello che vuoi, non li vede nessun altro.
+   - **Utenti di prova**: aggiungi il tuo indirizzo Google — è quello con cui
+     ti colleghi dall'app.
+4. **API e servizi → Credenziali → Crea credenziali → ID client OAuth**:
+   - Tipo di applicazione: **Applicazione web**.
+   - **URI di reindirizzamento autorizzati**: `https://il-tuo-deploy.vercel.app/api/fitbit/callback`
+     — l'indirizzo esatto del tuo deploy, senza slash finale, più
+     `/api/fitbit/callback`. Deve essere identico, carattere per carattere, a
+     `APP_URL` più questo percorso: non lo controlla nessuno finché non è
+     sbagliato, e allora Google rifiuta il collegamento senza dire perché.
+5. Copia **ID client** e **Client secret**.
+
+### Aggiungere le variabili su Vercel
+
+Stesso posto delle altre (**Settings → Environment Variables**):
+
+| Nome | Valore |
+|---|---|
+| `GOOGLE_HEALTH_CLIENT_ID` | l'ID client del punto 5 |
+| `GOOGLE_HEALTH_CLIENT_SECRET` | il Client secret del punto 5 |
+| `APP_URL` | l'indirizzo del tuo deploy, es. `https://il-tuo-deploy.vercel.app` |
+
+Poi **Deployments → ⋯ → Redeploy**, come per ogni altra variabile.
+
+### La scadenza dei 7 giorni
+
+Finché l'app resta in modalità **"Testing"** sulla schermata di consenso
+(quella di default — pubblicarla chiede una revisione di sicurezza di
+Google, non ha senso farla per un'app a un utente solo), **il permesso
+scade da solo ogni 7 giorni**: passata la settimana, "Sincronizza" smette di
+funzionare e *Piano → Passi da Fitbit* torna a mostrare "Connetti". Non è un
+guasto — riconnettersi richiede lo stesso tocco della prima volta.
+
+### Cosa è stato provato da qui, e cosa no
+
+A differenza di Open Food Facts e di Neon, il proxy di rete di questo
+ambiente **non** blocca i domini Google: `oauth2.googleapis.com` e
+`health.googleapis.com` rispondono davvero. Con delle credenziali finte
+(nessuna chiave vera, nessun account) si è visto il vero comportamento di
+entrambi — un rifiuto 401, nella forma reale che restituisce un'API Google —
+e verificato che l'app lo riconosce e lo traduce in italiano senza rompersi,
+compreso il caso "il permesso è scaduto" che cancella da sola la connessione
+e riporta la schermata allo stato "non collegato".
+
+Quello che resta non provato è **il consenso vero**: senza un tuo account
+Google e un browser con cui completare la schermata di autorizzazione, da
+qui non si può ottenere un token valido — quindi la lettura di passi reali
+non è mai stata vista, solo la sua forma attesa dalla documentazione
+ufficiale (`developers.google.com/health`, letta a settembre 2026). Il primo
+collegamento vero, con le tue chiavi, è anche la prima volta che si scopre se
+i passi tornano — vedi ROADMAP.md per il dettaglio completo di cosa è stato
+verificato e come.
+
 ## Struttura
 
 ```

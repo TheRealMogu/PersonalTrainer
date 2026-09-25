@@ -498,13 +498,85 @@ leggibile qualcosa che oggi non lo è.
       scritta nel codice — lì si arriva a cinque cifre, qui ci si ferma a
       quattro e il punto costa un carattere nell'anello senza far guadagnare
       niente.
-- [ ] **Dati da Apple Watch o Fitbit.** Le calorie bruciate e i passi
-      renderebbero il budget giornaliero vero invece che fisso. Costa parecchio:
-      per Apple Health serve un plugin HealthKit dentro il guscio Capacitor,
-      Xcode e un account sviluppatore a pagamento, e i dati non escono dal
-      telefono -- quindi niente lettura dal server. Fitbit è l'opposto: API
-      web con OAuth, si legge da Vercel, ma vuole un'app registrata e i token
-      da rinnovare. Nessuna delle due è un pomeriggio di lavoro.
+- [~] **Passi da Fitbit.** Mezzo fatto, e di proposito solo mezzo: dei due
+      candidati originari (Apple Health via HealthKit, o Fitbit via API web),
+      Apple Health resta scartato per lo stesso motivo di sempre -- plugin
+      nativo, Xcode, account sviluppatore a pagamento, e i dati non escono
+      dal telefono. Fitbit invece si può fare, ma non con la sua vecchia Web
+      API: Google l'ha dismessa a settembre 2026 (nuove registrazioni già
+      chiuse, spegnimento totale a fine mese), sostituendola con la
+      **Google Health API**, che aggrega Fitbit e altre fonti dietro un
+      login Google.
+
+      Fatta solo la parte dei **passi**, non le calorie bruciate: renderebbero
+      il budget dinamico invece che fisso, com'era nell'idea originale, ma
+      decidere se contare le calorie attive o quelle totali (che
+      includerebbero il metabolismo basale, già dentro il target fisso --
+      doppio conteggio) è una decisione nutrizionale a sé, non una scelta
+      tecnica. Un problema reale e recente lo conferma: un bug segnalato a
+      luglio 2026 su `open-wearables` mostra i totali di calorie del
+      provider Google "wildly inflated". I passi invece hanno un solo modo
+      di essere letti (`countSum`, un conteggio) e un posto dove finire
+      che esisteva già -- il campo *Passi* del diario, aggiunto in questa
+      stessa sezione.
+
+      **Come funziona.** *Piano → Passi da Fitbit*: un tasto "Connetti con
+      Google" apre il consenso OAuth (`access_type=offline` per il refresh
+      token, `prompt=consent` per riottenerlo anche a una riconnessione).
+      Tornati indietro, nel diario compare "Sincronizza da Fitbit" accanto al
+      campo Passi: **non scrive da sola** -- riempie il campo di testo
+      esistente, e resta il tasto *Salva* a confermare, la stessa identica
+      porta di quando li scrivi a mano (`setPassi`). Un numero che arriva da
+      un sensore esterno si mostra e si conferma come una stima (regola 12),
+      anche se qui non è una stima ma una misura: il costo è un tocco in
+      più, il guadagno è non fidarsi ciecamente di un servizio mai chiamato
+      da questo repo prima d'ora.
+
+      **Una riga sola in database** (`fitbit_connessione`, id sempre 1, come
+      `targets`): token di accesso, token di rinnovo, scadenza. Scollegare
+      cancella la riga, non la svuota -- "mai connesso" e "scollegato" sono
+      la stessa cosa. Un 401 da Google durante la sincronizzazione (permesso
+      scaduto o revocato) cancella da sola la connessione e riporta la
+      schermata a "non collegato", invece di continuare a fallire in
+      silenzio ogni giorno.
+
+      **La trappola dei 7 giorni.** Finché l'app resta in modalità "Testing"
+      su Google Cloud -- la modalità di default, dato che pubblicarla
+      chiederebbe una revisione di sicurezza di Google per un'app a un
+      utente solo -- **il permesso scade da solo ogni 7 giorni**. Non è un
+      guasto di questo repo: è cosí che Google tratta ogni app non
+      verificata con scope sanitari. Riconnettersi costa lo stesso tocco
+      della prima volta.
+
+      **Verificato, e più di quanto ci si aspettasse.** A differenza di Open
+      Food Facts, il proxy di rete di questo ambiente **non** blocca i domini
+      Google: `oauth2.googleapis.com` e `health.googleapis.com` rispondono
+      per davvero. Con credenziali finte (senza un account vero, quello non
+      si può avere da qui) si è vista la risposta reale di entrambi -- un 401
+      nella forma vera di un errore Google -- e si è controllato che il
+      codice la riconosca e la traduca in italiano senza rompersi, compreso
+      il caso "scaduto" che ripulisce la connessione da solo: verificato nel
+      browser vero, cliccando *Sincronizza* con una connessione finta in
+      database e guardando la richiesta arrivare davvero a
+      `health.googleapis.com` e tornare un 401 vero. Verificato anche il
+      callback OAuth con uno `state` sbagliato (rifiuta con garbo, non un
+      500) e con `?error=access_denied` (l'utente annulla il consenso: niente
+      messaggio d'errore, regola 8/9 -- non è un guasto, è una scelta).
+      Bersagli e contrasto passano in entrambi gli stati (connesso/non
+      connesso) a 320/390px, chiaro e scuro. `npm run e2e`: 162 controlli,
+      tutto a posto (aggiunta la schermata `/fitbit` alla lista).
+
+      **Quello che resta non verificato è il consenso vero**: senza un
+      account Google e un browser con cui completarlo, da qui non si ottiene
+      un token valido, quindi la lettura di passi reali non è mai stata
+      vista -- solo la sua forma attesa, letta dalla documentazione ufficiale
+      di Google a settembre 2026. La riga `dataSourceFamily`, che
+      nell'unico esempio trovato nella documentazione punta a
+      `google-wearables` (sembra pensato per un Pixel Watch, non per
+      Fitbit), è stata omessa apposta per non escludere la fonte giusta per
+      errore: se una volta collegato per davvero i passi tornassero sempre
+      vuoti, è il primo punto da controllare. Il primo collegamento vero,
+      con le chiavi vere, è anche la prima prova vera che i passi tornano.
 - [ ] **Un modo per tornare indietro dalla chat senza copiare a mano.** Oggi
       il giro è: copia il prompt, apri Claude, incolla, copia la risposta,
       torna, incolla. Sei gesti, di cui quattro sono trasporto. Da valutare

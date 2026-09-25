@@ -16,6 +16,7 @@ import { db } from "@/db";
 import { shiftIsoDate } from "@/lib/date";
 import type { DailyTotals } from "@/lib/history";
 import {
+  fitbitConnessione,
   meals,
   quickFoods,
   stepsDays,
@@ -135,6 +136,15 @@ export async function getPassi(day: string): Promise<number | null> {
     .from(stepsDays)
     .where(eq(stepsDays.day, day));
   return riga?.steps ?? null;
+}
+
+/** Se Fitbit (via Google Health) è collegato: decide se offrire "Sincronizza". */
+export async function getFitbitConnesso(): Promise<boolean> {
+  const righe = await db
+    .select({ id: fitbitConnessione.id })
+    .from(fitbitConnessione)
+    .limit(1);
+  return righe.length > 0;
 }
 
 /** Le righe di peso in un intervallo, per il grafico e per il riepilogo. */

@@ -117,6 +117,31 @@ export const targets = pgTable("targets", {
 });
 
 /**
+ * La connessione a Google Health (Fitbit dietro il login Google): i token
+ * OAuth per leggere i passi al posto di scriverli a mano.
+ *
+ * Una riga sola, `id` sempre a 1, come `targets` -- un utente solo, una
+ * connessione sola. Scollegare cancella la riga invece di svuotarla: non
+ * c'e' uno stato "disconnesso" da distinguere da "mai connesso", sono la
+ * stessa cosa.
+ *
+ * Finche' l'app Google resta in modalita' "Testing" (nessuna revisione
+ * fatta), il permesso scade da solo ogni 7 giorni: `scadeIl` e' quello,
+ * non un dettaglio tecnico da ignorare. Quando scade la sincronizzazione
+ * fallisce con un errore in italiano che dice di riconnettersi, invece di
+ * incolpare l'utente di un dato che l'app non riesce piu' a leggere.
+ */
+export const fitbitConnessione = pgTable("fitbit_connessione", {
+  id: integer("id").primaryKey().default(1),
+  accessToken: text("access_token").notNull(),
+  refreshToken: text("refresh_token").notNull(),
+  scadeIl: timestamp("scade_il", { withTimezone: true }).notNull(),
+  connessoIl: timestamp("connesso_il", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/**
  * L'acqua bevuta, un conteggio per giornata.
  *
  * Una riga per giorno e non una per bicchiere: un bicchiere non ha niente da

@@ -138,6 +138,21 @@ export default async function PianoPage() {
         </Card>
       </Section>
 
+      <Section title="Passi da Fitbit">
+        <Card>
+          <p className="mb-4 text-[15px] leading-snug text-muted">
+            Collega Google (che porta anche i dati di Fitbit) per non scrivere i
+            passi a mano ogni giorno — restano comunque modificabili nel diario.
+          </p>
+          <Link
+            href="/fitbit"
+            className="flex min-h-12 w-full items-center justify-center rounded-xl border border-hairline text-[15px] font-medium text-accent tocco active:bg-raised"
+          >
+            Gestisci il collegamento
+          </Link>
+        </Card>
+      </Section>
+
       {/*
         I dati restano tuoi. Se un giorno il progetto si ferma, o Neon cambia
         idea sul piano gratuito, i mesi di diario devono poter uscire di qui.

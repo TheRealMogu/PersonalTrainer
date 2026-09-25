@@ -11,6 +11,7 @@ import {
 import { slotForHour } from "@/lib/meal-slots";
 import {
   getDailyTotals,
+  getFitbitConnesso,
   getIntegratoriDelGiorno,
   getMealsByDay,
   getObiettivi,
@@ -60,6 +61,7 @@ export default async function DiarioPage({
   let acqua: number;
   let peso: number | null;
   let passi: number | null;
+  let fitbitConnesso: boolean;
   let obiettivi: Obiettivi;
   let integratori: IntegratoreDelGiorno[];
   let usi: UsoPerMomento[];
@@ -72,6 +74,7 @@ export default async function DiarioPage({
       acqua,
       peso,
       passi,
+      fitbitConnesso,
       obiettivi,
       integratori,
       usi,
@@ -83,6 +86,7 @@ export default async function DiarioPage({
       getWater(day),
       getPeso(day),
       getPassi(day),
+      getFitbitConnesso(),
       getObiettivi(),
       getIntegratoriDelGiorno(day),
       getUsiPerMomento(today),
@@ -119,6 +123,7 @@ export default async function DiarioPage({
         acqua={acqua}
         peso={peso}
         passi={passi}
+        fitbitConnesso={fitbitConnesso}
         obiettivi={obiettivi}
         integratori={integratori}
         usi={usi}

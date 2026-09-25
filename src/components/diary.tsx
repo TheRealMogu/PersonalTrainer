@@ -88,6 +88,7 @@ export function Diary({
   acqua,
   peso,
   passi,
+  fitbitConnesso,
   integratori,
   usi,
   ultimaVolta,
@@ -101,6 +102,7 @@ export function Diary({
   acqua: number;
   peso: number | null;
   passi: number | null;
+  fitbitConnesso: boolean;
   integratori: IntegratoreDelGiorno[];
   /** Quello che hai gia' registrato negli ultimi mesi: decide l'ordine dei tasti. */
   usi: UsoPerMomento[];
@@ -488,7 +490,12 @@ export function Diary({
           insieme all'acqua ogni domenica.
         */}
         <div className="mt-3 border-t border-hairline pt-3">
-          <Passi day={day} passi={passi} obiettivo={obiettivi.passiGiornalieri} />
+          <Passi
+            day={day}
+            passi={passi}
+            obiettivo={obiettivi.passiGiornalieri}
+            fitbitConnesso={fitbitConnesso}
+          />
         </div>
 
         {/*
