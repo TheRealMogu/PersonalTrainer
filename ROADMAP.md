@@ -56,7 +56,13 @@ Finché l'app vive solo sul computer, tutto il resto è teoria.
 - [x] **Compilare il primo IPA.** Fatto: run #1 verde. Actions → *Compila IPA per iPhone* → Run
       workflow. Non serve più il deploy: senza URL compila lo stesso e
       mostra la pagina di errore, ma l'app finisce sul telefono.
-- [ ] **Deploy su Vercel** e rilancio con l'URL, così l'app funziona davvero.
+- [x] **Deploy su Vercel** e rilancio con l'URL, così l'app funziona davvero.
+      Fatto: l'app è in produzione e viene usata tutti i giorni — confermato
+      dall'utente stesso mentre segnalava e poi verificava la correzione di
+      Open Food Facts direttamente lì, non solo su questo ambiente. Non
+      verificato da qui (questo ambiente non raggiunge Vercel né Neon), ma
+      non c'è dubbio: è la stessa build che ha appena trovato il guasto di
+      Search-a-licious e poi confermato che "funziona da dio".
 - [ ] **Provarla in Safari**, non in Chromium: tastiera che copre i campi,
       rimbalzo dello scroll, `env(safe-area-inset-*)` sui modelli con notch.
       È il collaudo che manca del tutto.
