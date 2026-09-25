@@ -67,7 +67,7 @@ export function ExerciseCard({
         onClick={() => setEspansoAMano(true)}
         disabled={disabled}
         aria-label={`Riapri ${exercise.name} per correggere una serie`}
-        className="mb-3 flex min-h-11 w-full items-center gap-3 rounded-2xl bg-surface p-4 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] tocco-riquadro active:bg-raised disabled:opacity-60"
+        className="mb-3 flex min-h-11 w-full items-center gap-3 rounded-2xl bg-surface p-4 text-left shadow-[var(--shadow-card)] tocco-riquadro active:bg-raised disabled:opacity-60"
       >
         <span className="min-w-0 flex-1">
           <span className="block text-[15px] font-semibold leading-snug">{exercise.name}</span>
@@ -100,7 +100,7 @@ export function ExerciseCard({
   }
 
   return (
-    <section className="mb-3 rounded-2xl bg-surface p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+    <section className="mb-3 rounded-2xl bg-surface p-4 shadow-[var(--shadow-card)]">
       <header className="flex items-baseline justify-between gap-3">
         <h3 className="min-w-0 flex-1 text-[15px] font-semibold leading-snug">{exercise.name}</h3>
         <span className="shrink-0 text-[13px] tabular-nums text-muted">

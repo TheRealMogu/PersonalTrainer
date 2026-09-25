@@ -357,6 +357,38 @@ Ordinato per quanto cambia davvero l'uso. Il metro resta quello di
 `PRODOTTO.md`: si aggiunge solo ciò che abbassa un costo in tocchi o rende
 leggibile qualcosa che oggi non lo è.
 
+- [x] **La barra in basso e le intestazioni sembravano un prototipo, non
+      un'app finita.** Segnalato a voce: "manca la parte grafica... sembra
+      ancora troppo wip, spoglia". Tre cose, tutte con gli stessi colori già
+      validati (nessuno nuovo):
+
+      **Icone nella barra in basso**, prima solo testo. *Piano* diventa
+      visivamente il "profilo" — un tondino con dentro una sagoma, invece
+      di un'icona uguale alle altre tre — perché è già lì che stanno le
+      impostazioni (accesso, i tuoi dati, il collegamento Fitbit): niente
+      schermata nuova, niente rotta in più.
+
+      **La stessa icona anche nell'intestazione** di Piano, Allenamento e
+      Storico, dentro un riquadro colorato — lega la parte alta e quella
+      bassa dello schermo invece di farle sembrare due app diverse. Trovato
+      un bug vero facendolo: passare l'icona come componente da un Server
+      Component a `PageHeader` (che è "use client") falliva con "Functions
+      cannot be passed directly to Client Components" — si passa l'elemento
+      già istanziato (`<IconPiano />`), non la funzione.
+
+      **Un'ombra sola per tutte le card** (`--shadow-card`, in
+      `globals.css`), leggermente più marcata di prima e non più ripetuta
+      uguale a mano in dieci file diversi — lo stesso principio della curva
+      di movimento unica, applicato alle ombre. Prima era così tenue da
+      leggersi come "senza ombra", ed era una delle cose dietro la
+      sensazione di piattezza.
+
+      Verificato nel browser vero, 320 e 390px, chiaro e scuro: le quattro
+      icone della barra cambiano colore con la scheda attiva, il riquadro
+      dell'intestazione ha contrasto a posto in entrambi i temi, nessuno
+      scorrimento orizzontale introdotto dalla barra più alta (64px invece
+      di 56, per fare posto all'icona sopra l'etichetta). `npm run e2e`: 162
+      controlli, tutto a posto.
 - [x] **Titoli di sezione fuori dalle schede.** Fatto su tutte e quattro le
       schermate.
 - [x] **Freccia su quello che si apre.** Fatto sulle tessere dei macro.

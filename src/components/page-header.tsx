@@ -17,9 +17,18 @@ const SOGLIA_COMPATTA = 24;
 export function PageHeader({
   title,
   subtitle,
+  icon,
 }: {
   title: string;
   subtitle?: string;
+  /**
+   * Un elemento già istanziato (`<IconPiano />`), non il componente: questo
+   * file è "use client" e le pagine che lo chiamano sono Server Component --
+   * passare la funzione invece dell'elemento fa fallire il render ("Functions
+   * cannot be passed directly to Client Components"), trovato provandolo per
+   * davvero, non a lettura di codice.
+   */
+  icon?: React.ReactNode;
 }) {
   const [compatta, setCompatta] = useState(false);
 
@@ -38,13 +47,23 @@ export function PageHeader({
         compatta ? "pt-3 pb-3" : "pt-12 pb-6"
       }`}
     >
-      <h1
-        className={`font-bold leading-tight tracking-tight transition-[font-size] duration-200 ease-ios ${
-          compatta ? "text-[17px]" : "text-[34px]"
-        }`}
-      >
-        {title}
-      </h1>
+      <div className="flex items-center gap-3">
+        {icon && !compatta ? (
+          <span
+            aria-hidden="true"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent/12 text-accent"
+          >
+            {icon}
+          </span>
+        ) : null}
+        <h1
+          className={`font-bold leading-tight tracking-tight transition-[font-size] duration-200 ease-ios ${
+            compatta ? "text-[17px]" : "text-[34px]"
+          }`}
+        >
+          {title}
+        </h1>
+      </div>
       {subtitle && !compatta ? (
         <p className="mt-1 text-[15px] text-muted">{subtitle}</p>
       ) : null}

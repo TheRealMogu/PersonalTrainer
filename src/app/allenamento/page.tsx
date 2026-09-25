@@ -1,5 +1,6 @@
 import { Card } from "@/components/card";
 import { DbErrorPanel } from "@/components/db-error-panel";
+import { IconAllenamento } from "@/components/nav-icons";
 import { PageHeader } from "@/components/page-header";
 import { RecentSessions } from "@/components/recent-sessions";
 import { UndoSeduta } from "@/components/undo-seduta";
@@ -65,7 +66,7 @@ export default async function AllenamentoPage() {
     console.error("[allenamento] lettura dei dati fallita:", error);
     return (
       <main>
-        <PageHeader title="Allenamento" subtitle="Team Schiavi · settimana T1" />
+        <PageHeader title="Allenamento" subtitle="Team Schiavi · settimana T1" icon={<IconAllenamento />} />
         <DbErrorPanel error={error} />
       </main>
     );
@@ -93,7 +94,7 @@ export default async function AllenamentoPage() {
 
   return (
     <main>
-      <PageHeader title="Allenamento" subtitle="Team Schiavi · settimana T1" />
+      <PageHeader title="Allenamento" subtitle="Team Schiavi · settimana T1" icon={<IconAllenamento />} />
 
       {/*
         Quale giornata tocca: e' la domanda con cui si entra in palestra, e
@@ -101,7 +102,7 @@ export default async function AllenamentoPage() {
         suggerimento: le giornate qui sotto sono tutte avviabili.
       */}
       {suggested ? (
-        <section className="mb-4 rounded-2xl bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <section className="mb-4 rounded-2xl bg-surface p-5 shadow-[var(--shadow-card)]">
           <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-muted">
             Tocca a te
           </p>

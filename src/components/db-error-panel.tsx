@@ -16,7 +16,7 @@ export function DbErrorPanel({ error }: { error: unknown }) {
   const { title, body, hint, command } = describeDbError(kind);
 
   return (
-    <section className="mb-4 rounded-2xl bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+    <section className="mb-4 rounded-2xl bg-surface p-5 shadow-[var(--shadow-card)]">
       <h2 className="text-[17px] font-semibold">{title}</h2>
       <p className="mt-2 text-[15px] leading-relaxed text-muted">{body}</p>
       {hint ? <p className="mt-2 text-[15px] leading-relaxed text-muted">{hint}</p> : null}
