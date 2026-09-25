@@ -86,6 +86,7 @@ proprio le schermate che vanno riviste.
 | Segnare una serie senza segnale | 1 gesto | 1 (resta sul telefono) | ok |
 | Sapere com'è andata la settimana | 0 gesti | 0 (striscia in cima al diario) | ok |
 | Aprire un giorno passato | 1 gesto | 1 (dalla striscia) | ok |
+| Tornare a un giorno più lontano di una settimana | 2 gesti | 2 (tocca la data in alto → scegli dal selettore) | ok |
 | Rivedere un allenamento passato | 1 gesto | 1 (tocca la riga in *Ultimi allenamenti*) | ok |
 | Sapere se sto andando meglio dell'ultima volta | 0 gesti | 0 (accanto a ogni serie) | ok |
 | Sapere a che punto è la seduta | 0 gesti | 0 (in cima, accanto al cronometro) | ok |
