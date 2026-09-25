@@ -288,8 +288,24 @@ Nessuna è bloccante, tutte sono state pesate col metro dei gesti.
       non a una riga vuota: "nota cancellata" e "nota mai scritta" sono la
       stessa cosa, e distinguerle vorrebbe dire mostrare un campo vuoto anche
       dove non serve.
-- [ ] **Riordinare gli esercizi** della giornata, se in palestra la macchina
-      è occupata.
+- [x] **Riordinare gli esercizi** della giornata, se in palestra la macchina
+      è occupata. Fatto, ma non come il riordino del programma da *Piano →
+      Cambia la scheda* (quello, già segnato fatto altrove, riscrive
+      l'ordine vero incollando una scheda intera — sproporzionato per "la
+      panca è occupata, la faccio fra cinque minuti"). Due tasti su/giù su
+      ogni scheda dell'esercizio, **solo per la seduta di oggi**: nessuna
+      scrittura sul server, nessuna `sortOrder` toccata. Riaprendo la seduta
+      (o solo ricaricando la pagina) l'ordine torna quello del programma —
+      voluto, perché una modifica per "oggi la macchina è occupata" non deve
+      cambiare cosa fai domani.
+
+      Verificato sul browser vero, 320 e 390px, chiaro e scuro: i tasti sono
+      44×44 px e spariscono da soli quando c'è un solo esercizio (spostare
+      non vorrebbe dire niente); un tocco su "giù" scambia solo la coppia
+      toccata, il resto dell'elenco non si muove; il tasto "su" sul primo e
+      "giù" sull'ultimo restano disabilitati; si può ancora segnare una
+      serie subito dopo aver riordinato, senza errori; un reload vero
+      riporta l'elenco all'ordine del programma, non a quello scambiato.
 - [x] **Quale giornata tocca.** Fatto: l'Allenamento apre su *Tocca a te* con
       la giornata successiva a quella dell'ultima seduta. Resta un
       suggerimento — le altre giornate sono tutte avviabili.

@@ -77,6 +77,37 @@ export function WorkoutSession({
   const [serieDaRipristinare, setSerieDaRipristinare] = useState<LoggedSet | null>(null);
   const tempId = useRef(-1);
 
+  /*
+   * L'ordine delle schede, solo per questa seduta: se una macchina è
+   * occupata si sposta l'esercizio più giù, senza toccare il programma.
+   * Non è una `sortOrder` sul database -- niente da scrivere, niente da
+   * sincronizzare, e riaprendo la seduta si riparte dall'ordine vero.
+   *
+   * Si tiene un elenco di id invece degli esercizi stessi: `exercises`
+   * arriva di nuovo a ogni `router.refresh()`, e l'id è l'unica cosa che
+   * resta la stessa fra un refresh e l'altro.
+   */
+  const [ordine, setOrdine] = useState(() => exercises.map((e) => e.id));
+  const eserciziPerId = new Map(exercises.map((e) => [e.id, e]));
+  // Un esercizio archiviato o aggiunto dopo l'apertura della seduta non è
+  // nell'elenco salvato: si scarta quello che non c'è più, si aggiunge in
+  // fondo quello nuovo -- non si ricalcola `ordine` per farlo, altrimenti un
+  // giro in più di render vedrebbe ancora l'ordine vecchio.
+  const idOrdinati = [
+    ...ordine.filter((id) => eserciziPerId.has(id)),
+    ...exercises.map((e) => e.id).filter((id) => !ordine.includes(id)),
+  ];
+  const eserciziOrdinati = idOrdinati.map((id) => eserciziPerId.get(id)!);
+
+  function handleSposta(exerciseId: number, direzione: -1 | 1) {
+    const indice = idOrdinati.indexOf(exerciseId);
+    const vicino = indice + direzione;
+    if (indice === -1 || vicino < 0 || vicino >= idOrdinati.length) return;
+    const nuovo = [...idOrdinati];
+    [nuovo[indice], nuovo[vicino]] = [nuovo[vicino], nuovo[indice]];
+    setOrdine(nuovo);
+  }
+
   const [optimisticSets, applyOptimistic] = useOptimistic(
     sets,
     (state: LoggedSet[], action: OptimisticAction) =>
@@ -343,7 +374,7 @@ export function WorkoutSession({
         </section>
       ) : null}
 
-      {exercises.map((exercise) => (
+      {eserciziOrdinati.map((exercise, indice) => (
         <ExerciseCard
           key={exercise.id}
           exercise={exercise}
@@ -352,6 +383,9 @@ export function WorkoutSession({
           onLog={(weight, reps) => handleLog(exercise.id, weight, reps)}
           onEdit={setInModifica}
           onDelete={handleDelete}
+          onSposta={(direzione) => handleSposta(exercise.id, direzione)}
+          puoSalire={indice > 0}
+          puoScendere={indice < eserciziOrdinati.length - 1}
           disabled={false}
         />
       ))}
