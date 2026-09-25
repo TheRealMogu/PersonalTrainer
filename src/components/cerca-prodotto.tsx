@@ -2,6 +2,12 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import {
+  CapacitorBarcodeScanner,
+  CapacitorBarcodeScannerCameraDirection,
+  CapacitorBarcodeScannerScanOrientation,
+  CapacitorBarcodeScannerTypeHint,
+} from "@capacitor/barcode-scanner";
+import {
   cercaProdotto,
   cercaProdottoPerBarcode,
   type MealInput,
@@ -52,6 +58,7 @@ export function CercaProdotto({
   const [salvataggio, startSalvataggio] = useTransition();
   const [modalitaBarcode, setModalitaBarcode] = useState(false);
   const [barcodeTesto, setBarcodeTesto] = useState("");
+  const [scansionando, setScansionando] = useState(false);
   const richiesta = useRef(0);
 
   function chiudi() {
@@ -66,6 +73,7 @@ export function CercaProdotto({
     setSalvato("no");
     setModalitaBarcode(false);
     setBarcodeTesto("");
+    setScansionando(false);
   }
 
   /**
@@ -82,6 +90,52 @@ export function CercaProdotto({
     setRisultati(null);
     setCercando(false);
     setErrore(null);
+  }
+
+  /**
+   * Apre la fotocamera invece di far digitare tredici cifre a mano.
+   *
+   * `@capacitor/barcode-scanner` gira nativo dentro il guscio iOS (Vision di
+   * Apple, senza CocoaPods -- si incastra nel progetto a Swift Package
+   * Manager di questo repo) e via camera del browser fuori dall'app: stessa
+   * chiamata, nessuna distinzione di piattaforma da scrivere qui.
+   *
+   * Annullare non è un errore da segnalare (regola 8): sia il ramo web sia
+   * quello nativo del plugin rifiutano la promessa con lo stesso testo,
+   * "...cancelled", quando è l'utente a chiudere la fotocamera.
+   */
+  async function scansiona() {
+    setErrore(null);
+    setScansionando(true);
+    try {
+      const esito = await CapacitorBarcodeScanner.scanBarcode({
+        hint: CapacitorBarcodeScannerTypeHint.ALL,
+        cameraDirection: CapacitorBarcodeScannerCameraDirection.BACK,
+        scanOrientation: CapacitorBarcodeScannerScanOrientation.ADAPTIVE,
+        scanInstructions: "Inquadra il codice a barre del prodotto",
+        scanButton: false,
+      });
+      const codice = esito.ScanResult.trim();
+      if (!barcodeValido(codice)) {
+        setErrore(
+          "Il codice letto non è un codice a barre di un prodotto. Riprova, o scrivilo a mano.",
+        );
+        return;
+      }
+      setBarcodeTesto(codice);
+    } catch (cause) {
+      const messaggio = cause instanceof Error ? cause.message : "";
+      if (/cancel/i.test(messaggio)) return;
+      if (/camera/i.test(messaggio)) {
+        setErrore(
+          "Serve il permesso della fotocamera. Controllalo nelle impostazioni del telefono e riprova.",
+        );
+        return;
+      }
+      setErrore("Non riesco ad aprire la fotocamera. Scrivi il codice a mano.");
+    } finally {
+      setScansionando(false);
+    }
   }
 
   function scegli(prodotto: ProdottoOFF) {
@@ -318,13 +372,43 @@ export function CercaProdotto({
                   Serve solo quando il nome non basta a distinguere due
                   varianti dello stesso prodotto: per questo sta dietro un
                   tocco in più e non affianco al campo del nome.
+
+                  La fotocamera è il modo principale di leggere un codice a
+                  barre -- digitare tredici cifre a mano resta sotto, per
+                  quando la fotocamera non serve o non c'è.
                 */}
+                <button
+                  type="button"
+                  onClick={scansiona}
+                  disabled={scansionando}
+                  className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent-solid text-[15px] font-semibold text-on-accent tocco active:opacity-80 disabled:opacity-60"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3 6V4a1 1 0 0 1 1-1h2M17 6V4a1 1 0 0 0-1-1h-2M3 14v2a1 1 0 0 0 1 1h2M17 14v2a1 1 0 0 1-1 1h-2M3 10h14"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  {scansionando ? "Scansiono…" : "Scansiona con la fotocamera"}
+                </button>
+
+                <p className="mt-3 mb-1 text-[13px] text-muted">
+                  Oppure scrivi il codice
+                </p>
                 <label className="block">
                   <span className="sr-only">Codice a barre</span>
                   <input
                     type="text"
                     inputMode="numeric"
-                    autoFocus
                     value={barcodeTesto}
                     onChange={(event) =>
                       setBarcodeTesto(
