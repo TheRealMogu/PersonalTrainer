@@ -164,6 +164,21 @@ describe("normalizzaProdottiOFF", () => {
     });
     assert.equal(prodotti.length, 1);
   });
+
+  it("legge 'hits', la chiave di Search-a-licious dopo il cambio endpoint", () => {
+    const prodotti = normalizzaProdottiOFF({ hits: [prodottoGrezzo()] });
+    assert.equal(prodotti.length, 1);
+    assert.equal(prodotti[0].nome, "Pane integrale");
+  });
+
+  it("preferisce 'hits' a 'products' quando ci sono entrambe", () => {
+    const prodotti = normalizzaProdottiOFF({
+      hits: [prodottoGrezzo({ product_name: "Da hits" })],
+      products: [prodottoGrezzo({ product_name: "Da products" })],
+    });
+    assert.equal(prodotti.length, 1);
+    assert.equal(prodotti[0].nome, "Da hits");
+  });
 });
 
 describe("scalaProdotto", () => {
