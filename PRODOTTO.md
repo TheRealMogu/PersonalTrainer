@@ -72,6 +72,7 @@ proprio le schermate che vanno riviste.
 | Annullare un errore | 1 gesto | 1 | ok |
 | Entrare nell'app | 0 gesti dopo il primo accesso | 0 | ok |
 | Segnare il carico di una serie | 2 gesti | 1 (campi già pronti) | ok |
+| Spostare un esercizio più giù perché la macchina è occupata | 1 gesto | 1 (tasto ↓, solo per oggi) | ok |
 | Vedere il carico dell'ultima volta | 0 gesti | 0 | ok |
 | Sapere cosa mi entra ancora | 0 gesti | 0 (conteggio sempre visibile) | ok |
 | Capire dove sono finite le calorie | 0 gesti | 0 (totale per pasto) | ok |

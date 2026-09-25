@@ -24,6 +24,9 @@ export function ExerciseCard({
   onLog,
   onEdit,
   onDelete,
+  onSposta,
+  puoSalire,
+  puoScendere,
   disabled,
 }: {
   exercise: WorkoutExercise;
@@ -32,6 +35,10 @@ export function ExerciseCard({
   onLog: (weight: number, reps: number) => void;
   onEdit: (set: LoggedSet) => void;
   onDelete: (setId: number) => void;
+  /** Sposta la scheda di un posto, su (-1) o giù (1), solo per questa seduta. */
+  onSposta: (direzione: -1 | 1) => void;
+  puoSalire: boolean;
+  puoScendere: boolean;
   disabled: boolean;
 }) {
   const suggestion = suggestNextSet(sets, lastTime);
@@ -67,6 +74,51 @@ export function ExerciseCard({
           {done}/{planned} × {exercise.reps}
         </span>
       </header>
+
+      {/*
+        Solo per oggi: se la macchina è occupata si sposta la scheda più giù
+        senza toccare il programma. Niente da scrivere sul server, quindi
+        niente da annullare -- basta ritoccarla. Sparisce da sola quando c'è
+        un solo esercizio, dove spostare non vorrebbe dire niente.
+      */}
+      {puoSalire || puoScendere ? (
+        <div className="mt-1 flex justify-end gap-1">
+          <button
+            type="button"
+            onClick={() => onSposta(-1)}
+            disabled={disabled || !puoSalire}
+            aria-label={`Sposta ${exercise.name} più su, solo per questa seduta`}
+            className="flex h-11 w-11 items-center justify-center rounded-full tocco active:bg-raised disabled:opacity-30"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path
+                d="M2 9.5 7 4.5l5 5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => onSposta(1)}
+            disabled={disabled || !puoScendere}
+            aria-label={`Sposta ${exercise.name} più giù, solo per questa seduta`}
+            className="flex h-11 w-11 items-center justify-center rounded-full tocco active:bg-raised disabled:opacity-30"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path
+                d="M2 4.5 7 9.5l5-5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      ) : null}
 
       {lastTime.length > 0 ? (
         <p className="mt-1 text-[13px] text-muted">
