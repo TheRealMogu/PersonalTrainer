@@ -27,6 +27,27 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: process.env.DEV_ORIGINS?.split(",")
     .map((origine) => origine.trim())
     .filter(Boolean),
+
+  /*
+   * Intestazioni di base contro due classi di attacco che non c'entrano con
+   * la password: incorporare l'app in un iframe altrui (clickjacking) e far
+   * eseguire al browser un file come se fosse un altro tipo (sniffing del
+   * MIME). Niente Content-Security-Policy qui: ne serve una scritta apposta
+   * per questo repo, non presa a scatola chiusa -- rischia di rompere script
+   * o stili legittimi invece di fermare quelli finti.
+   */
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

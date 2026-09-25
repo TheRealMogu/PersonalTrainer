@@ -13,6 +13,23 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
+/**
+ * Tentativi di accesso falliti, per indirizzo IP.
+ *
+ * Prima di questa tabella un tentativo sbagliato costava solo 600ms di
+ * attesa: rallentava chi prova password a raffica, non lo fermava mai
+ * davvero. Una riga per IP, non per tentativo -- contatore e data
+ * dell'ultimo bastano, e la finestra scorrevole (`src/lib/login-tentativi.ts`)
+ * azzera da sola il conteggio quando passa, senza un lavoro a parte che
+ * ripulisca la tabella.
+ */
+export const loginTentativi = pgTable("login_tentativi", {
+  ip: text("ip").primaryKey(),
+  tentativi: integer("tentativi").notNull(),
+  ultimoTentativo: timestamp("ultimo_tentativo", { withTimezone: true }).notNull(),
+  bloccatoFino: timestamp("bloccato_fino", { withTimezone: true }),
+});
+
 /** I momenti della giornata, nell'ordine in cui si mangia. */
 export const mealSlotEnum = pgEnum("meal_slot", [
   "colazione",

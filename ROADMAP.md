@@ -151,6 +151,29 @@ L'app presuppone che tutto vada bene. Non è vero.
 
 ## 4. Qualità che non si vede ma si sente
 
+- [x] **Il sito un po' più difficile da infastidire.** Prima un tentativo di
+      password sbagliato costava solo 600ms di attesa fissa — rallentava,
+      non fermava mai chi ne provasse a raffica. Fatto: dopo 8 tentativi
+      sbagliati nello stesso quarto d'ora, quell'indirizzo resta bloccato per
+      15 minuti, password giusta compresa — una riga per IP
+      (`login_tentativi`, migrazione additiva) che si azzera da sola quando
+      la finestra passa, senza un lavoro a parte che la ripulisca. Aggiunti
+      anche `robots.txt` e il tag `noindex` (un'app a un utente solo dietro
+      password non ha ragione di finire su Google) e tre intestazioni di
+      sicurezza di base (anti-clickjacking, anti-sniffing del MIME,
+      referrer). Niente Content-Security-Policy: ne servirebbe una scritta
+      apposta per questo repo, non presa a scatola chiusa.
+
+      Verificato nel browser vero: 8 password sbagliate di fila bloccano
+      anche il tentativo successivo con la password giusta, col messaggio
+      che dice quanti minuti mancano; il blocco è per indirizzo IP, letto da
+      `x-forwarded-for` (quello che scrive Vercel in produzione); dopo un
+      login riuscito la riga si cancella. `robots.txt` risponde davvero (200,
+      `text/plain`, le regole vere) e non più con un reindirizzamento al
+      login — trovato provandolo per davvero: il middleware di autenticazione
+      lo intercettava come qualunque altra pagina, e un crawler anonimo non
+      avrebbe mai letto le regole vere. `npm run e2e`: 162 controlli, tutto a
+      posto.
 - [x] **Test end-to-end nella pipeline.** Fatto: `npm run e2e`, e in CI gira
       contro un Postgres vero (non Neon: da una macchina di GitHub il database
       di produzione non si tocca). Ha richiesto una cosa che valeva da sola —
@@ -209,15 +232,27 @@ L'app presuppone che tutto vada bene. Non è vero.
 
 ## 5. Dati personali fuori dal codice
 
-La repo è pubblica e contiene i tuoi target, la lista dei cibi e la scheda
-del PT. Non sono credenziali, ma sono tuoi.
+La repo contiene i tuoi target, la lista dei cibi e la scheda del PT. Non
+sono credenziali, ma sono tuoi.
 
-- [ ] **Spostare i dati personali nel database**, lasciando nel repo solo un
-      file di esempio. Il codice diventa riusabile e la repo smette di
-      raccontare la tua dieta.
-- [ ] **Decidere sulla storia di git.** I dati sono in una decina di commit
-      pubblici: toglierli da adesso non li toglie dal passato. O si riscrive
-      la storia, o si accetta.
+- [ ] **Repo privata**, e con lei la domanda che si trascinava da tempo su
+      cosa fare della storia di git: i dati sono in una decina di commit
+      pubblici, e toglierli da adesso non li toglie dal passato. Renderla
+      privata risolve anche quello senza riscrivere niente — i vecchi commit
+      smettono di essere visibili a chiunque, non solo i nuovi. Si fa dalle
+      impostazioni di GitHub (Settings → Danger Zone → Change repository
+      visibility), non da qui: non c'è uno strumento per farlo dal codice,
+      resta un passo da confermare a mano.
+- [x] **Target di partenza nel codice, resi generici.** Fatto: la tabella nel
+      README e la costante `DAILY_TARGETS` in `src/lib/targets.ts` scrivevano
+      i tuoi numeri veri. Ora sono numeri qualunque (2050 kcal, 250/150/50 g)
+      — servono solo come punto di partenza prima che tu apra l'app la prima
+      volta, o se la lettura del database fallisce; i tuoi target veri stanno
+      già nella tabella `targets` e non cambiano.
+- [ ] **Spostare cibi e scheda del PT nel database**, lasciando nel repo solo
+      un file di esempio (`src/lib/seed-data.ts`). Resta da fare: con la repo
+      privata è meno urgente, ma il file contiene ancora nomi di prodotti
+      reali (Yogurt Fage, Whey Yamamoto) e il programma "Team Schiavi".
 
 ## 6. Comodità che mancano ancora
 

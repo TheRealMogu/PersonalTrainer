@@ -97,8 +97,13 @@ export const config = {
    * di login invece dello script vero, e da quel momento ogni apertura
    * dell'app passerebbe da un service worker rotto finche' qualcuno non lo
    * disinstalla a mano dal telefono.
+   *
+   * `robots.txt` per il motivo opposto a tutti gli altri: deve rispondere
+   * a chi non ha ancora fatto login, altrimenti chi lo legge (un crawler,
+   * non un browser) riceve un reindirizzamento verso /login invece delle
+   * regole vere, e non le rispetta perche' non le ha mai lette.
    */
   matcher: [
-    "/((?!_next/static|_next/image|_vercel|favicon.ico|icon.svg|apple-icon|manifest.webmanifest|sw.js).*)",
+    "/((?!_next/static|_next/image|_vercel|favicon.ico|icon.svg|apple-icon|manifest.webmanifest|sw.js|robots.txt).*)",
   ],
 };
