@@ -1,3 +1,4 @@
+import { AllenamentoSintesi } from "@/components/allenamento-sintesi";
 import { Card } from "@/components/card";
 import { DbErrorPanel } from "@/components/db-error-panel";
 import { IconAllenamento } from "@/components/nav-icons";
@@ -12,9 +13,10 @@ import {
   getPreviousSets,
   getRecentSessions,
   getSessionSets,
+  getSessionsInRange,
   getWorkout,
 } from "@/lib/queries";
-import { formatDayLabel } from "@/lib/date";
+import { lunediDellaSettimana, shiftIsoDate, todayIso } from "@/lib/date";
 import { suggestNextDayId } from "@/lib/workout";
 import type { LoggedSet } from "@/lib/workout";
 
@@ -46,7 +48,12 @@ async function caricaDati() {
     return { stato: "in-corso", session: open, day: dayInCorso, sets, lastTime } as const;
   }
 
-  const recent = await getRecentSessions(5);
+  const oggi = todayIso();
+  const lunedi = lunediDellaSettimana(oggi);
+  const [recent, settimana] = await Promise.all([
+    getRecentSessions(5),
+    getSessionsInRange(lunedi, shiftIsoDate(lunedi, 6)),
+  ]);
 
   // La rotazione si legge dallo storico: l'ultima seduta conclusa decide
   // quale giornata proporre adesso.
@@ -55,7 +62,15 @@ async function caricaDati() {
     recent[0]?.dayId ?? null,
   );
 
-  return { stato: "elenco", days, recent, suggestedId } as const;
+  return {
+    stato: "elenco",
+    days,
+    recent,
+    suggestedId,
+    oggi,
+    lunedi,
+    giorniAllenati: settimana.map((seduta) => seduta.day),
+  } as const;
 }
 
 export default async function AllenamentoPage() {
@@ -88,7 +103,7 @@ export default async function AllenamentoPage() {
     );
   }
 
-  const { days, recent, suggestedId } = dati;
+  const { days, recent, suggestedId, oggi, lunedi, giorniAllenati } = dati;
   const suggested = days.find((day) => day.id === suggestedId);
   const ultima = recent[0];
 
@@ -111,9 +126,6 @@ export default async function AllenamentoPage() {
           </h2>
           <p className="mt-1 text-[13px] text-muted">
             {suggested.exercises.length} esercizi
-            {ultima
-              ? ` · ultima seduta: ${ultima.label}, ${formatDayLabel(ultima.day).toLowerCase()}`
-              : " · è la prima seduta"}
           </p>
           <div className="mt-4">
             <StartWorkoutButton
@@ -123,6 +135,14 @@ export default async function AllenamentoPage() {
           </div>
         </section>
       ) : null}
+
+      {/* L'ultima seduta sta qui e non piu' nella riga sotto "Tocca a te": detta due volte era rumore. */}
+      <AllenamentoSintesi
+        lunedi={lunedi}
+        oggi={oggi}
+        giorniAllenati={giorniAllenati}
+        ultima={ultima}
+      />
 
       {days.length === 0 ? (
         <Card>

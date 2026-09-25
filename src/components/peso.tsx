@@ -42,11 +42,14 @@ export function Peso({ day, kg }: { day: string; kg: number | null }) {
     });
   }
 
+  // Il campo sopra e il tasto sotto, non affiancati: il riquadro è largo
+  // metà schermo, e su un telefono da 320 px tutti e tre in fila non ci
+  // stanno senza stringere il campo sotto i numeri che deve contenere.
   return (
     <div>
       <label className="block">
         <span className="mb-1 block text-[13px] text-muted">Peso</span>
-        <div className="flex items-center gap-2">
+        <span className="flex items-center gap-2">
           <input
             type="text"
             inputMode="decimal"
@@ -56,19 +59,19 @@ export function Peso({ day, kg }: { day: string; kg: number | null }) {
               setSalvato(false);
             }}
             placeholder="Es. 82,5"
-            className="w-24 min-h-11 rounded-xl border border-hairline bg-raised px-3 text-[15px] tabular-nums outline-none focus:border-accent"
+            className="min-h-11 w-full min-w-0 rounded-xl border border-hairline bg-raised px-3 text-[15px] tabular-nums outline-none focus:border-accent"
           />
           <span className="text-[15px] text-muted">kg</span>
-          <button
-            type="button"
-            onClick={salva}
-            disabled={pending}
-            className="ml-auto min-h-11 min-w-11 rounded-xl border border-hairline px-4 text-[15px] font-medium text-accent tocco active:bg-raised disabled:opacity-60"
-          >
-            {salvato ? "Salvato ✓" : "Salva"}
-          </button>
-        </div>
+        </span>
       </label>
+      <button
+        type="button"
+        onClick={salva}
+        disabled={pending}
+        className="mt-2 min-h-11 w-full rounded-xl border border-hairline px-3 text-[15px] font-medium text-accent tocco active:bg-raised disabled:opacity-60"
+      >
+        {salvato ? "Salvato ✓" : "Salva"}
+      </button>
 
       {errore ? (
         <p role="alert" className="mt-2 text-[13px] text-muted">

@@ -76,47 +76,75 @@ export function Passi({
     });
   }
 
+  // Stessa forma del peso, che gli sta accanto: campo sopra, tasti sotto.
+  // "Sincronizza da Fitbit" diventa un'icona accanto a Salva perché per
+  // intero non ci starebbe in metà schermo -- il nome resta per chi usa
+  // uno screen reader.
   return (
     <div>
       <label className="block">
-        <div className="mb-1 flex items-center justify-between">
+        <span className="mb-1 flex items-baseline justify-between gap-2">
           <span className="text-[13px] text-muted">Passi</span>
-          {fitbitConnesso ? (
-            <button
-              type="button"
-              onClick={sincronizza}
-              disabled={sincronizzando}
-              className="flex min-h-11 items-center rounded-lg px-2 text-[13px] font-medium text-accent tocco active:opacity-60 disabled:opacity-60"
-            >
-              {sincronizzando ? "Sincronizzo…" : "Sincronizza da Fitbit"}
-            </button>
-          ) : null}
-        </div>
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            inputMode="numeric"
-            value={testo}
-            onChange={(e) => {
-              setTesto(e.target.value);
-              setSalvato(false);
-            }}
-            placeholder="Es. 8500"
-            className="w-28 min-h-11 rounded-xl border border-hairline bg-raised px-3 text-[15px] tabular-nums outline-none focus:border-accent"
-          />
-          <span className="text-[15px] text-muted">
-            / {formatPassi(obiettivo)}
+          <span className="text-[13px] text-muted">
+            di {formatPassi(obiettivo)}
           </span>
+        </span>
+        <input
+          type="text"
+          inputMode="numeric"
+          value={testo}
+          onChange={(e) => {
+            setTesto(e.target.value);
+            setSalvato(false);
+          }}
+          placeholder="Es. 8500"
+          className="min-h-11 w-full min-w-0 rounded-xl border border-hairline bg-raised px-3 text-[15px] tabular-nums outline-none focus:border-accent"
+        />
+      </label>
+      <div className="mt-2 flex gap-1.5">
+        <button
+          type="button"
+          onClick={salva}
+          disabled={pending}
+          className="min-h-11 min-w-0 flex-1 rounded-xl border border-hairline px-1 text-[15px] font-medium text-accent tocco active:bg-raised disabled:opacity-60"
+        >
+          {salvato ? "Salvato ✓" : "Salva"}
+        </button>
+        {fitbitConnesso ? (
           <button
             type="button"
-            onClick={salva}
-            disabled={pending}
-            className="ml-auto min-h-11 min-w-11 rounded-xl border border-hairline px-4 text-[15px] font-medium text-accent tocco active:bg-raised disabled:opacity-60"
+            onClick={sincronizza}
+            disabled={sincronizzando}
+            aria-label={
+              sincronizzando ? "Sincronizzo da Fitbit" : "Sincronizza da Fitbit"
+            }
+            title="Sincronizza da Fitbit"
+            className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-hairline text-accent tocco active:bg-raised disabled:opacity-40"
           >
-            {salvato ? "Salvato ✓" : "Salva"}
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M19 12a7 7 0 0 1-12.3 4.6M5 12a7 7 0 0 1 12.3-4.6"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+              />
+              <path
+                d="M17.5 3.5v4h-4M6.5 20.5v-4h4"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
-        </div>
-      </label>
+        ) : null}
+      </div>
 
       {errore ? (
         <p role="alert" className="mt-2 text-[13px] text-muted">
