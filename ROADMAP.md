@@ -389,6 +389,36 @@ leggibile qualcosa che oggi non lo è.
       scorrimento orizzontale introdotto dalla barra più alta (64px invece
       di 56, per fare posto all'icona sopra l'etichetta). `npm run e2e`: 162
       controlli, tutto a posto.
+- [x] **Lo Storico sembrava un foglio di calcolo, non una dashboard.**
+      Segnalato a voce ("manca quel qualcosa delle dashboard fighe"). Guardate
+      le app del genere, le due cose che tornano sempre e che qui avevano
+      senso: **riquadri di grandezza diversa** e **un andamento in
+      miniatura** accanto al numero.
+
+      *In sintesi* (`storico-sintesi.tsx`) sostituisce le due card uguali
+      "media" e "giorni entro il target" e la sezione Peso a parte. La
+      grandezza dice quanto conta: le calorie prendono tutta la riga con il
+      numero a 48px, carboidrati, proteine, grassi e peso stanno a metà. Ogni
+      riquadro ha media, scarto dal target e giorni entro il target insieme,
+      invece di dividere le stesse informazioni in due posti.
+
+      La **sparkline** (`sparkline.tsx`) sta sotto le calorie, con il target
+      tratteggiato, e sotto il peso. Regole seguite: un giorno non registrato
+      spezza la linea (regola 6), un giorno isolato fra due buchi è un
+      puntino — la prima versione lo faceva sparire, visto solo nello
+      screenshot a 30 giorni. Oggi non entra nella linea delle calorie, come
+      non entra nella media. Il peso invece sta sui giorni veri e passa sopra
+      i buchi: due pesate a una settimana di distanza non sono vicine come due
+      di fila, e fra l'una e l'altra il peso non smette di esistere. La sua
+      linea è in inchiostro e non in blu, perché accanto ai macro il blu vuol
+      dire calorie (regola 7), e non ha colore sul verso: il peso non ha un
+      target qui.
+
+      Il rosso resta solo sullo scarto sopra il target. Verificato nel
+      browser vero a 320 e 390px, chiaro e scuro, 7 e 30 giorni, con dati di
+      prova: media calorie 2110 = (2300 + 1900 + 2150 + 1800 + 2400) / 5,
+      carboidrati 256 = 1280 / 5, come a schermo. `npm run e2e`: 162
+      controlli, tutto a posto.
 - [x] **Titoli di sezione fuori dalle schede.** Fatto su tutte e quattro le
       schermate.
 - [x] **Freccia su quello che si apre.** Fatto sulle tessere dei macro.
