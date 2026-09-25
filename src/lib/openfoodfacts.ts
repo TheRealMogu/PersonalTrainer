@@ -79,11 +79,24 @@ function leggiProdotto(voce: unknown): ProdottoOFF | null {
   };
 }
 
-/** Trasforma la risposta della ricerca per nome in prodotti utilizzabili. */
+/**
+ * Trasforma la risposta della ricerca per nome in prodotti utilizzabili.
+ *
+ * `hits` e' la chiave di Search-a-licious (`search.openfoodfacts.org/search`),
+ * il servizio a cui si e' passati a settembre 2026 quando il vecchio
+ * `cgi/search.pl` ha smesso di rispondere (503 globale, non un problema di
+ * questo repo -- vedi ROADMAP.md, 6-sexies). `products` resta accettata: e'
+ * la forma del vecchio endpoint, ed e' gratis da tenere nel caso Open Food
+ * Facts cambi ancora.
+ */
 export function normalizzaProdottiOFF(raw: unknown): ProdottoOFF[] {
   if (typeof raw !== "object" || raw === null) return [];
   const corpo = raw as Record<string, unknown>;
-  const lista = Array.isArray(corpo.products) ? corpo.products : [];
+  const lista = Array.isArray(corpo.hits)
+    ? corpo.hits
+    : Array.isArray(corpo.products)
+      ? corpo.products
+      : [];
 
   const prodotti: ProdottoOFF[] = [];
   for (const voce of lista.slice(0, MAX_RISULTATI)) {

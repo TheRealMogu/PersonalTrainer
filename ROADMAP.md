@@ -974,6 +974,34 @@ l'«aggiunta dinamica dei prodotti» arriva senza toccare il guscio iOS.
       (forma dei campi, quanti prodotti hanno i macro compilati) resta da
       fare con una chiamata reale, fuori da questo ambiente, prima di
       considerarla verificata davvero.
+
+      **Aggiornamento, settembre 2026**: l'endpoint usato sopra
+      (`world.openfoodfacts.org/cgi/search.pl`) ha smesso di rispondere —
+      503 a livello globale, segnalato da più progetti esterni che lo usano
+      (non un problema di questo repo). Open Food Facts lo ha dismesso in
+      favore di *Search-a-licious*, il nuovo servizio di ricerca su
+      `search.openfoodfacts.org/search`. `cercaProdotto` ora chiama quello
+      (`q`, `index=off`, `page_size`, `fields`), e `normalizzaProdottiOFF`
+      legge la chiave `hits` che usa il nuovo servizio, tenendo `products`
+      come ripiego per non ripetere questo giro se Open Food Facts cambia
+      ancora. La ricerca per codice a barre non è toccata: usa un endpoint
+      diverso, mai stato giù.
+
+      Anche questa volta non è stato possibile chiamare il servizio vero da
+      qui — il proxy di rete blocca ogni sottodominio di openfoodfacts.org,
+      non solo `world.`. Verificato però tutto il resto della catena contro
+      un server locale che risponde con la forma documentata di
+      Search-a-licious (`{"hits": [...]}`, due prodotti come nella prova
+      precedente): la ricerca mostra entrambi i risultati con macro e
+      "incompleti" giusti, scegliere 150 g del prodotto completo mostra 146
+      kcal (97 kcal/100 g arrotondate), il tasto rapido salvato finisce
+      nella tabella con quei valori scalati e la porzione "150 g", *Aggiungi*
+      scrive lo stesso pasto nel diario — controllato riga per riga sul
+      database. Provato anche il ramo d'errore (risposta non-2xx): il
+      messaggio "Open Food Facts non risponde. Riprova tra poco." compare
+      invariato. Resta comunque da confermare, con una chiamata vera fuori
+      da questo ambiente, che i campi di Search-a-licious abbiano davvero
+      questa forma per un prodotto reale.
 - [x] **Salvalo come tasto rapido**, con la porzione che usi tu. È il punto
       in cui l'archivio smette di essere quello del seed e diventa il tuo —
       e si incastra con il punto «cibi rapidi modificabili» di 6-quater.

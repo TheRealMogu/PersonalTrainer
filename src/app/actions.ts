@@ -463,6 +463,14 @@ export type RicercaProdottiResult =
  * fa scegliere il prodotto e i grammi, mostra i macro calcolati e chiede
  * conferma prima di passarli ad `addMeal` — la stessa porta unica di
  * `normalizzaStima` per "Incolla da Claude" (regola 12).
+ *
+ * Il vecchio endpoint (`world.openfoodfacts.org/cgi/search.pl`) risponde
+ * 503 a livello globale da settembre 2026 -- Open Food Facts lo ha
+ * dismesso in favore di Search-a-licious, il nuovo servizio di ricerca su
+ * `search.openfoodfacts.org`. Non e' rate limiting ne' un problema di
+ * questo repo: fallisce cosi' per chiunque lo chiami. La ricerca per
+ * codice a barre (`cercaProdottoPerBarcode`, sotto) usa un endpoint
+ * diverso e non e' toccata da questo cambio.
  */
 export async function cercaProdotto(
   query: string
@@ -470,11 +478,9 @@ export async function cercaProdotto(
   const pulita = query.trim().slice(0, MAX_RICERCA);
   if (!pulita) return { ok: false, error: "Scrivi almeno una lettera." };
 
-  const url = new URL("https://world.openfoodfacts.org/cgi/search.pl");
-  url.searchParams.set("search_terms", pulita);
-  url.searchParams.set("search_simple", "1");
-  url.searchParams.set("action", "process");
-  url.searchParams.set("json", "1");
+  const url = new URL("https://search.openfoodfacts.org/search");
+  url.searchParams.set("q", pulita);
+  url.searchParams.set("index", "off");
   url.searchParams.set("page_size", "20");
   url.searchParams.set("fields", "product_name,brands,nutriments");
 
