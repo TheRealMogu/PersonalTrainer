@@ -14,6 +14,9 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   formatDetection: { telephone: false },
+  // Oltre a robots.ts: quello vale per i crawler che lo leggono, questo è
+  // il tag che finisce in ogni pagina per chi non lo controlla nemmeno.
+  robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {

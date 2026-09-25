@@ -8,12 +8,16 @@
  * per mostrare qualcosa e' una schermata che non si apre.
  *
  * Tutto quello che li usa accetta anche altri numeri: cerca `Obiettivi`.
+ *
+ * Numeri generici e non i tuoi veri, di proposito: questi finiscono nel
+ * codice sorgente, i tuoi nel database. Cambiarli qui non tocca l'app in
+ * produzione, dove la riga `targets` esiste gia'.
  */
 export const DAILY_TARGETS = {
-  kcal: 1905,
-  carbs: 220,
-  protein: 155,
-  fat: 45,
+  kcal: 2050,
+  carbs: 250,
+  protein: 150,
+  fat: 50,
 } as const;
 
 export type MacroKey = keyof typeof DAILY_TARGETS;

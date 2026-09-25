@@ -45,7 +45,7 @@ describe("buildProgress", () => {
     assert.equal(kcal.key, "kcal");
     assert.equal(kcal.consumed, 365);
     assert.equal(kcal.target, DAILY_TARGETS.kcal);
-    assert.equal(kcal.remaining, 1540);
+    assert.equal(kcal.remaining, 1685);
     assert.equal(kcal.over, 0);
     assert.equal(kcal.isOver, false);
   });
@@ -57,12 +57,12 @@ describe("buildProgress", () => {
 
     assert.equal(kcal.consumed, 2190);
     assert.equal(kcal.isOver, true);
-    assert.equal(kcal.over, 285);
+    assert.equal(kcal.over, 140);
     assert.equal(kcal.remaining, 0);
     assert.equal(kcal.percent, 100);
 
     assert.equal(carbs.consumed, 468);
-    assert.equal(carbs.over, 248);
+    assert.equal(carbs.over, 218);
   });
 
   it("tratta il target esatto come non sforato", () => {

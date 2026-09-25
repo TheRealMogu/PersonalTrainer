@@ -73,8 +73,8 @@ describe("coerenza fra kcal e macro", () => {
   });
 
   it("non impone la coerenza: si dice, non si rifiuta", () => {
-    // 220*4 + 155*4 + 45*9 = 1905, che è proprio il target di partenza
-    assert.equal(kcalDaiMacro(OBIETTIVI_PREDEFINITI.macro), 1905);
+    // 250*4 + 150*4 + 50*9 = 2050, che è proprio il target di partenza
+    assert.equal(kcalDaiMacro(OBIETTIVI_PREDEFINITI.macro), 2050);
     // ma anche dei numeri che non tornano restano validi
     assert.equal(validaObiettivi(obiettivi({ kcal: 3000 })), null);
   });

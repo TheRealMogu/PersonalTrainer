@@ -24,12 +24,17 @@ Stack: Next.js (App Router) + TypeScript, Tailwind CSS, Drizzle ORM, Neon
 
 ## Target giornalieri
 
+I target veri stanno nel database (tabella `targets`), non nel codice: si
+cambiano da *Piano → Cambia gli obiettivi*, senza deploy. Quelli qui sotto
+sono solo il punto di partenza usato la primissima volta, prima che quella
+riga esista:
+
 | | |
 |---|---|
-| Calorie | 1905 kcal |
-| Carboidrati | 220 g |
-| Proteine | 155 g |
-| Grassi | 45 g |
+| Calorie | 2050 kcal |
+| Carboidrati | 250 g |
+| Proteine | 150 g |
+| Grassi | 50 g |
 
 ## 1. Collegare Neon
 

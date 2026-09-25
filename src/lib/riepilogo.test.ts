@@ -168,7 +168,7 @@ describe("riepilogoTesto", () => {
   });
 
   it("riporta il target, così il numero si legge da solo", () => {
-    assert.match(testo, /Target: 1905 kcal/);
+    assert.match(testo, /Target: 2050 kcal/);
   });
 
   it("elenca le sedute e il volume totale", () => {
