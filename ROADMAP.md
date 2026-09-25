@@ -408,9 +408,24 @@ leggibile qualcosa che oggi non lo è.
       del contrasto leggeva per errore il testo nascosto (`.sr-only`, che
       Tailwind fa 1×1px e non zero pixel) invece del numero visibile — corretto
       nello strumento di prova, non nell'app.
-- [ ] **Data toccabile nell'intestazione** che apre un selettore, invece delle
+- [x] **Data toccabile nell'intestazione** che apre un selettore, invece delle
       sole frecce. La striscia della settimana copre già i sette giorni
       vicini; serve per andare più indietro.
+
+      Fatto con un `<input type="date">` nativo, invisibile e grande quanto
+      il titolo (`position: absolute; inset: 0; opacity: 0`) sopra
+      "Oggi"/"Ieri"/"lun 3 mar": il tocco apre il selettore del telefono
+      invece di dover premere la freccia decine di volte per un mese fa.
+      Niente calendario scritto a mano — l'input nativo costa una riga e
+      non un componente nuovo. Il bersaglio resta ≥44×44 anche a 320px
+      (misurato: 176×44). Ferma sul giorno scelto se e' quello gia' aperto
+      (`vaiA` esce subito), e mostra la stessa dissolvenza a 200ms/`--ease-ios`
+      che il resto dell'app usa per un salvataggio in corso, invece di uno
+      spinner nuovo per un bersaglio che non e' un cerchio.
+      Verificato: browser vero a 320/390px, chiaro/scuro; saltato al 10
+      settembre e tornato a oggi passando dal selettore, frecce ancora
+      funzionanti, nessuno scorrimento orizzontale introdotto.
+      `npm run e2e`: 144 controlli, tutto a posto.
 - [ ] **Il volume dovrebbe contare due manubri?** Oggi il volume è quello che
       scrivi per ripetizioni, quindi sugli esercizi con i manubri conta un
       braccio solo. È coerente settimana su settimana, quindi la progressione

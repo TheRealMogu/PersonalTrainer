@@ -1,7 +1,9 @@
 "use client";
 
+import { useTransition } from "react";
 import Link, { useLinkStatus } from "next/link";
-import { formatDayLabel, shiftIsoDate, todayIso } from "@/lib/date";
+import { useRouter } from "next/navigation";
+import { formatDayLabel, isIsoDate, shiftIsoDate, todayIso } from "@/lib/date";
 
 function hrefForDay(day: string, today: string) {
   return day === today ? "/" : `/?day=${day}`;
@@ -42,9 +44,18 @@ function NavPending() {
  * pixel di altezza.
  */
 export function DayNav({ day, pasti }: { day: string; pasti: number }) {
+  const router = useRouter();
+  const [andandoA, startTransition] = useTransition();
   const today = todayIso();
   const previous = shiftIsoDate(day, -1);
   const next = shiftIsoDate(day, 1);
+
+  function vaiA(nuovoGiorno: string) {
+    if (nuovoGiorno === day) return;
+    startTransition(() => {
+      router.push(hrefForDay(nuovoGiorno, today));
+    });
+  }
 
   return (
     <div className="flex items-center justify-between pt-12 pb-6">
@@ -58,9 +69,31 @@ export function DayNav({ day, pasti }: { day: string; pasti: number }) {
       </Link>
 
       <div className="min-w-0 flex-1 px-2 text-center">
-        <h1 className="truncate text-[20px] font-bold capitalize leading-tight tracking-tight">
-          {formatDayLabel(day, today)}
-        </h1>
+        {/*
+          Le frecce coprono solo ieri e domani. Sotto c'e' un `<input
+          type="date">` invisibile e grande quanto il titolo: il tocco apre
+          il selettore nativo del telefono invece di dover premere la
+          freccia decine di volte per tornare a un mese fa.
+        */}
+        <div className="relative">
+          <h1
+            className={`flex min-h-11 items-center justify-center truncate text-[20px] font-bold capitalize leading-tight tracking-tight transition-opacity duration-200 ease-ios ${
+              andandoA ? "opacity-50" : ""
+            }`}
+          >
+            {formatDayLabel(day, today)}
+          </h1>
+          <input
+            type="date"
+            value={day}
+            aria-label="Vai a un altro giorno"
+            onChange={(event) => {
+              const scelto = event.target.value;
+              if (isIsoDate(scelto)) vaiA(scelto);
+            }}
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+          />
+        </div>
         {day !== today ? (
           <Link href="/" className="inline-block py-1 text-[13px] text-accent">
             Torna a oggi
