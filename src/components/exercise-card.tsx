@@ -45,9 +45,42 @@ export function ExerciseCard({
   const [weight, setWeight] = useState(suggestion ? formatWeight(suggestion.weight) : "");
   const [reps, setReps] = useState(suggestion ? String(suggestion.reps) : "");
   const [error, setError] = useState<string | null>(null);
+  // Un finito si riapre per correggere una serie: da li' in poi resta aperto,
+  // non ce n'e' bisogno di richiuderlo a mano per il resto della seduta.
+  const [espansoAMano, setEspansoAMano] = useState(false);
 
   const done = sets.length;
   const planned = exercise.sets;
+  const finito = planned > 0 && done >= planned;
+
+  /*
+   * Un esercizio finito compresso in una riga, non in un rettangolo identico
+   * a quello che stai facendo adesso -- otto schede uguali fanno sembrare
+   * ugualmente urgente quello di quaranta minuti fa e quello sotto le mani.
+   * Niente campi da compilare qui: si tocca solo per riaprirlo, per esempio
+   * per correggere una serie sbagliata.
+   */
+  if (finito && !espansoAMano) {
+    return (
+      <button
+        type="button"
+        onClick={() => setEspansoAMano(true)}
+        disabled={disabled}
+        aria-label={`Riapri ${exercise.name} per correggere una serie`}
+        className="mb-3 flex min-h-11 w-full items-center gap-3 rounded-2xl bg-surface p-4 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] tocco-riquadro active:bg-raised disabled:opacity-60"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block text-[15px] font-semibold leading-snug">{exercise.name}</span>
+          <span className="mt-0.5 block text-[13px] tabular-nums text-muted">
+            {sets.map((s) => `${formatWeight(s.weight)}×${s.reps}`).join(" · ")}
+          </span>
+        </span>
+        <span aria-hidden="true" className="shrink-0 text-[13px] text-reference">
+          ›
+        </span>
+      </button>
+    );
+  }
 
   function handleLog() {
     const parsedWeight = parseWeight(weight);
