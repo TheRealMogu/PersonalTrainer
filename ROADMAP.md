@@ -1056,7 +1056,48 @@ l'«aggiunta dinamica dei prodotti» arriva senza toccare il guscio iOS.
       (verificato il nome a schermo), e tornando indietro si resta nella
       stessa modalità invece di ripartire dal nome. Provato anche a 320px
       scuro: bersagli e contrasto del link a posto.
-- [ ] **Scanner con la fotocamera**, solo dopo, e solo se serve davvero.
+- [x] **Scanner con la fotocamera**, solo dopo, e solo se serve davvero — l'ha
+      chiesto l'utente, quindi "davvero" è arrivato.
+
+      La soluzione scartata a suo tempo (`BarcodeDetector`, che non esiste
+      nel WebView di iOS) non era la sola strada: `@capacitor/barcode-scanner`
+      -- ufficiale del team Capacitor, gratis, MIT -- apre la fotocamera
+      nativa (Vision di Apple su iOS) bypassando del tutto il problema del
+      WebView. Compatibile con Swift Package Manager: si incastra nel
+      progetto iOS di questo repo (Capacitor 8, niente CocoaPods) senza
+      toccare `ios.yml` oltre a una riga.
+
+      Il tasto "Scansiona con la fotocamera" sta dentro *Cerca un prodotto →
+      Hai il codice a barre?*, sopra il campo per scriverlo a mano — che
+      resta, per quando la fotocamera non serve o non c'è. Il risultato
+      dello scan passa dallo stesso `barcodeValido` e dalla stessa
+      `cercaProdottoPerBarcode` di sempre: nessuna porta nuova. Annullare la
+      scansione non mostra un errore (regola 8): sia il ramo web sia quello
+      nativo del plugin rifiutano con lo stesso testo ("...cancelled") in
+      quel caso, e il codice lo riconosce.
+
+      Un'aggiunta che il codice web non richiedeva da solo:
+      `ios/` non è nel repo — viene rigenerato da zero a ogni build — quindi
+      il permesso della fotocamera (`NSCameraUsageDescription`) va scritto
+      nel workflow, non nel progetto. Senza, iOS chiude l'app di colpo alla
+      prima richiesta di accesso alla fotocamera invece di mostrare il
+      permesso: non un avviso, un crash garantito. Aggiunta una riga a
+      `ios.yml` con `PlistBuddy` subito dopo `cap add ios`.
+
+      **Verificato quello che si può da qui, non la lettura vera.** Questo
+      ambiente non ha una fotocamera, ma Chromium accetta un video finto
+      (`--use-file-for-fake-video-capture`): con quello si è aperta
+      davvero la fotocamera del plugin (stesso `CapacitorBarcodeScanner
+      .scanBarcode()` che chiama l'app, non un mock), verificato che il
+      video parte (`readyState`, `paused`), che annullare non mostra un
+      errore, e che il campo a mano resta scrivibile dopo — a 320/390px,
+      chiaro e scuro. Il bersaglio del tasto è ≥44px anche a 320px. Non si è
+      riusciti a far *leggere* un codice a barre vero al video finto (un
+      problema di orientamento nella codifica sintetica del fotogramma, non
+      del codice dell'app — un video finto non è una fotocamera vera).
+      **La lettura di un codice a barre reale resta da provare su un
+      iPhone vero**, con una build IPA: non c'è altro modo di saperlo per
+      certo.
 
 ### Due cose da sapere prima di scriverne una riga
 

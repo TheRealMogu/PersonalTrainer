@@ -84,6 +84,18 @@ jobs:
           npx cap add ios
           npx cap sync ios
 
+      # `ios/` non e' nel repo: viene rigenerato da zero a ogni build, quindi
+      # un Info.plist modificato a mano andrebbe perso al giro dopo. Il
+      # permesso della fotocamera (per @capacitor/barcode-scanner) va
+      # aggiunto qui, non nel progetto. Senza questa riga iOS chiude l'app
+      # di colpo alla prima richiesta di accesso alla fotocamera invece di
+      # mostrare il permesso -- non e' un avviso, e' un crash garantito.
+      - name: Aggiungi il permesso della fotocamera
+        run: |
+          /usr/libexec/PlistBuddy -c \
+            "Add :NSCameraUsageDescription string 'Per leggere il codice a barre di un prodotto.'" \
+            ios/App/App/Info.plist
+
       # Senza questo, ogni IPA installato ha la stessa versione (quella di
       # default del progetto generato da Capacitor): non c'e' modo di sapere
       # quale build hai sul telefono dopo un sideload. La versione viene da

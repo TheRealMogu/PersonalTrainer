@@ -66,6 +66,7 @@ proprio le schermate che vanno riviste.
 | Segnare un bicchiere d'acqua | 1 gesto | 1 (tasto + nella scheda in cima) | ok |
 | Salvare un pasto fra i tasti rapidi | 2 gesti | 2 (tocca la riga → salva) | ok |
 | Correggere un alimento in archivio | 3 gesti | 3 (Piano → archivio → riga) | ok |
+| Trovare un prodotto dal suo codice a barre | 2 gesti | 2 (tocca *Scansiona* → inquadra); 3+ scrivendolo a mano (tredici cifre) | ok con la fotocamera, non provato su un telefono vero |
 | Vedere quanta acqua ho bevuto | 0 gesti | 0 su schermo alto (finisce a 632 px); **1** su 320×568 | ok sopra i 700 px |
 | Correggere un pasto già inserito | 2 gesti | 2 (tocca la riga → quantità) | ok |
 | Correggere nome o macro di un pasto | 3 gesti | 3 (riga → *Correggi nome e valori* → campo) | ok |
