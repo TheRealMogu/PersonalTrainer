@@ -18,6 +18,7 @@ import type { DailyTotals } from "@/lib/history";
 import {
   meals,
   quickFoods,
+  stepsDays,
   supplementChecks,
   supplements,
   targets,
@@ -105,6 +106,7 @@ export async function getObiettivi(): Promise<Obiettivi> {
       fat: riga.fat,
     },
     bicchieriAcqua: riga.waterGlasses,
+    passiGiornalieri: riga.stepsTarget,
   };
 }
 
@@ -124,6 +126,15 @@ export async function getPeso(day: string): Promise<number | null> {
     .from(weightDays)
     .where(eq(weightDays.day, day));
   return riga?.weightKg ?? null;
+}
+
+/** I passi di un giorno, o null se non li hai ancora scritti. */
+export async function getPassi(day: string): Promise<number | null> {
+  const [riga] = await db
+    .select({ steps: stepsDays.steps })
+    .from(stepsDays)
+    .where(eq(stepsDays.day, day));
+  return riga?.steps ?? null;
 }
 
 /** Le righe di peso in un intervallo, per il grafico e per il riepilogo. */

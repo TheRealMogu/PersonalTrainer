@@ -92,6 +92,8 @@ proprio le schermate che vanno riviste.
 | Sapere cosa ci sta nel margine di un macro | 1 gesto | 1 (stesso foglio) | ok |
 | Cambiare i target dopo che il PT li ha cambiati | 3 gesti | 3 (Piano → *Cambia gli obiettivi* → campo) | ok |
 | Cambiare l'obiettivo dell'acqua | 3 gesti | 3 (stessa schermata) | ok |
+| Segnare i passi di oggi | 2 gesti | 2 (campo → Salva, come il peso) | ok |
+| Cambiare l'obiettivo dei passi | 3 gesti | 3 (Piano → *Cambia gli obiettivi* → campo) | ok |
 | Segnare un integratore preso | 1 gesto | 1 (tocco sulla riga, riscontro in 50 ms) | ok |
 | Rimediare a un integratore spuntato per sbaglio | 1 gesto | 1 (stesso tocco) | ok |
 | Sapere cosa devo ancora prendere oggi | 0 gesti | 0 su schermo alto (finisce a 804 px); **1** su 320×568 | ok sopra gli 850 px |
