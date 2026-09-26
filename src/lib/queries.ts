@@ -28,6 +28,8 @@ import {
   weightDays,
   workoutDays,
   workoutExercises,
+  workoutExerciseWeeks,
+  workoutProgramma,
   workoutSessions,
   workoutSets,
   type Meal,
@@ -276,11 +278,20 @@ export async function getQuickFoods(): Promise<QuickFood[]> {
     .orderBy(asc(quickFoods.sortOrder), asc(quickFoods.id));
 }
 
+/**
+ * Un esercizio del programma, con sopra la prescrizione della settimana in
+ * corso quando il PT ne ha mandata una (`weekly.ts`) -- `null` per un
+ * esercizio senza blocco a settimane, che resta con `sets`/`reps` di sempre.
+ */
+export type WorkoutExerciseConSettimana = WorkoutExercise & {
+  settimanaCorrente: { reps: string; peso: number } | null;
+};
+
 export type WorkoutDayWithExercises = {
   id: number;
   label: string;
   focus: string;
-  exercises: WorkoutExercise[];
+  exercises: WorkoutExerciseConSettimana[];
 };
 
 /**
@@ -291,7 +302,7 @@ export type WorkoutDayWithExercises = {
  * cosa fare, e un esercizio che il personal trainer ha tolto non va fatto.
  */
 export async function getWorkout(): Promise<WorkoutDayWithExercises[]> {
-  const [days, exercises] = await Promise.all([
+  const [days, exercises, settimane, programma] = await Promise.all([
     db
       .select()
       .from(workoutDays)
@@ -302,14 +313,46 @@ export async function getWorkout(): Promise<WorkoutDayWithExercises[]> {
       .from(workoutExercises)
       .where(isNull(workoutExercises.archiviatoIl))
       .orderBy(asc(workoutExercises.sortOrder), asc(workoutExercises.id)),
+    db.select().from(workoutExerciseWeeks),
+    getSettimanaCorrente(),
   ]);
+
+  const settimanaPerEsercizio = new Map(
+    settimane
+      .filter((riga) => riga.settimana === programma)
+      .map((riga) => [riga.exerciseId, { reps: riga.reps, peso: riga.peso }])
+  );
 
   return days.map((day) => ({
     id: day.id,
     label: day.label,
     focus: day.focus,
-    exercises: exercises.filter((exercise) => exercise.dayId === day.id),
+    exercises: exercises
+      .filter((exercise) => exercise.dayId === day.id)
+      .map((exercise) => ({
+        ...exercise,
+        settimanaCorrente: settimanaPerEsercizio.get(exercise.id) ?? null,
+      })),
   }));
+}
+
+/** In che settimana del blocco sei: 1 se non e' mai stata impostata. */
+export async function getSettimanaCorrente(): Promise<number> {
+  const [riga] = await db.select().from(workoutProgramma).limit(1);
+  return riga?.settimanaCorrente ?? 1;
+}
+
+/**
+ * Quante settimane ha il blocco caricato -- per non mostrare un selettore a
+ * tre tacche quando il PT ne ha mandate quattro, o una quando non c'e'
+ * ancora nessun blocco a settimane.
+ */
+export async function getSettimaneDisponibili(): Promise<number[]> {
+  const righe = await db
+    .selectDistinct({ settimana: workoutExerciseWeeks.settimana })
+    .from(workoutExerciseWeeks)
+    .orderBy(asc(workoutExerciseWeeks.settimana));
+  return righe.map((riga) => riga.settimana);
 }
 
 /** La seduta ancora aperta, se c'e': riaprendo l'app si riprende da li'. */

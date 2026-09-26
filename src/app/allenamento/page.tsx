@@ -4,8 +4,9 @@ import { DbErrorPanel } from "@/components/db-error-panel";
 import { IconAllenamento } from "@/components/nav-icons";
 import { PageHeader } from "@/components/page-header";
 import { RecentSessions } from "@/components/recent-sessions";
-import { UndoSeduta } from "@/components/undo-seduta";
 import { Section } from "@/components/section";
+import { SettimanaProgramma } from "@/components/settimana-programma";
+import { UndoSeduta } from "@/components/undo-seduta";
 import { StartWorkoutButton } from "@/components/start-workout-button";
 import { WorkoutSession } from "@/components/workout-session";
 import {
@@ -14,10 +15,12 @@ import {
   getRecentSessions,
   getSessionSets,
   getSessionsInRange,
+  getSettimaneDisponibili,
+  getSettimanaCorrente,
   getWorkout,
 } from "@/lib/queries";
 import { lunediDellaSettimana, shiftIsoDate, todayIso } from "@/lib/date";
-import { suggestNextDayId } from "@/lib/workout";
+import { repsDaMostrare, suggestNextDayId } from "@/lib/workout";
 import type { LoggedSet } from "@/lib/workout";
 
 export const dynamic = "force-dynamic";
@@ -58,10 +61,13 @@ async function caricaDati() {
 
   const oggi = todayIso();
   const lunedi = lunediDellaSettimana(oggi);
-  const [recent, settimana] = await Promise.all([
-    getRecentSessions(5),
-    getSessionsInRange(lunedi, shiftIsoDate(lunedi, 6)),
-  ]);
+  const [recent, settimana, settimaneBlocco, settimanaBlocco] =
+    await Promise.all([
+      getRecentSessions(5),
+      getSessionsInRange(lunedi, shiftIsoDate(lunedi, 6)),
+      getSettimaneDisponibili(),
+      getSettimanaCorrente(),
+    ]);
 
   // La rotazione si legge dallo storico: l'ultima seduta conclusa decide
   // quale giornata proporre adesso.
@@ -78,6 +84,8 @@ async function caricaDati() {
     oggi,
     lunedi,
     giorniAllenati: settimana.map((seduta) => seduta.day),
+    settimaneBlocco,
+    settimanaBlocco,
   } as const;
 }
 
@@ -115,7 +123,16 @@ export default async function AllenamentoPage() {
     );
   }
 
-  const { days, recent, suggestedId, oggi, lunedi, giorniAllenati } = dati;
+  const {
+    days,
+    recent,
+    suggestedId,
+    oggi,
+    lunedi,
+    giorniAllenati,
+    settimaneBlocco,
+    settimanaBlocco,
+  } = dati;
   const suggested = days.find((day) => day.id === suggestedId);
   const ultima = recent[0];
 
@@ -168,6 +185,10 @@ export default async function AllenamentoPage() {
         </Card>
       ) : (
         <Section title="Il programma">
+          <SettimanaProgramma
+            settimane={settimaneBlocco}
+            corrente={settimanaBlocco}
+          />
           {days.map((day) => (
             <Card key={day.id}>
               <header className="mb-3 flex items-baseline justify-between gap-2">
@@ -189,8 +210,8 @@ export default async function AllenamentoPage() {
                     <span className="flex-1 text-[15px] leading-snug">
                       {exercise.name}
                     </span>
-                    <span className="shrink-0 text-[15px] font-semibold tabular-nums text-muted">
-                      {exercise.sets}×{exercise.reps}
+                    <span className="shrink-0 text-right text-[15px] font-semibold tabular-nums text-muted">
+                      {exercise.sets}×{repsDaMostrare(exercise)}
                     </span>
                   </li>
                 ))}
