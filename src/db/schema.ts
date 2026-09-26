@@ -275,6 +275,53 @@ export const workoutExercises = pgTable(
 );
 
 /**
+ * Il carico e la scaletta di ripetizioni che il PT prescrive per un
+ * esercizio, settimana per settimana dentro uno stesso blocco.
+ *
+ * Nata perche' la scheda di settembre 2026 non e' piu' "stessi numeri finche'
+ * non arriva la prossima" (quello resta su `workout_exercises.reps`, ed e'
+ * il valore di ripiego finche' non c'e' una riga qui): il PT manda tre
+ * settimane insieme, con la scaletta delle ripetizioni e il carico che
+ * salgono settimana su settimana -- prima mai prescritto in anticipo, solo
+ * registrato dopo aver fatto la serie (`workout_sets.weight`).
+ *
+ * `ON DELETE CASCADE` dall'esercizio e non un archivio a parte: queste righe
+ * sono la prescrizione di adesso, non uno storico da conservare -- quando
+ * arriva il prossimo blocco si sostituiscono, non si accumulano.
+ */
+export const workoutExerciseWeeks = pgTable(
+  "workout_exercise_weeks",
+  {
+    id: serial("id").primaryKey(),
+    exerciseId: integer("exercise_id")
+      .notNull()
+      .references(() => workoutExercises.id, { onDelete: "cascade" }),
+    settimana: integer("settimana").notNull(),
+    reps: text("reps").notNull(),
+    peso: real("peso").notNull(),
+  },
+  (table) => [
+    uniqueIndex("workout_exercise_weeks_uniq").on(
+      table.exerciseId,
+      table.settimana
+    ),
+  ]
+);
+
+/**
+ * In che settimana del blocco sei, adesso. Una riga sola (`id` sempre 1),
+ * come `targets` -- un utente solo, un blocco alla volta.
+ *
+ * Non calcolata dalla data di inizio apposta: un blocco si segue a sedute
+ * fatte, non a calendario. Chi salta una settimana per malattia non deve
+ * ritrovarsi la prescrizione avanti di colpo.
+ */
+export const workoutProgramma = pgTable("workout_programma", {
+  id: integer("id").primaryKey().default(1),
+  settimanaCorrente: integer("settimana_corrente").notNull().default(1),
+});
+
+/**
  * Una seduta di allenamento: si apre quando inizi, si chiude quando premi
  * Fine. `endedAt` nullo significa "in corso", cosi' riaprendo l'app la ritrovi
  * dove l'avevi lasciata.

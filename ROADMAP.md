@@ -1165,6 +1165,48 @@ serie si leggono ancora** — nel dettaglio della seduta e nella progressione.
 Poi si fa undo e il programma torna identico a prima, campo per campo.
 Finché questa prova non esiste, la funzione non esiste.
 
+### Un blocco a settimane: ripetizioni e carico che salgono senza cambiare esercizio
+
+Il PT non manda sempre una scheda nuova. Più spesso manda un blocco di 2-3
+settimane sugli **stessi** esercizi, dove cambiano solo le ripetizioni e il
+peso da usare (es. "7 → 8-7-7-7 → 8-8-7-7" a parità di serie). Prima
+dell'ultima modifica l'app non aveva un posto dove tenere questo numero: si
+poteva solo registrare quello che si era fatto, mai quello che il PT aveva
+prescritto per la settimana in corso.
+
+- [x] **Due tabelle nuove**, non un cambio a `workout_exercises`:
+      `workout_exercise_weeks` (esercizio, settimana, ripetizioni, peso) e
+      `workout_programma` (una riga sola, dice in che settimana del blocco
+      si è adesso). Separate perché la prescrizione non è storico da
+      conservare come le serie registrate — è lo stato di adesso, si
+      sostituisce tutta insieme a ogni blocco nuovo, e non ha bisogno di
+      archiviare niente perché gli esercizi non cambiano identità.
+- [x] **Pagina propria, *Scheda → Aggiorna pesi e settimane***, stesso giro di
+      *Cambia la scheda* (prompt, incolla, confronto, conferma) ma più
+      semplice: qui non c'è niente da archiviare, un nome che non trova a chi
+      appartenere resta fuori senza toccare il resto.
+- [x] **Abbinamento per giornata, non per nome da solo.** Lo stesso nome di
+      esercizio torna su giornate diverse con numeri diversi — nel programma
+      vero, "Spinte manubri panca piana" è sia il Day 1 sia il Day 3, con
+      serie e carichi differenti. Un confronto per nome soltanto avrebbe
+      scritto i numeri del Day 1 anche sul Day 3, silenziosamente. Trovato
+      interrogando il database reale (non ipotizzando dai dati del PDF), e
+      corretto raggruppando il confronto per giornata prima, per nome dentro
+      quella giornata poi — verificato incollando un JSON con questi tre nomi
+      duplicati e controllando che ogni giornata avesse i suoi numeri.
+- [x] **Una tacca per settimana** in *Allenamento*, come i giorni di
+      *Storico*: a mano, non a calendario, perché un blocco si segue a sedute
+      fatte e chi salta una settimana per malattia non deve ritrovarsela
+      avanti da sola. Sparisce quando il blocco ha una settimana sola.
+      Trovato e corretto in prova: con tre settimane la riga di tacche
+      superava i 320px e faceva scorrere tutta la pagina di lato — la riga
+      ora scorre da sola, contenuta, invece di allargare la pagina.
+
+**Non ancora fatto**: i numeri veri del blocco del PT non sono stati inseriti
+in produzione — questo ambiente non raggiunge Neon, quindi la verifica sopra
+usa numeri di prova, non quelli del PDF. Restano da incollare a mano sul sito
+vero, dalla nuova pagina.
+
 ## 6-sexies. Trovare un prodotto da solo: quali API esistono, davvero
 
 Cercate a settembre 2026. La conclusione è corta: **una sola vale la pena, e

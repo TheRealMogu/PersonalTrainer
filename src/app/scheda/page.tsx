@@ -73,6 +73,19 @@ export default async function SchedaPage() {
           Niente viene cancellato: quello che esce dal programma resta
           leggibile, con tutti i carichi che ci hai registrato sopra.
         </p>
+        {/*
+          Un blocco a settimane (stessi esercizi, ripetizioni e carico che
+          salgono) capita piu' spesso di una scheda vera e propria: pagina a
+          parte, cosi' non tocca rileggere tutto questo modulo per un
+          aggiornamento che non cambia un solo esercizio.
+        */}
+        <Link
+          href="/scheda/settimane"
+          className="mt-3 flex min-h-11 items-center gap-1.5 text-[15px] font-medium text-accent tocco active:opacity-60"
+        >
+          Aggiorna pesi e settimane
+          <span aria-hidden="true">›</span>
+        </Link>
       </header>
 
       <CambiaScheda attuale={attuale} />

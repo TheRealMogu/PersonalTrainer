@@ -51,6 +51,22 @@ export function formatWeight(kg: number): string {
 }
 
 /**
+ * Cosa scrivere per le ripetizioni di un esercizio: se il PT ha prescritto
+ * la settimana in corso, la sua scaletta col carico che l'accompagna --
+ * altrimenti la ripetizione di sempre, senza carico (nessuno prescritto).
+ *
+ * Non importa il tipo da `queries.ts` apposta: quel file e' `server-only`,
+ * questo lo leggono anche i test, senza database davanti.
+ */
+export function repsDaMostrare(exercise: {
+  reps: string;
+  settimanaCorrente: { reps: string; peso: number } | null;
+}): string {
+  if (!exercise.settimanaCorrente) return exercise.reps;
+  return `${exercise.settimanaCorrente.reps} · ${formatWeight(exercise.settimanaCorrente.peso)} kg`;
+}
+
+/**
  * Accetta sia la virgola sia il punto: sulla tastiera dell'iPhone il
  * separatore decimale italiano e' la virgola.
  */

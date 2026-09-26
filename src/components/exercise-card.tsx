@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import type { WorkoutExercise } from "@/db/schema";
+import type { WorkoutExerciseConSettimana } from "@/lib/queries";
 import {
   caricoPerManubrio,
   confrontaSerie,
   etichettaCarico,
   formatWeight,
   parseWeight,
+  repsDaMostrare,
   suggestNextSet,
   type LoggedSet,
 } from "@/lib/workout";
@@ -29,7 +30,7 @@ export function ExerciseCard({
   puoScendere,
   disabled,
 }: {
-  exercise: WorkoutExercise;
+  exercise: WorkoutExerciseConSettimana;
   sets: LoggedSet[];
   lastTime: LoggedSet[];
   onLog: (weight: number, reps: number) => void;
@@ -42,7 +43,21 @@ export function ExerciseCard({
   disabled: boolean;
 }) {
   const suggestion = suggestNextSet(sets, lastTime);
-  const [weight, setWeight] = useState(suggestion ? formatWeight(suggestion.weight) : "");
+  /*
+   * Il carico di partenza viene dal PT quando c'e' una prescrizione per
+   * questa settimana -- e' quello da caricare oggi, non una stima di quello
+   * che hai fatto l'ultima volta (che magari era la settimana scorsa, con
+   * un carico piu' leggero). Le ripetizioni restano dall'ultima serie: la
+   * prescrizione e' spesso una scaletta ("8-7-7-7", una per serie), non un
+   * numero solo da poter precompilare.
+   */
+  const [weight, setWeight] = useState(
+    exercise.settimanaCorrente
+      ? formatWeight(exercise.settimanaCorrente.peso)
+      : suggestion
+        ? formatWeight(suggestion.weight)
+        : ""
+  );
   const [reps, setReps] = useState(suggestion ? String(suggestion.reps) : "");
   const [error, setError] = useState<string | null>(null);
   // Un finito si riapre per correggere una serie: da li' in poi resta aperto,
@@ -104,7 +119,7 @@ export function ExerciseCard({
       <header className="flex items-baseline justify-between gap-3">
         <h3 className="min-w-0 flex-1 text-[15px] font-semibold leading-snug">{exercise.name}</h3>
         <span className="shrink-0 text-[13px] tabular-nums text-muted">
-          {done}/{planned} × {exercise.reps}
+          {done}/{planned} × {repsDaMostrare(exercise)}
         </span>
       </header>
 
@@ -253,7 +268,7 @@ export function ExerciseCard({
             inputMode="numeric"
             value={reps}
             onChange={(event) => setReps(event.target.value)}
-            placeholder={exercise.reps}
+            placeholder={exercise.settimanaCorrente?.reps ?? exercise.reps}
             aria-label={`Ripetizioni per ${exercise.name}`}
             className="h-11 w-full rounded-xl border border-hairline bg-raised px-3 text-center text-[17px] font-semibold tabular-nums outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
           />

@@ -10,7 +10,8 @@ import {
   restoreSet,
   updateSet,
 } from "@/app/allenamento/actions";
-import type { WorkoutExercise, WorkoutSession as Session } from "@/db/schema";
+import type { WorkoutSession as Session } from "@/db/schema";
+import type { WorkoutExerciseConSettimana } from "@/lib/queries";
 import { newClientId, pendingForSession, type PendingSet } from "@/lib/pending-sets";
 import {
   dequeue,
@@ -58,7 +59,7 @@ export function WorkoutSession({
   session: Session;
   label: string;
   focus: string;
-  exercises: WorkoutExercise[];
+  exercises: WorkoutExerciseConSettimana[];
   sets: LoggedSet[];
   lastTime: Record<number, LoggedSet[]>;
 }) {
