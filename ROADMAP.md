@@ -1343,6 +1343,44 @@ l'«aggiunta dinamica dei prodotti» arriva senza toccare il guscio iOS.
       **La lettura di un codice a barre reale resta da provare su un
       iPhone vero**, con una build IPA: non c'è altro modo di saperlo per
       certo.
+- [x] **Il dialogo della fotocamera fuori dalla shell nativa faceva un po'
+      schifo.** Segnalato a voce. `@capacitor/barcode-scanner`, nel ramo web
+      (fuori dall'app, o se il plugin nativo non parte), disegna da solo un
+      riquadro con sfondo quasi bianco fisso (`#fefefe`), un bordo grigio e
+      una "×" di 28px senza bersaglio — letto nel suo sorgente, non solo
+      visto: ignora lo scuro e le regole di questa app a prescindere da
+      cosa gira intorno. Dentro la shell nativa iOS scansiona invece la
+      fotocamera di sistema (Vision di Apple), che questo punto non tocca.
+
+      Non si può cambiare il markup della libreria (niente `aria-*`, un
+      `<span>` al posto di un `<button>` per chiudere): sistemato quello che
+      il CSS può raggiungere, in `globals.css`. Il riquadro prende i colori
+      di superficie dell'app (bianco in chiaro, `#1c1c1e` in scuro), angoli
+      arrotondati e l'ombra `--shadow-card` come le altre schede; la "×"
+      diventa un bersaglio vero di 44×44px con lo stato attivo della curva
+      `--ease-ios`. Il suo `<style>` viene iniettato nell'head solo al primo
+      tocco su *Scansiona*, quindi dopo il nostro: a parità di specificità
+      avrebbe vinto lui, e i selettori del blocco nuovo passano dall'id del
+      dialogo apposta per stare sempre avanti senza `!important`. Trovato
+      anche un difetto vero della libreria, non nostro: il paragrafo delle
+      istruzioni resta sempre vuoto (`&nbsp;`), il testo che le passiamo
+      (`scanInstructions`) non viene mai scritto dentro — verificato
+      leggendo `web.js` della versione installata. Il testo vero
+      ("Inquadra il codice a barre del prodotto") arriva da un `content`
+      CSS: non è selezionabile, e non tutti i lettori di schermo lo
+      leggono — un limite di questa soluzione, scritto qui e non nascosto.
+
+      Verificato per davvero, non solo letto: Chromium con una fotocamera
+      finta (`--use-fake-device-for-media-stream`, un file `.y4m` sintetico
+      a 1280×720 — sotto ai 576px di altezza richiesti la libreria rifiuta
+      la fotocamera con `OverconstrainedError`, trovato provandolo). Il
+      video parte davvero (`readyState` 4, non in pausa), lo sfondo del
+      riquadro è bianco in chiaro e `rgb(28, 28, 30)` in scuro (letto con
+      `getComputedStyle`, non assunto), il bersaglio della "×" misura
+      44×44px, chiudere e riaprire una seconda volta funziona, e il campo
+      per scrivere il codice a mano resta scrivibile dopo. Contrasto del
+      testo delle istruzioni calcolato: 5,07:1 in chiaro, 6,16:1 in scuro —
+      sopra la soglia di 4,5:1. `npm run e2e`: 162 controlli, tutto a posto.
 
 ### Due cose da sapere prima di scriverne una riga
 
