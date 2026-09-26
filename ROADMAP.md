@@ -1559,9 +1559,61 @@ ancora.
       cancella a cascata lo storico di allenamento (vedi 6-quinquies). Quando
       gli esercizi si archivieranno invece di sparire, anche questo potrà
       diventare automatico.
-- [ ] **Backup di Neon.** Il piano gratuito tiene una finestra di ripristino
-      breve. Un export periodico che finisce da qualche parte è la differenza
-      fra perdere un giorno e perdere tutto.
+- [x] **Backup di Neon.** Fatto (vedi il punto 2, "Non perdere i dati") —
+      questa voce era rimasta doppia dalla prima stesura della roadmap.
+
+## 6-nonies. Non solo un telefono al centro di uno schermo grande
+
+- [x] **Adattarsi al desktop, non solo restare mobile-first.** Segnalato a
+      voce: aperta da un computer, l'app restava un rettangolo largo
+      `max-w-md` (448px) incollato in mezzo allo schermo — la stessa
+      schermata di un telefono, con tutto il resto vuoto intorno.
+
+      Cercato online come fanno le app simili prima di scrivere codice: lo
+      schema che torna è uno solo — un `<nav>` con due forme dallo stesso
+      markup, non due componenti separati da tenere allineati a mano. Sotto
+      una soglia (768px, la stessa che usano queste app: sotto è un
+      telefono) resta la barra in basso; sopra si alza in corsia laterale,
+      icona e etichetta affiancate invece che una sopra l'altra.
+
+      **`TabBar`** è quel `<nav>`: le stesse quattro voci, `md:` le ridispone
+      da riga a colonna e la sposta da `bottom-0` a `left-0`, largo `w-56`
+      (224px). **`layout.tsx`** allarga il contenuto in due passi
+      (`md:max-w-2xl`, `lg:max-w-3xl`) invece che in uno solo — uno schermo
+      enorme con le stesse righe di testo di un telefono sarebbe scomodo da
+      seguire quanto uno stretto, solo nell'altro verso. `globals.css` toglie
+      lo spazio riservato in basso alla barra e lo sposta a sinistra, per la
+      corsia — **solo `body:has(nav)`**, non `body` da solo: sul login la
+      corsia non c'è (niente da navigare prima di essere dentro), e uno
+      spazio a sinistra senza nessuno a giustificarlo spingerebbe la
+      schermata di accesso fuori centro. Misurato prima di scriverlo così:
+      con `body` da solo il riquadro del login finiva a x≈832 su 1440,
+      invece che al centro vero, 720.
+
+      Stessa ragione dietro `UndoToast` e `RestTimer`: sono `fixed inset-x-0`
+      con dentro un `max-w-md` che si centra da solo — a schermo largo si
+      centravano nel mezzo *dell'intero* schermo, non nella colonna di
+      contenuto accanto alla corsia, galleggiando spostati a sinistra.
+      `md:left-56` li allinea alla stessa colonna.
+
+      **Cosa non è cambiato apposta.** Nessun ridisegno delle schermate in
+      griglie multi-colonna da dashboard: i riquadri di Storico, Piano e
+      Allenamento restano a due colonne fisse, verificato che allargare
+      soltanto il contenitore attorno a loro (senza cambiare quante colonne
+      hanno) già li stacca dal "rettangolo di telefono nel vuoto" senza
+      stirarli né lasciarli sparsi. Un vero layout a più colonne è un
+      progetto suo, non incluso qui.
+
+      Verificato nel browser vero: 320/390px (telefono, invariato — barra in
+      basso, nessuna corsia), 1024px (tablet, corsia già attiva) e 1440px
+      (desktop), chiaro e scuro, su tutte e quattro le schermate principali
+      più Alimenti, Fitbit e il login. Il login misurato centrato per
+      davvero (`boundingBox`, non a occhio): centro a 720px su 1440, esatto.
+      L'avviso di annullamento (cancellando un pasto) misurato allineato
+      alla colonna di contenuto, non al centro dello schermo. typecheck,
+      lint, test (466), build a posto. `npm run e2e`: 162 controlli, tutto a
+      posto (le prove restano tutte a 320/390px, il telefono non è
+      cambiato).
 
 ## 7. Cose che restano fuori, di proposito
 

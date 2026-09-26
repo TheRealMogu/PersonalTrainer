@@ -229,6 +229,26 @@ body {
   padding-bottom: calc(6rem + env(safe-area-inset-bottom));
 }
 
+/*
+ * Da tablet in su (`TabBar` passa da barra in basso a corsia laterale,
+ * `md:w-56`): niente più spazio da lasciare sotto, e a sinistra la larghezza
+ * della corsia -- altrimenti il contenuto ci finirebbe sotto. La stessa
+ * soglia di `TabBar`: le due cose devono cambiare insieme, o la corsia
+ * resta ma lo spazio per lei no (o viceversa).
+ *
+ * `body:has(nav)` e non `body` da solo: sul login `TabBar` non c'e' proprio
+ * (niente da navigare prima di essere dentro), e uno spazio a sinistra senza
+ * la corsia che lo giustifica spingerebbe la schermata di accesso fuori
+ * centro -- misurato, non immaginato: a 1440px il riquadro finiva a x≈832
+ * invece che al centro vero, 720.
+ */
+@media (min-width: 768px) {
+  body:has(nav) {
+    padding-bottom: 0;
+    padding-left: 14rem;
+  }
+}
+
 /* Niente zoom automatico di Safari sugli input sotto i 16px. */
 input,
 select,
