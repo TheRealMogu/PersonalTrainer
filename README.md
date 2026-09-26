@@ -236,6 +236,36 @@ Se preferisci applicarle dalla tua macchina resta possibile:
 npm run db:migrate
 ```
 
+### Backup automatico
+
+Il piano gratuito di Neon tiene solo **6 ore** di storia per il ripristino a
+un istante preciso — non giorni. Passata quella finestra, l'unico modo di
+tornare indietro è un dump fatto da fuori. Il workflow **Backup**
+(`.github/workflows/backup.yml`) ne fa uno cifrato ogni notte, tenuto come
+allegato del workflow — cifrato perché la repo è pubblica, e un allegato lo
+scarica chiunque.
+
+Perché funzioni servono due segreti (**Settings → Secrets and variables →
+Actions**): `DATABASE_URL`, lo stesso già usato da *Migrazioni*, e uno
+nuovo:
+
+- Nome: `BACKUP_PASSPHRASE`
+- Valore: una frase lunga a piacere, generata per esempio con
+  `openssl rand -base64 32` — **conservala altrove** (un gestore di
+  password), perché senza non si decifra più niente, nemmeno tu.
+
+Senza uno dei due il workflow non fallisce: lo scrive nel riepilogo e non
+carica niente. Si può lanciare anche a mano da **Actions → Backup → Run
+workflow**, senza aspettare la notte.
+
+Per ripristinare un backup: scaricalo da **Actions → Backup → (una
+esecuzione) → Artifacts**, poi
+
+```bash
+gpg --decrypt --passphrase "LA_TUA_FRASE" -o backup.sql backup-AAAA-MM-GG.sql.gpg
+psql "$DATABASE_URL" -f backup.sql
+```
+
 ## 5. Metterla sull'iPhone
 
 L'obiettivo è un'**app vera** (`.ipa`) installata sul telefono, non un

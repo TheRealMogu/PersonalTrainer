@@ -76,8 +76,22 @@ Finché l'app vive solo sul computer, tutto il resto è teoria.
 Oggi il database non ha rete di sicurezza. Per un diario che accumula mesi di
 storia è la lacuna più grave dopo il punto 1.
 
-- [ ] **Backup automatico.** Neon ha lo storico dei rami; va verificato che
-      sia attivo sul piano gratuito e documentato come si recupera.
+- [x] **Backup automatico.** Verificato: sul piano gratuito Neon tiene solo
+      **6 ore** di storia per il ripristino a un istante preciso, non giorni
+      — troppo poco per un diario che accumula mesi. Fatto un backup vero e
+      indipendente: il workflow *Backup* fa un `pg_dump` ogni notte, lo
+      cifra con una frase segreta (`gpg --symmetric`, AES256) e lo tiene come
+      allegato del workflow per 35 giorni. Cifrato perché la repo è pubblica:
+      un allegato di workflow lo scarica chiunque, e dentro ci sono pasti e
+      peso di una persona sola. Come *Migrazioni*, gira solo su schedule e a
+      mano, mai su pull_request — non eredita mai i segreti di una PR
+      esterna. Documentato in README come impostare `BACKUP_PASSPHRASE` e
+      come ripristinare.
+
+      Provato per davvero: dump del database locale, cifrato e decifrato di
+      nuovo — il file che esce è identico byte per byte a quello originale.
+      Il workflow in sé non è stato ancora visto girare su GitHub: serve il
+      segreto `BACKUP_PASSPHRASE`, che tocca a te aggiungere.
 - [x] **Export dei dati.** Fatto. Piano → *I tuoi dati*: copia completa in
       JSON, oppure pasti e allenamenti in CSV che si aprono in Excel. Il CSV
       esce con BOM e CRLF, altrimenti Excel rompe le accentate. Provato
@@ -1423,12 +1437,14 @@ giornate, l'ultima è la più grossa di tutta la roadmap.
       finisce già l'acqua (632 px), quindi non è una cosa che introducono gli
       integratori: è la prima schermata che è lunga. Vale un giro a parte, non
       un rattoppo qui.
-- [ ] **La prima schermata su un telefono corto.** Misurato su 320×568:
+- [x] **La prima schermata su un telefono corto.** Misurato su 320×568:
       l'acqua finisce a 632 px e gli integratori a 804, quindi entrambi
-      chiedono uno scorrimento che su 390×844 non serve. Non è un bug di una
-      singola scheda, è la somma: giorno, striscia, anello, tre riquadri,
-      acqua, integratori. Da guardare quando si sa su che telefono gira
-      davvero — se è un 844, non c'è niente da riparare.
+      chiedono uno scorrimento che su 390×844 non serve. Non era un bug di
+      una singola scheda, era la somma: giorno, striscia, anello, tre
+      riquadri, acqua, integratori. Chiesto (26 settembre) su che telefono
+      gira davvero: uno standard o più grande, quindi 844px o più. Chiuso
+      senza toccare codice — la misura di 320×568 non riguarda questo
+      telefono.
 - [x] **Allenamento modificabile.** Fatto, e il nodo era davvero quello
       previsto: `ON DELETE CASCADE` fra serie ed esercizi. Risolto con
       `archiviato_il` invece che con una pulizia fatta bene — uno schema in
