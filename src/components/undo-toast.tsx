@@ -35,7 +35,10 @@ export function UndoToast({
   return (
     <div
       role="status"
-      className="fixed inset-x-0 z-20 px-5"
+      // `md:left-56` per non centrarsi sotto la corsia laterale (`TabBar`,
+      // stessa larghezza): senza, a schermo largo il messaggio galleggiava
+      // spostato a sinistra del contenuto invece che sopra di lui.
+      className="fixed inset-x-0 z-20 px-5 md:left-56"
       /*
         `distanzaRem` serve quando in fondo c'e' gia' qualcos'altro: in
         palestra il timer di recupero sta nello stesso punto, e senza spostare

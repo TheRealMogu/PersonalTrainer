@@ -43,7 +43,17 @@ export default function RootLayout({
   return (
     <html lang="it">
       <body className="font-sans antialiased">
-        <div className="mx-auto w-full max-w-md px-5">{children}</div>
+        {/*
+          `max-w-md` da solo, su qualunque schermo, e' la ragione per cui
+          segnalato "resta un telefono anche da desktop": un rettangolo
+          stretto in mezzo a un monitor vuoto. Da tablet in su (`md:`, la
+          stessa soglia di `TabBar`) si allarga in due passi, non uno solo --
+          uno schermo enorme con lo stesso contenuto di oggi diventerebbe
+          righe di testo lunghissime da seguire, non "adattato".
+        */}
+        <div className="mx-auto w-full max-w-md px-5 md:max-w-2xl md:px-8 lg:max-w-3xl">
+          {children}
+        </div>
         <TabBar />
         <ServiceWorkerRegister />
         {/*

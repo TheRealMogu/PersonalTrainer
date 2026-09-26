@@ -38,7 +38,9 @@ export function RestTimer({ onClose }: { onClose: () => void }) {
       La zona viva e' solo la riga di stato, che cambia una volta sola.
     */
     <div
-      className="fixed inset-x-0 z-20 px-5"
+      // `md:left-56`: stesso motivo di `UndoToast`, per non centrarsi sotto
+      // la corsia laterale a schermo largo.
+      className="fixed inset-x-0 z-20 px-5 md:left-56"
       style={{ bottom: "calc(4.25rem + env(safe-area-inset-bottom))" }}
     >
       <div className="mx-auto w-full max-w-md animate-barra overflow-hidden rounded-2xl bg-overlay/95 text-on-overlay shadow-lg backdrop-blur">
