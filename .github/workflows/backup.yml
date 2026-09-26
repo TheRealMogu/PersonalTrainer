@@ -1,0 +1,84 @@
+name: Backup
+
+# Un dump del database una volta al giorno, cifrato, tenuto come allegato
+# del workflow.
+#
+# Il piano gratuito di Neon tiene solo 6 ore di storia per il ripristino a un
+# istante preciso (punto-in-tempo), non giorni: passata quella finestra, un
+# problema sul database si ripara solo con un dump fatto da fuori. Questo lo
+# fa da solo, ogni giorno, cosi' il danno peggiore possibile e' perdere un
+# giorno di diario, non tutto.
+#
+# Cifrato perche' la repo e' pubblica: un allegato di workflow su una repo
+# pubblica lo puo' scaricare chiunque, e dentro ci sono i pasti e il peso di
+# una persona sola. Senza la frase segreta il file e' inutile.
+#
+# Come migrazioni.yml, gira solo su schedule e a mano (mai su pull_request):
+# uno scheduled workflow non eredita mai i segreti di una PR esterna, quindi
+# e' sicuro a prescindere da chi ha aperto una PR.
+on:
+  schedule:
+    # 03:14 UTC: fuori dagli orari di punta di GitHub Actions, e non
+    # sull'ora esatta per lo stesso motivo per cui altrove in questo repo si
+    # evitano gli orari tondi.
+    - cron: "14 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: I segreti ci sono?
+        id: segreti
+        env:
+          DB: ${{ secrets.DATABASE_URL }}
+          FRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$DB" ]; then
+            echo "::warning::DATABASE_URL non è fra i segreti del repo: nessun backup. Settings → Secrets and variables → Actions → New repository secret."
+            echo "presenti=no" >> "$GITHUB_OUTPUT"
+          elif [ -z "$FRASE" ]; then
+            echo "::warning::BACKUP_PASSPHRASE non è fra i segreti del repo: nessun backup finché non c'è una frase per cifrarlo. Settings → Secrets and variables → Actions → New repository secret."
+            echo "presenti=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "presenti=si" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Dump e cifratura
+        if: steps.segreti.outputs.presenti == 'si'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          data="$(date -u +%Y-%m-%d)"
+          pg_dump "$DATABASE_URL" --no-owner --no-privileges -f "backup-$data.sql"
+          gpg --batch --yes --symmetric --cipher-algo AES256 \
+            --passphrase "$BACKUP_PASSPHRASE" \
+            -o "backup-$data.sql.gpg" "backup-$data.sql"
+          rm "backup-$data.sql"
+          echo "NOME_FILE=backup-$data.sql.gpg" >> "$GITHUB_ENV"
+
+      - name: Carica il backup cifrato
+        if: steps.segreti.outputs.presenti == 'si'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NOME_FILE }}
+          path: ${{ env.NOME_FILE }}
+          # Un mese abbondante: il piano gratuito di Neon copre solo le
+          # ultime 6 ore, quindi qui serve una finestra molto più larga.
+          retention-days: 35
+
+      - name: Riepilogo
+        run: |
+          if [ "${{ steps.segreti.outputs.presenti }}" = "si" ]; then
+            echo "Backup cifrato caricato come allegato del workflow." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Saltato: manca un segreto (vedi il warning sopra)." >> "$GITHUB_STEP_SUMMARY"
+          fi
