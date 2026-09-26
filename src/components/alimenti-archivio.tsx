@@ -88,7 +88,9 @@ export function AlimentiArchivio({ foods }: { foods: QuickFood[] }) {
     setErrore(null);
     startTransition(async () => {
       const esito =
-        id === "nuovo" ? await addQuickFood(input) : await updateQuickFood(id, input);
+        id === "nuovo"
+          ? await addQuickFood(input)
+          : await updateQuickFood(id, input);
       if (!esito.ok) {
         setErrore(esito.error);
         return;
@@ -103,8 +105,8 @@ export function AlimentiArchivio({ foods }: { foods: QuickFood[] }) {
       <Card>
         {ottimistici.length === 0 ? (
           <p className="text-[15px] leading-snug text-muted">
-            L&apos;archivio è vuoto. Aggiungi il primo alimento qui sotto, oppure
-            registra un pasto nel diario e salvalo fra i tasti rapidi.
+            L&apos;archivio è vuoto. Aggiungi il primo alimento qui sotto,
+            oppure registra un pasto nel diario e salvalo fra i tasti rapidi.
           </p>
         ) : (
           <ul className="divide-y divide-hairline">
@@ -131,15 +133,20 @@ export function AlimentiArchivio({ foods }: { foods: QuickFood[] }) {
                     className="flex min-h-11 w-full items-center gap-3 rounded-lg text-left tocco active:bg-raised"
                   >
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[15px] font-medium">{food.name}</span>
+                      <span className="block truncate text-[15px] font-medium">
+                        {food.name}
+                      </span>
                       <span className="block truncate text-[13px] tabular-nums text-muted">
                         {food.portion ? `${food.portion} · ` : ""}
-                        {food.kcal} kcal · C {formatMacro(food.carbs, "carbs")} · P{" "}
-                        {formatMacro(food.protein, "protein")} · G{" "}
+                        {food.kcal} kcal · C {formatMacro(food.carbs, "carbs")}{" "}
+                        · P {formatMacro(food.protein, "protein")} · G{" "}
                         {formatMacro(food.fat, "fat")}
                       </span>
                     </span>
-                    <span aria-hidden="true" className="shrink-0 text-[13px] text-reference">
+                    <span
+                      aria-hidden="true"
+                      className="shrink-0 text-[13px] text-reference"
+                    >
                       ›
                     </span>
                   </button>
@@ -212,7 +219,7 @@ function Scheda({
           onChange={(e) => setValori((v) => ({ ...v, name: e.target.value }))}
           maxLength={120}
           autoFocus
-          placeholder="Es. Yogurt greco Fage 0%"
+          placeholder="Es. Yogurt greco 0%"
           className="min-h-11 w-full rounded-xl border border-hairline bg-raised px-3 py-2.5 outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
         />
       </label>
@@ -224,7 +231,9 @@ function Scheda({
         <input
           type="text"
           value={valori.portion ?? ""}
-          onChange={(e) => setValori((v) => ({ ...v, portion: e.target.value }))}
+          onChange={(e) =>
+            setValori((v) => ({ ...v, portion: e.target.value }))
+          }
           maxLength={80}
           placeholder="Es. 170 g, oppure 2 fette"
           className="min-h-11 w-full rounded-xl border border-hairline bg-raised px-3 py-2.5 outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
@@ -282,7 +291,8 @@ function Scheda({
       <p className="mt-3 text-[13px] leading-snug text-muted">
         I valori sono quelli di una porzione. Cambiarli non tocca i pasti già
         registrati: quando aggiungi un alimento al diario i numeri vengono
-        copiati nella riga del pasto, quindi la colazione di marzo resta com&apos;era.
+        copiati nella riga del pasto, quindi la colazione di marzo resta
+        com&apos;era.
       </p>
     </div>
   );

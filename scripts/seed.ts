@@ -1,8 +1,14 @@
 import "./load-env";
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { isNull, sql } from "drizzle-orm";
 import { db } from "../src/db";
-import { quickFoods, workoutDays, workoutExercises, workoutSets } from "../src/db/schema";
-import { QUICK_FOODS_SEED, WORKOUT_SEED } from "../src/lib/seed-data";
+import {
+  quickFoods,
+  workoutDays,
+  workoutExercises,
+  workoutSets,
+} from "../src/db/schema";
 
 /*
  * Il collegamento arriva da `src/db`, lo stesso che usa l'app, invece di
@@ -10,14 +16,52 @@ import { QUICK_FOODS_SEED, WORKOUT_SEED } from "../src/lib/seed-data";
  * funziona anche contro un Postgres normale -- in locale e sulla macchina
  * della CI, dove Neon non si deve nemmeno provare a raggiungerla.
  */
+
 async function main() {
+  /*
+   * `seed-data.ts` conteneva i tuoi cibi veri e il nome della tua scheda --
+   * dati personali in un file pubblico. Ora e' `seed-data.local.ts`, che non
+   * e' tracciato da git (vedi `.gitignore`): se non lo trova sul disco, come
+   * capita su una clonazione nuova o in CI, usa `seed-data.example.ts`, che
+   * e' quello pubblico. Un `existsSync` esplicito e non un
+   * import-provato-e-preso: un errore vero dentro il file locale (una
+   * virgola sbagliata) deve fermare lo script, non passare inosservato come
+   * "file assente". L'import resta dentro `main`: il file e' CommonJS (niente
+   * `"type": "module"` in `package.json`), e un `await` fuori da una
+   * funzione non ci compila.
+   */
+  const usaLocale = existsSync(
+    path.resolve(import.meta.dirname, "../src/lib/seed-data.local.ts"),
+  );
+  if (!usaLocale) {
+    console.log(
+      "Nessun src/lib/seed-data.local.ts: uso i dati d'esempio (src/lib/seed-data.example.ts).",
+    );
+  }
+  /*
+   * Il percorso passa da una variabile e non da una stringa letterale
+   * apposta: con la stringa letterale `tsc` prova a risolvere il modulo
+   * anche quando non serve (il ramo "locale" quando gira in CI, dove
+   * seed-data.local.ts non esiste per davvero) e la build fallisce con
+   * "Cannot find module". Il tipo delle due forme è lo stesso, quindi il
+   * cast su quella d'esempio -- che invece è sempre presente -- resta
+   * preciso.
+   */
+  const percorso = usaLocale
+    ? "../src/lib/seed-data.local"
+    : "../src/lib/seed-data.example";
+  const { QUICK_FOODS_SEED, WORKOUT_SEED } = (await import(
+    percorso
+  )) as typeof import("../src/lib/seed-data.example");
 
   // I tasti rapidi non sono riferiti da nessuno: si possono sempre rifare.
   console.log(`Ricarico ${QUICK_FOODS_SEED.length} tasti rapidi…`);
   await db.delete(quickFoods);
-  await db.insert(quickFoods).values(
-    QUICK_FOODS_SEED.map((food, index) => ({ ...food, sortOrder: index })),
-  );
+  await db
+    .insert(quickFoods)
+    .values(
+      QUICK_FOODS_SEED.map((food, index) => ({ ...food, sortOrder: index })),
+    );
 
   /*
    * Le serie registrate puntano agli esercizi con ON DELETE CASCADE, quindi
