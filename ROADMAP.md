@@ -771,6 +771,39 @@ leggibile qualcosa che oggi non lo è.
       l'intestazione resta a `top: 0px` durante lo scorrimento (misurato,
       non assunto) e il font passa da 34px a 17px; nessuno scorrimento
       orizzontale introdotto. `npm run e2e`: 144 controlli, tutto a posto.
+
+      **Seguito (26 settembre): rimbalzava proprio mentre si restringeva.**
+      Segnalato a voce ("comincia a glicciare quando deve ridursi"). Non un
+      problema del codice di `PageHeader`, ma del browser: mentre
+      l'intestazione si restringe, la sua altezza cambia esattamente nella
+      zona visibile se sei fermo a pochi pixel dall'inizio — sotto la sua
+      stessa altezza. L'"ancoraggio dello scorrimento", la funzione nativa
+      che tiene ferma a schermo la cosa che il browser pensa tu stia
+      guardando quando un contenuto sopra cambia dimensione, interpretava
+      quel restringersi come un contenuto che sparisce e riportava lo
+      scroll a 0 da solo per compensare — il che rimandava l'intestazione
+      grande, che si restringeva di nuovo: un rimbalzo vero, non
+      immaginato.
+
+      Misurato prima di scrivere una riga: uno `scroll` a 40px generava un
+      secondo evento `scroll` con `scrollY` tornato a 0 circa 25ms dopo, mai
+      un tocco dell'utente. Corretto con `overflow-anchor: none` — ma sul
+      documento intero, in `globals.css`, non sulla sola intestazione:
+      provato prima lì, da solo non bastava, perché il browser sceglie come
+      "ancora" un nodo qualunque nella zona visibile, non necessariamente
+      l'intestazione stessa. Il costo è onesto e scritto lì: sparisce anche
+      l'utilità vera dell'ancoraggio altrove (un contenuto che cambia
+      altezza sopra quello che stai leggendo non tiene più ferma la riga a
+      schermo) — in questa app oggi non c'è un caso così, ma se comparisse
+      andrebbe riconsiderato da lì.
+
+      Riverificato con lo stesso tracciamento su tutte e quattro le
+      schermate con `PageHeader` (Diario, Piano, Allenamento, Storico): un
+      solo evento di scroll, fermo al valore vero, nessun rimbalzo.
+      Screenshot a metà della transizione (100ms su 200) e a fine
+      transizione, 320/390px chiaro/scuro: niente stati a metà rotti.
+      typecheck, lint, test, build a posto. `npm run e2e`: 162 controlli,
+      tutto a posto.
 - [ ] **Un "+" che apre i modi di registrare.** Oggi i tasti rapidi sono in
       fondo al diario: da valutare solo se il conteggio dei tocchi migliora,
       altrimenti è decorazione.

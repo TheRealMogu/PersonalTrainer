@@ -200,6 +200,28 @@ body {
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
+  /*
+   * L'"ancoraggio dello scorrimento" del browser spento su tutto il
+   * documento -- non basta sulla sola intestazione, provato: quando
+   * l'intestazione di una schermata (`PageHeader`) si restringe scorrendo,
+   * la sua altezza cambia proprio nella zona visibile mentre sei fermo a
+   * pochi pixel dall'inizio, sotto la sua stessa altezza. Il browser prova
+   * a tenere ferma a schermo la cosa su cui pensa tu stia guardando e
+   * riporta da solo lo scroll a 0 per compensare -- il che rimanda
+   * l'intestazione grande, che si restringe di nuovo: un rimbalzo visibile,
+   * non un tocco dell'utente. Misurato: uno `scroll` a 40px generava un
+   * secondo evento a scrollY 0 circa 25ms dopo. `overflow-anchor: none`
+   * sull'intestazione da sola non bastava -- il browser sceglie come
+   * "ancora" un nodo qualunque nella zona visibile, non necessariamente
+   * l'intestazione stessa -- va spento sul contenitore che scorre.
+   *
+   * Il costo: sparisce anche la sua utilita' vera altrove (un contenuto che
+   * cambia altezza sopra quello che stai leggendo non tiene piu' ferma la
+   * riga a schermo). In questa app non c'e' un caso cosi' oggi -- niente
+   * immagini che caricano in ritardo, le liste si disegnano gia' intere --
+   * ma se un giorno comparisse, si riconsidera qui.
+   */
+  overflow-anchor: none;
 }
 
 body {
